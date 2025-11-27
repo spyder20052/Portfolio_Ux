@@ -37,55 +37,26 @@
             color: var(--text-main);
             overflow: hidden;
             cursor: none;
+            touch-action: none; /* Prevent pull-to-refresh on mobile */
             transition: background-color 1.5s cubic-bezier(0.4, 0, 0.2, 1), color 1.5s ease;
         }
 
         /* --- LIGHT MODE OVERRIDES --- */
-        body.light-mode {
-            background-color: var(--bg-light);
-            color: var(--text-light);
-        }
-
-        /* Text Visibility Fixes for Light Mode */
+        body.light-mode { background-color: var(--bg-light); color: var(--text-light); }
         .ui-text-dim { color: var(--text-dim); transition: color 1s ease; }
         body.light-mode .ui-text-dim { color: var(--text-light-dim); }
-
         .ui-text-accent { color: var(--neon-cyan); transition: color 1s ease; }
-        body.light-mode .ui-text-accent { color: #8C7B6D; font-weight: bold; } /* Darker gold for readability */
-
-        body.light-mode .hero-title {
-            color: var(--text-light);
-            text-shadow: 0 0 10px rgba(0,0,0,0.1); 
-            mix-blend-mode: multiply;
-        }
-        
-        body.light-mode .hero-title:hover {
-            color: #000;
-            text-shadow: 0 0 20px rgba(0,0,0,0.2);
-        }
-
-        body.light-mode .hud-nav {
-            background: rgba(255, 255, 255, 0.6);
-            border-color: rgba(0, 0, 0, 0.1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            backdrop-filter: blur(15px);
-        }
-
+        body.light-mode .ui-text-accent { color: #8C7B6D; font-weight: bold; }
+        body.light-mode .hero-title { color: var(--text-light); text-shadow: 0 0 10px rgba(0,0,0,0.1); mix-blend-mode: multiply; }
+        body.light-mode .hero-title:hover { color: #000; text-shadow: 0 0 20px rgba(0,0,0,0.2); }
+        body.light-mode .hud-nav { background: rgba(255, 255, 255, 0.6); border-color: rgba(0, 0, 0, 0.1); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); backdrop-filter: blur(15px); }
         body.light-mode .hud-btn { color: #444; }
         body.light-mode .hud-btn:hover { color: #000; border-color: #000; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
         body.light-mode .hud-btn.active { background-color: #333; color: white; }
-
-        body.light-mode #custom-cursor {
-            border-color: #111;
-            background-color: rgba(0,0,0,0.05);
-            mix-blend-mode: normal;
-        }
-
+        body.light-mode #custom-cursor { border-color: #111; background-color: rgba(0,0,0,0.05); mix-blend-mode: normal; }
         body.light-mode .tech-ring { border-color: rgba(0,0,0,0.1); }
         body.light-mode .ring-inner { border-color: rgba(0,0,0,0.3); }
-        
         body.light-mode .hero-subtitle { color: #555; font-weight: bold; }
-        
         body.light-mode .layer-base { border-color: #333; }
 
         /* --- UI LAYER --- */
@@ -95,92 +66,73 @@
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             opacity: 0; transform: translateY(20px);
             transition: opacity 1.5s ease, transform 1.5s ease-out;
+            padding-bottom: 2rem; /* Space for desktop HUD */
         }
         #ui-layer.visible { opacity: 1; transform: translateY(0); }
         #ui-layer.blurred { opacity: 0.2; filter: blur(5px); pointer-events: none; }
 
-        /* --- TOGGLE BUTTONS (Theme & Lang) --- */
+        /* --- TOGGLE BUTTONS --- */
         .toggle-container {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            display: flex;
-            gap: 1rem;
-            z-index: 60;
-            pointer-events: auto;
+            position: fixed; bottom: 2rem; right: 2rem;
+            display: flex; gap: 1rem; z-index: 60; pointer-events: auto;
+            transition: all 0.5s ease;
         }
 
         .ctrl-btn {
             width: 44px; height: 44px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-            backdrop-filter: blur(5px);
-            background: rgba(0,0,0,0.2);
-            font-family: var(--font-tech);
-            font-size: 0.8rem;
-            color: white;
+            cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            backdrop-filter: blur(5px); background: rgba(0,0,0,0.2);
+            font-family: var(--font-tech); font-size: 0.8rem; color: white;
         }
-
-        body.light-mode .ctrl-btn {
-            border-color: rgba(0, 0, 0, 0.1);
-            background: rgba(255, 255, 255, 0.6);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
-            color: #111;
-        }
-
+        body.light-mode .ctrl-btn { border-color: rgba(0, 0, 0, 0.1); background: rgba(255, 255, 255, 0.6); box-shadow: 0 5px 15px rgba(0,0,0,0.05); color: #111; }
         .ctrl-btn:hover { transform: scale(1.1); }
-        #theme-toggle:hover { transform: scale(1.1) rotate(15deg); }
-
         .icon-sun, .icon-moon { position: absolute; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
         .icon-sun { opacity: 0; transform: scale(0.5) rotate(-90deg); }
         .icon-moon { opacity: 1; transform: scale(1) rotate(0deg); }
-
         body.light-mode .icon-sun { opacity: 1; transform: scale(1) rotate(0deg); color: #111; }
         body.light-mode .icon-moon { opacity: 0; transform: scale(0.5) rotate(90deg); }
 
-        /* --- TYPOGRAPHY & EFFECTS --- */
+        /* --- TYPOGRAPHY --- */
         .hero-title {
-            font-family: var(--font-hero); font-size: clamp(3rem, 10vw, 8rem); font-weight: 700;
-            text-transform: uppercase; line-height: 0.9; text-align: center;
+            font-family: var(--font-hero); font-size: clamp(2.5rem, 8vw, 8rem); /* Adjusted clamp for mobile */
+            font-weight: 700; text-transform: uppercase; line-height: 0.9; text-align: center;
             mix-blend-mode: normal; pointer-events: auto; position: relative;
             text-shadow: 0 0 20px rgba(196, 167, 125, 0.3); z-index: 20; cursor: default;
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
-        .hero-title:hover {
-            letter-spacing: 0.15em; color: #ffffff;
-            text-shadow: 0 0 30px rgba(196, 167, 125, 0.8), 0 0 60px rgba(196, 167, 125, 0.4);
-            transform: scale(1.05);
-        }
-        /* Fix hover color in Light Mode to stay dark/contrasted */
+        .hero-title:hover { letter-spacing: 0.15em; color: #ffffff; text-shadow: 0 0 30px rgba(196, 167, 125, 0.8), 0 0 60px rgba(196, 167, 125, 0.4); transform: scale(1.05); }
         body.light-mode .hero-title:hover { color: #111; text-shadow: 0 0 30px rgba(0,0,0,0.2); }
 
-        .profile-wrapper { position: relative; width: 260px; height: 260px; margin-bottom: 3rem; perspective: 1000px; pointer-events: auto; cursor: pointer; z-index: 30; }
+        /* --- PROFILE WRAPPER (Responsive) --- */
+        .profile-wrapper { 
+            position: relative; width: 260px; height: 260px; margin-bottom: 3rem; 
+            perspective: 1000px; pointer-events: auto; cursor: pointer; z-index: 30; 
+        }
         .profile-core { position: relative; width: 100%; height: 100%; border-radius: 50%; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .glitch-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background-image: url('Spynel P KOUTON.jpg'); background-size: cover; background-position: center; opacity: 1; transition: all 0.3s ease; }
         .layer-base { z-index: 10; border: 2px solid var(--neon-cyan); overflow: hidden; }
-        body.light-mode .layer-base { border-color: #333; }
         .layer-red { z-index: 9; opacity: 0; mix-blend-mode: screen; filter: hue-rotate(90deg); transform: translate(-5px, 0); }
         .layer-blue { z-index: 8; opacity: 0; mix-blend-mode: screen; filter: hue-rotate(-90deg); transform: translate(5px, 0); }
         .scanner-beam { position: absolute; top: -100%; left: 0; width: 100%; height: 20px; background: rgba(196, 167, 125, 0.8); box-shadow: 0 0 15px var(--neon-cyan); z-index: 15; animation: scan 3s linear infinite; opacity: 0.5; }
         @keyframes scan { 0% { top: -20%; opacity: 0; } 10% { opacity: 0.8; } 90% { opacity: 0.8; } 100% { top: 120%; opacity: 0; } }
         
         .tech-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 50%; border: 1px dashed rgba(196, 167, 125, 0.3); pointer-events: none; transition: all 0.5s ease; }
-        .ring-inner { width: 290px; height: 290px; border-style: solid; border-width: 1px; border-color: rgba(196, 167, 125, 0.5); animation: spin-slow 10s linear infinite; }
-        .ring-outer { width: 340px; height: 340px; border-style: dashed; animation: spin-reverse 15s linear infinite; }
+        .ring-inner { width: 110%; height: 110%; border-style: solid; border-width: 1px; border-color: rgba(196, 167, 125, 0.5); animation: spin-slow 10s linear infinite; }
+        .ring-outer { width: 130%; height: 130%; border-style: dashed; animation: spin-reverse 15s linear infinite; }
         @keyframes spin-slow { to { transform: translate(-50%, -50%) rotate(360deg); } }
         @keyframes spin-reverse { to { transform: translate(-50%, -50%) rotate(-360deg); } }
-        .profile-wrapper:hover .profile-core { transform: scale(1.1); }
-        .profile-wrapper:hover .layer-red { opacity: 0.6; animation: glitch-anim-1 2s infinite linear alternate-reverse; }
-        .profile-wrapper:hover .layer-blue { opacity: 0.6; animation: glitch-anim-2 2s infinite linear alternate-reverse; }
-        .profile-wrapper:hover .tech-ring { border-color: var(--neon-cyan); box-shadow: 0 0 20px rgba(196, 167, 125, 0.2); }
+        
+        /* Hover/Active States */
+        .profile-wrapper.active-touch .profile-core, .profile-wrapper:hover .profile-core { transform: scale(1.1); }
+        .profile-wrapper.active-touch .layer-red, .profile-wrapper:hover .layer-red { opacity: 0.6; animation: glitch-anim-1 2s infinite linear alternate-reverse; }
+        .profile-wrapper.active-touch .layer-blue, .profile-wrapper:hover .layer-blue { opacity: 0.6; animation: glitch-anim-2 2s infinite linear alternate-reverse; }
+        .profile-wrapper.active-touch .tech-ring, .profile-wrapper:hover .tech-ring { border-color: var(--neon-cyan); box-shadow: 0 0 20px rgba(196, 167, 125, 0.2); }
         @keyframes glitch-anim-1 { 0% { transform: translate(-2px, 0); } 100% { transform: translate(-6px, 2px); } }
         @keyframes glitch-anim-2 { 0% { transform: translate(2px, 0); } 100% { transform: translate(6px, -2px); } }
-        .profile-wrapper:hover ~ .hero-title, .profile-wrapper:hover ~ .hero-subtitle { opacity: 0.3; filter: blur(4px); transform: scale(0.95); }
 
-        .hero-subtitle { font-family: var(--font-tech); color: var(--neon-lime); margin-top: 1rem; font-size: clamp(0.8rem, 1.5vw, 1.2rem); letter-spacing: 2px; pointer-events: auto; transition: all 0.3s; }
+        .hero-subtitle { font-family: var(--font-tech); color: var(--neon-lime); margin-top: 1rem; font-size: clamp(0.7rem, 1.5vw, 1.2rem); letter-spacing: 2px; pointer-events: auto; transition: all 0.3s; text-align: center; padding: 0 1rem; }
         
         #custom-cursor { position: fixed; top: 0; left: 0; width: 40px; height: 40px; border: 2px solid var(--neon-cyan); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 9999; transition: width 0.2s, height 0.2s, background-color 0.2s; mix-blend-mode: difference; display: block; }
         #custom-cursor.active { width: 80px; height: 80px; background-color: rgba(196, 167, 125, 0.1); border-color: var(--neon-lime); }
@@ -208,13 +160,36 @@
         @keyframes load { to { width: 100%; } }
         #flash-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; pointer-events: none; opacity: 0; z-index: 100; mix-blend-mode: screen; }
 
+        /* --- MOBILE OPTIMIZATIONS --- */
         @media (max-width: 768px) {
-            .hud-nav { width: 90%; justify-content: space-between; bottom: 1.5rem; }
+            /* Move Toggles to Top to clear HUD */
+            .toggle-container { bottom: auto; top: 1.5rem; right: 1.5rem; }
+            
+            /* Adjust Profile Size for Mobile */
+            .profile-wrapper { width: 200px; height: 200px; margin-bottom: 2rem; }
+            
+            /* Adjust HUD Nav for Mobile Thumb Zone */
+            .hud-nav { 
+                width: 95%; 
+                justify-content: space-between; 
+                bottom: 1.5rem; 
+                padding: 0.5rem;
+            }
+            .hud-btn { 
+                padding: 0.8rem 0.5rem; 
+                font-size: 0.65rem; 
+                flex: 1; 
+                text-align: center;
+            }
+            
+            /* Hide Desktop Decor */
             #custom-cursor { display: none !important; }
-            .profile-wrapper { width: 180px; height: 180px; }
-            .ring-inner { width: 200px; height: 200px; }
-            .ring-outer { width: 240px; height: 240px; }
-            .toggle-container { bottom: 6rem; right: 1.5rem; }
+            
+            /* Ensure Content Fits */
+            #ui-layer { padding-bottom: 5rem; }
+            
+            /* Larger touch targets */
+            .ctrl-btn { width: 50px; height: 50px; }
         }
     </style>
 </head>
@@ -222,12 +197,9 @@
 
     <div id="flash-overlay"></div>
 
-    <!-- TOGGLE BUTTONS (Theme & Language) -->
+    <!-- TOGGLE BUTTONS -->
     <div class="toggle-container">
-        <!-- Lang Toggle -->
         <div class="ctrl-btn" id="lang-toggle" onclick="toggleLanguage()">EN</div>
-        
-        <!-- Theme Toggle -->
         <div class="ctrl-btn" id="theme-toggle" onclick="toggleTheme()">
             <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C4A77D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
             <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
@@ -242,7 +214,6 @@
     <div id="custom-cursor"></div>
     <div id="canvas-container" class="fixed inset-0 z-0"></div>
 
-    <!-- HOLOGRAPHIC PROFILE MODULE -->
     <div id="profile-module">
         <div class="holo-card" id="holo-card">
             <div class="close-holo" onclick="toggleProfile(false)">[X] TERMINATE</div>
@@ -266,7 +237,7 @@
 
     <div id="ui-layer">
         <div class="flex flex-col items-center justify-center p-4">
-            <div class="profile-wrapper" onclick="toggleProfile(true)" onmouseenter="setWarpSpeed(true)" onmouseleave="setWarpSpeed(false)">
+            <div class="profile-wrapper" onclick="toggleProfile(true)" onmouseenter="setWarpSpeed(true)" onmouseleave="setWarpSpeed(false)" ontouchstart="setWarpSpeed(true); this.classList.add('active-touch')" ontouchend="setWarpSpeed(false); this.classList.remove('active-touch')">
                 <div class="tech-ring ring-outer"></div>
                 <div class="tech-ring ring-inner"></div>
                 <div class="profile-core">
@@ -313,7 +284,6 @@
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
         
-        // FOG CONFIGURATION (Dark vs Light)
         const fogColorDark = new THREE.Color(0x0A0806);
         const fogColorLight = new THREE.Color(0xE6E8EC); 
         scene.fog = new THREE.FogExp2(fogColorDark, 0.0005);
@@ -326,11 +296,9 @@
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(renderer.domElement);
 
-        // --- LIGHTING ---
         const ambientLight = new THREE.AmbientLight(0x404040, 1.0); 
         scene.add(ambientLight);
         
-        // Sun Light
         const sunLight = new THREE.PointLight(0xFFDD88, 2, 1200);
         sunLight.position.set(-150, 80, -200);
         scene.add(sunLight);
@@ -362,7 +330,6 @@
             return canvas;
         }
 
-        // Planets
         const planets = [];
         const planetGroup = new THREE.Group();
         scene.add(planetGroup);
@@ -552,28 +519,65 @@
             safeSetText('sys-label', data.sys);
             safeSetText('loader-text', data.loader);
 
-            // Nav Buttons
             const navBtns = document.querySelectorAll('.hud-btn');
             navBtns.forEach((btn, index) => {
                 if(data.nav[index]) btn.innerText = data.nav[index];
             });
 
-            // Re-run Scramble Effect on Bio
             scrambler.setText(data.bio);
         }
 
         // --- WARP & ANIM ---
         let warpSpeed = 0; window.setWarpSpeed = function(active) { gsap.to(window, { warpSpeed: active ? 1 : 0, duration: 1 }); }
-        const mouse = new THREE.Vector2(); const targetMouse = new THREE.Vector2();
-        document.addEventListener('mousemove', (e) => { mouse.x = (e.clientX / window.innerWidth) * 2 - 1; mouse.y = -(e.clientY / window.innerHeight) * 2 + 1; targetMouse.x = e.clientX; targetMouse.y = e.clientY; const card = document.getElementById('holo-card'); if(document.getElementById('profile-module').classList.contains('active')) { card.style.transform = `perspective(1000px) rotateX(${-mouse.y*5}deg) rotateY(${mouse.x*5}deg)`; } });
+        const mouse = new THREE.Vector2(); 
+        const targetMouse = new THREE.Vector2();
+        
+        // --- MOUSE + TOUCH HANDLING ---
+        const updateInput = (x, y) => {
+            mouse.x = (x / window.innerWidth) * 2 - 1; 
+            mouse.y = -(y / window.innerHeight) * 2 + 1; 
+            targetMouse.x = x; 
+            targetMouse.y = y;
+            
+            // 3D Tilt Logic
+            const card = document.getElementById('holo-card'); 
+            if(document.getElementById('profile-module').classList.contains('active')) { 
+                card.style.transform = `perspective(1000px) rotateX(${-mouse.y*5}deg) rotateY(${mouse.x*5}deg)`; 
+            }
+        };
+
+        document.addEventListener('mousemove', (e) => updateInput(e.clientX, e.clientY));
+        
+        // Touch support for interaction
+        document.addEventListener('touchmove', (e) => {
+            const touch = e.touches[0];
+            updateInput(touch.clientX, touch.clientY);
+        }, { passive: false });
+
+        // Custom Cursor (Desktop)
         const cursor = document.getElementById('custom-cursor'); let cX = 0, cY = 0;
         function animCursor() { cX += (targetMouse.x - cX) * 0.15; cY += (targetMouse.y - cY) * 0.15; if(cursor) { cursor.style.left = cX+'px'; cursor.style.top = cY+'px'; } requestAnimationFrame(animCursor); } animCursor();
         document.querySelectorAll('a, div[onclick]').forEach(el => { el.addEventListener('mouseenter', () => cursor.classList.add('active')); el.addEventListener('mouseleave', () => cursor.classList.remove('active')); });
+
+        // --- GYROSCOPE (Mobile) ---
+        let gyroX = 0; let gyroY = 0;
+        window.addEventListener('deviceorientation', (event) => {
+            if(event.beta && event.gamma) {
+                // Scale down for subtlety
+                gyroX = event.gamma / 90; 
+                gyroY = event.beta / 90;
+            }
+        });
 
         const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
             const speedMultiplier = 1 + (warpSpeed * 20); 
+            
+            // Combine Mouse + Gyro for Camera
+            const targetCamX = (mouse.x * 5) + (gyroX * 10);
+            const targetCamY = (mouse.y * 5) + (gyroY * 10);
+
             planets.forEach(p => { p.pivot.rotation.y += p.speed * speedMultiplier; p.mesh.rotation.y += 0.01; });
             starsBack.rotation.y += 0.0001 * speedMultiplier; starsMid.rotation.y += 0.0003 * speedMultiplier;
             if (warpSpeed > 0.1) { starsFront.position.z += warpSpeed * 5; if(starsFront.position.z > 200) starsFront.position.z = -200; starsMid.position.z += warpSpeed * 2; if(starsMid.position.z > 200) starsMid.position.z = -200; }
@@ -583,7 +587,12 @@
                 bigBangSys.geometry.attributes.position.needsUpdate = true; if(bbMat.opacity <= 0.01) bbActive = false;
             }
             meteors.forEach(m => m.update());
-            camera.position.x += (mouse.x * 5 - camera.position.x) * 0.05; camera.position.y += (mouse.y * 5 - camera.position.y) * 0.05; camera.lookAt(scene.position);
+            
+            // Apply Camera Movement
+            camera.position.x += (targetCamX - camera.position.x) * 0.05; 
+            camera.position.y += (targetCamY - camera.position.y) * 0.05; 
+            camera.lookAt(scene.position);
+
             renderer.render(scene, camera);
         }
         animate();
