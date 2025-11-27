@@ -166,8 +166,8 @@
             .toggle-container { bottom: auto; top: 1.5rem; right: 1.5rem; }
             
             /* Adjust Profile Size for Mobile */
-            /* Increased margin-bottom to separate photo from name */
-            .profile-wrapper { width: 200px; height: 200px; margin-bottom: 5rem; }
+            /* Adjusted margin to balance spacing */
+            .profile-wrapper { width: 200px; height: 200px; margin-bottom: 3rem; }
             
             /* Adjust HUD Nav for Mobile Thumb Zone */
             .hud-nav { 
@@ -186,8 +186,12 @@
             /* Hide Desktop Decor */
             #custom-cursor { display: none !important; }
             
-            /* Ensure Content Fits */
-            #ui-layer { padding-bottom: 5rem; }
+            /* FIX: Remove bottom padding to allow true centering, add slight top margin if needed */
+            #ui-layer { 
+                padding-bottom: 0; 
+                justify-content: center; /* Force vertical centering */
+                padding-top: 15vh; /* DESCENDRE LES ÉLÉMENTS : Ajout d'espace en haut (15% de l'écran) */
+            }
             
             /* Larger touch targets */
             .ctrl-btn { width: 50px; height: 50px; }
