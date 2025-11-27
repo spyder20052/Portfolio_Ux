@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SPYNEL KOUTON | Creative Technologist</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- GSAP for smooth animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Syncopate:wght@400;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* DARK MODE (Default - Deep Space) */
+            --bg-deep: #0A0806;
+            --text-main: #ffffff;
+            --neon-cyan: #C4A77D; 
+            --neon-lime: #E5D3B3; 
+            --font-hero: 'Syncopate', sans-serif;
+            --font-tech: 'Space Mono', monospace;
+            
+            /* LIGHT MODE (Laboratory / Blueprint) */
+            --bg-light: #E6E8EC; 
+            --text-light: #1A1A20;
+            --accent-light: #2A2A35;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            overflow: hidden;
+            cursor: none;
+            transition: background-color 1.5s cubic-bezier(0.4, 0, 0.2, 1), color 1.5s ease;
+        }
+
+        /* --- LIGHT MODE OVERRIDES --- */
+        body.light-mode {
+            background-color: var(--bg-light);
+            color: var(--text-light);
+        }
+
+        body.light-mode .hero-title {
+            color: var(--text-light);
+            text-shadow: 0 0 10px rgba(0,0,0,0.1); /* Subtle shadow for clean look */
+            mix-blend-mode: multiply; /* Better blending on light bg */
+        }
+        
+        body.light-mode .hero-title:hover {
+            color: #000;
+            text-shadow: 0 0 20px rgba(0,0,0,0.2);
+        }
+
+        body.light-mode .hud-nav {
+            background: rgba(255, 255, 255, 0.6);
+            border-color: rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            backdrop-filter: blur(15px);
+        }
+
+        body.light-mode .hud-btn { color: #444; }
+        body.light-mode .hud-btn:hover { color: #000; border-color: #000; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        body.light-mode .hud-btn.active { background-color: #333; color: white; }
+
+        body.light-mode #custom-cursor {
+            border-color: #111;
+            background-color: rgba(0,0,0,0.05);
+            mix-blend-mode: normal;
+        }
+
+        body.light-mode .tech-ring { border-color: rgba(0,0,0,0.1); }
+        body.light-mode .ring-inner { border-color: rgba(0,0,0,0.3); }
+
+        /* --- UI LAYER --- */
+        #ui-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 10;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+            opacity: 0; transform: translateY(20px);
+            transition: opacity 1.5s ease, transform 1.5s ease-out;
+        }
+        #ui-layer.visible { opacity: 1; transform: translateY(0); }
+        #ui-layer.blurred { opacity: 0.2; filter: blur(5px); pointer-events: none; }
+
+        /* --- THEME TOGGLE BUTTON (Relocated) --- */
+        #theme-toggle {
+            position: fixed;
+            bottom: 2rem; /* Aligned with HUD bottom */
+            right: 3rem;  /* Right corner */
+            width: 44px;
+            height: 44px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 60;
+            pointer-events: auto;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.2);
+        }
+        
+        body.light-mode #theme-toggle {
+            border-color: rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.6);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        }
+
+        #theme-toggle:hover { transform: scale(1.1) rotate(15deg); }
+
+        .icon-sun, .icon-moon { position: absolute; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .icon-sun { opacity: 0; transform: scale(0.5) rotate(-90deg); }
+        .icon-moon { opacity: 1; transform: scale(1) rotate(0deg); }
+
+        body.light-mode .icon-sun { opacity: 1; transform: scale(1) rotate(0deg); color: #111; }
+        body.light-mode .icon-moon { opacity: 0; transform: scale(0.5) rotate(90deg); }
+
+        /* --- TYPOGRAPHY & EFFECTS --- */
+        .hero-title {
+            font-family: var(--font-hero); font-size: clamp(3rem, 10vw, 8rem); font-weight: 700;
+            text-transform: uppercase; line-height: 0.9; text-align: center;
+            mix-blend-mode: normal; pointer-events: auto; position: relative;
+            text-shadow: 0 0 20px rgba(196, 167, 125, 0.3); z-index: 20; cursor: default;
+            transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .hero-title:hover {
+            letter-spacing: 0.15em; color: #ffffff;
+            text-shadow: 0 0 30px rgba(196, 167, 125, 0.8), 0 0 60px rgba(196, 167, 125, 0.4);
+            transform: scale(1.05);
+        }
+        /* Fix hover color in Light Mode to stay dark/contrasted */
+        body.light-mode .hero-title:hover { color: #111; text-shadow: 0 0 30px rgba(0,0,0,0.2); }
+
+        .profile-wrapper { position: relative; width: 260px; height: 260px; margin-bottom: 3rem; perspective: 1000px; pointer-events: auto; cursor: pointer; z-index: 30; }
+        .profile-core { position: relative; width: 100%; height: 100%; border-radius: 50%; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+        .glitch-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background-image: url('Spynel P KOUTON.jpg'); background-size: cover; background-position: center; opacity: 1; transition: all 0.3s ease; }
+        .layer-base { z-index: 10; border: 2px solid var(--neon-cyan); overflow: hidden; }
+        body.light-mode .layer-base { border-color: #333; }
+        .layer-red { z-index: 9; opacity: 0; mix-blend-mode: screen; filter: hue-rotate(90deg); transform: translate(-5px, 0); }
+        .layer-blue { z-index: 8; opacity: 0; mix-blend-mode: screen; filter: hue-rotate(-90deg); transform: translate(5px, 0); }
+        .scanner-beam { position: absolute; top: -100%; left: 0; width: 100%; height: 20px; background: rgba(196, 167, 125, 0.8); box-shadow: 0 0 15px var(--neon-cyan); z-index: 15; animation: scan 3s linear infinite; opacity: 0.5; }
+        @keyframes scan { 0% { top: -20%; opacity: 0; } 10% { opacity: 0.8; } 90% { opacity: 0.8; } 100% { top: 120%; opacity: 0; } }
+        
+        .tech-ring { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 50%; border: 1px dashed rgba(196, 167, 125, 0.3); pointer-events: none; transition: all 0.5s ease; }
+        .ring-inner { width: 290px; height: 290px; border-style: solid; border-width: 1px; border-color: rgba(196, 167, 125, 0.5); animation: spin-slow 10s linear infinite; }
+        .ring-outer { width: 340px; height: 340px; border-style: dashed; animation: spin-reverse 15s linear infinite; }
+        @keyframes spin-slow { to { transform: translate(-50%, -50%) rotate(360deg); } }
+        @keyframes spin-reverse { to { transform: translate(-50%, -50%) rotate(-360deg); } }
+        .profile-wrapper:hover .profile-core { transform: scale(1.1); }
+        .profile-wrapper:hover .layer-red { opacity: 0.6; animation: glitch-anim-1 2s infinite linear alternate-reverse; }
+        .profile-wrapper:hover .layer-blue { opacity: 0.6; animation: glitch-anim-2 2s infinite linear alternate-reverse; }
+        .profile-wrapper:hover .tech-ring { border-color: var(--neon-cyan); box-shadow: 0 0 20px rgba(196, 167, 125, 0.2); }
+        @keyframes glitch-anim-1 { 0% { transform: translate(-2px, 0); } 100% { transform: translate(-6px, 2px); } }
+        @keyframes glitch-anim-2 { 0% { transform: translate(2px, 0); } 100% { transform: translate(6px, -2px); } }
+        .profile-wrapper:hover ~ .hero-title, .profile-wrapper:hover ~ .hero-subtitle { opacity: 0.3; filter: blur(4px); transform: scale(0.95); }
+
+        .hero-subtitle { font-family: var(--font-tech); color: var(--neon-lime); margin-top: 1rem; font-size: clamp(0.8rem, 1.5vw, 1.2rem); letter-spacing: 2px; pointer-events: auto; transition: all 0.3s; }
+        
+        #custom-cursor { position: fixed; top: 0; left: 0; width: 40px; height: 40px; border: 2px solid var(--neon-cyan); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 9999; transition: width 0.2s, height 0.2s, background-color 0.2s; mix-blend-mode: difference; display: block; }
+        #custom-cursor.active { width: 80px; height: 80px; background-color: rgba(196, 167, 125, 0.1); border-color: var(--neon-lime); }
+
+        .hud-nav { position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: rgba(5, 5, 11, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 999px; padding: 0.5rem 1rem; display: flex; gap: 1rem; pointer-events: auto; z-index: 50; box-shadow: 0 0 30px rgba(10, 8, 6, 0.5); opacity: 0; transform: translateY(20px); transition: opacity 1s ease, transform 1s ease, background 0.5s ease; }
+        .hud-nav.visible { opacity: 1; transform: translateY(0) translateX(-50%); }
+        .hud-btn { font-family: var(--font-tech); font-size: 0.8rem; color: white; padding: 0.8rem 1.5rem; border-radius: 999px; border: 1px solid transparent; transition: all 0.3s ease; text-transform: uppercase; cursor: pointer; position: relative; overflow: hidden; }
+        .hud-btn:hover { border-color: var(--neon-cyan); color: var(--neon-cyan); box-shadow: 0 0 15px var(--neon-cyan); }
+        .hud-btn.active { background-color: var(--neon-lime); color: black; font-weight: bold; }
+
+        #profile-module { position: fixed; top: 0; left: 0; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; z-index: 40; pointer-events: none; opacity: 0; transition: opacity 0.5s ease; perspective: 1000px; }
+        #profile-module.active { opacity: 1; pointer-events: auto; }
+        .holo-card { width: 90%; max-width: 600px; background: rgba(10, 8, 6, 0.85); backdrop-filter: blur(20px); border: 1px solid var(--neon-cyan); padding: 2rem; position: relative; transform-style: preserve-3d; box-shadow: 0 0 50px rgba(196, 167, 125, 0.2); clip-path: polygon(0 0, 100% 0, 100% 85%, 95% 100%, 0 100%); }
+        .holo-title { font-family: var(--font-hero); font-size: 1.5rem; color: var(--neon-cyan); }
+        .holo-content { font-family: var(--font-tech); color: #ddd; font-size: 0.9rem; margin-top: 1rem; }
+        .close-holo { position: absolute; top: 1rem; right: 1rem; color: white; cursor: pointer; font-family: var(--font-tech); border: 1px solid rgba(255,255,255,0.2); padding: 0.2rem 0.6rem; font-size: 0.7rem; transition: 0.3s; }
+        .close-holo:hover { background: var(--neon-magenta); border-color: var(--neon-magenta); }
+        .skill-bar-container { margin-top: 1rem; }
+        .skill-track { width: 100%; height: 4px; background: rgba(255,255,255,0.1); margin-top: 0.2rem; }
+        .skill-fill { height: 100%; background: var(--neon-cyan); width: 0%; transition: width 1.5s; }
+
+        #loader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-deep); z-index: 10000; display: flex; flex-direction: column; justify-content: center; align-items: center; font-family: var(--font-tech); transition: opacity 0.5s ease; }
+        .loader-bar { width: 200px; height: 2px; background: #333; margin-top: 15px; position: relative; overflow: hidden; }
+        .loader-progress { position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: var(--neon-cyan); animation: load 2.5s ease-out forwards; box-shadow: 0 0 10px var(--neon-cyan); }
+        @keyframes load { to { width: 100%; } }
+        #flash-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; pointer-events: none; opacity: 0; z-index: 100; mix-blend-mode: screen; }
+
+        @media (max-width: 768px) {
+            .hud-nav { width: 90%; justify-content: space-between; bottom: 1.5rem; }
+            #custom-cursor { display: none !important; }
+            .profile-wrapper { width: 180px; height: 180px; }
+            .ring-inner { width: 200px; height: 200px; }
+            .ring-outer { width: 240px; height: 240px; }
+            #theme-toggle { bottom: 6rem; right: 1.5rem; } /* Adjusted for mobile to clear HUD */
+        }
+    </style>
+</head>
+<body>
+
+    <div id="flash-overlay"></div>
+
+    <!-- THEME TOGGLE (Relocated Bottom Right) -->
+    <div id="theme-toggle" onclick="toggleTheme()">
+        <svg class="icon-moon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C4A77D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+        <svg class="icon-sun" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+    </div>
+
+    <div id="loader">
+        <div style="color: var(--neon-cyan); letter-spacing: 2px;">INITIALIZING SYSTEM...</div>
+        <div class="loader-bar"><div class="loader-progress"></div></div>
+    </div>
+
+    <div id="custom-cursor"></div>
+    <div id="canvas-container" class="fixed inset-0 z-0"></div>
+
+    <div id="profile-module">
+        <div class="holo-card" id="holo-card">
+            <div class="close-holo" onclick="toggleProfile(false)">[X] TERMINATE</div>
+            <div class="holo-title">IDENTITÉ</div>
+            <div class="text-xs text-gray-500 mb-4">ID: 5PY-N3L // STATUS: ONLINE</div>
+            <div class="holo-content">
+                <p id="bio-text" class="scramble-target"></p>
+                <div class="mt-8 border-t border-white/10 pt-4">
+                    <div class="skill-bar-container">
+                        <div class="flex justify-between text-xs text-[#E5D3B3]"><span>CREATIVITY</span><span>98%</span></div>
+                        <div class="skill-track"><div class="skill-fill" style="width: 0%" data-width="98%"></div></div>
+                    </div>
+                    <div class="skill-bar-container">
+                        <div class="flex justify-between text-xs text-[#E5D3B3]"><span>WEBGL / 3D</span><span>92%</span></div>
+                        <div class="skill-track"><div class="skill-fill" style="width: 0%" data-width="92%"></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="ui-layer">
+        <div class="flex flex-col items-center justify-center p-4">
+            <div class="profile-wrapper" onclick="toggleProfile(true)" onmouseenter="setWarpSpeed(true)" onmouseleave="setWarpSpeed(false)">
+                <div class="tech-ring ring-outer"></div>
+                <div class="tech-ring ring-inner"></div>
+                <div class="profile-core">
+                    <div class="layer-red glitch-layer"></div>
+                    <div class="layer-blue glitch-layer"></div>
+                    <div class="layer-base glitch-layer">
+                         <div class="scanner-beam"></div>
+                    </div>
+                </div>
+                <div class="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-[10px] font-mono text-[#C4A77D] opacity-60 tracking-widest whitespace-nowrap">
+                    [ ACCESS GRANTED ]
+                </div>
+            </div>
+
+            <h1 class="hero-title" id="main-title">SPYNEL<br>KOUTON</h1>
+            <p class="hero-subtitle">[ DESIGNER &amp; DÉVELOPPEUR ]</p>
+            
+            <div class="mt-12 group cursor-pointer pointer-events-auto" onclick="reTriggerBigBang()">
+                <div class="border border-white/20 px-8 py-4 rounded-none bg-black/50 backdrop-blur-sm group-hover:bg-white/10 transition-all relative overflow-hidden">
+                    <span class="font-mono text-xs text-[#C0FF00]" style="color: var(--neon-lime)">>> INITIALIZE SEQUENCE_01</span>
+                    <div class="absolute bottom-0 left-0 h-[2px] w-full bg-[#C0FF00] transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" style="background-color: var(--neon-lime)"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="absolute top-10 left-10 font-mono text-xs text-white/40 hidden md:block">
+            COORDS: <span id="coords">00.00 / 00.00</span><br>
+            SYS: STABLE
+        </div>
+        <div class="absolute top-10 right-10 font-mono text-xs text-[#C4A77D] animate-pulse hidden md:block">
+            ● LIVE CONNECTION
+        </div>
+    </div>
+
+    <nav class="hud-nav" id="hud-nav">
+        <div class="hud-btn active" onclick="toggleProfile(false)">Index</div>
+        <div class="hud-btn">Projets</div>
+        <div class="hud-btn" onclick="toggleProfile(true)">Profil</div>
+        <div class="hud-btn">Comms</div>
+    </nav>
+
+    <script>
+        // --- THREE.JS SETUP ---
+        const container = document.getElementById('canvas-container');
+        const scene = new THREE.Scene();
+        
+        // FOG CONFIGURATION (Dark vs Light)
+        const fogColorDark = new THREE.Color(0x0A0806);
+        const fogColorLight = new THREE.Color(0xE6E8EC); // Matching Light BG
+        scene.fog = new THREE.FogExp2(fogColorDark, 0.0005);
+
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
+        camera.position.z = 60; 
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
+
+        // --- LIGHTING ---
+        const ambientLight = new THREE.AmbientLight(0x404040, 1.0); 
+        scene.add(ambientLight);
+        
+        // Sun Light
+        const sunLight = new THREE.PointLight(0xFFDD88, 2, 1200);
+        sunLight.position.set(-150, 80, -200);
+        scene.add(sunLight);
+
+        // --- SOLAR SYSTEM ---
+        const sunGeometry = new THREE.SphereGeometry(40, 32, 32);
+        const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xFFDD88 }); 
+        const sun = new THREE.Mesh(sunGeometry, sunMaterial);
+        sun.position.copy(sunLight.position); 
+        
+        const spriteMaterial = new THREE.SpriteMaterial({ 
+            map: new THREE.CanvasTexture(generateGlowTexture()), 
+            color: 0xFFDD88, transparent: true, blending: THREE.AdditiveBlending 
+        });
+        const sunGlow = new THREE.Sprite(spriteMaterial);
+        sunGlow.scale.set(350, 350, 1);
+        sun.add(sunGlow);
+        scene.add(sun);
+
+        function generateGlowTexture() {
+            const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 64;
+            const ctx = canvas.getContext('2d');
+            const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
+            gradient.addColorStop(0.2, 'rgba(255, 220, 100, 0.5)');
+            gradient.addColorStop(0.5, 'rgba(255, 200, 50, 0.1)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = gradient; ctx.fillRect(0,0,64,64);
+            return canvas;
+        }
+
+        // Planets
+        const planets = [];
+        const planetGroup = new THREE.Group();
+        scene.add(planetGroup);
+
+        function createPlanet(radius, dist, color, speed, hasRing) {
+            const pivot = new THREE.Object3D(); pivot.rotation.y = Math.random() * Math.PI * 2;
+            const geo = new THREE.IcosahedronGeometry(radius, 4);
+            const mat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.8, metalness: 0.1 });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(dist, (Math.random()-0.5)*10, (Math.random()-0.5)*10);
+            pivot.add(mesh); planetGroup.add(pivot);
+            if(hasRing) {
+                const ringGeo = new THREE.TorusGeometry(radius * 1.6, 0.4, 2, 60);
+                const ringMat = new THREE.MeshBasicMaterial({ color: 0x88AAFF, transparent: true, opacity: 0.4 });
+                const ring = new THREE.Mesh(ringGeo, ringMat);
+                ring.rotation.x = Math.PI / 2 + 0.2; mesh.add(ring);
+            }
+            return { pivot, mesh, speed };
+        }
+
+        planets.push(createPlanet(4, 50, 0x8C7B6D, 0.001, false)); 
+        planets.push(createPlanet(8, 90, 0x224466, 0.0008, true));  
+        planets.push(createPlanet(5, 130, 0xC4A77D, 0.0015, false)); 
+        planets.push(createPlanet(10, 180, 0x553344, 0.0005, true)); 
+        planets.push(createPlanet(3, 220, 0xAAAAAA, 0.002, false)); 
+        planets.push(createPlanet(6, 280, 0x335533, 0.001, false)); 
+
+        // --- BIG BANG ---
+        const bbCount = 5000; const bbGeo = new THREE.BufferGeometry(); const bbPos = new Float32Array(bbCount * 3); const bbVel = [];
+        for(let i=0; i<bbCount; i++) {
+            bbPos[i*3] = 0; bbPos[i*3+1] = 0; bbPos[i*3+2] = 0;
+            const theta = Math.random() * Math.PI * 2; const phi = Math.acos((Math.random() * 2) - 1); const speed = Math.random() * 4 + 1;
+            bbVel.push({ x: speed * Math.sin(phi) * Math.cos(theta), y: speed * Math.sin(phi) * Math.sin(theta), z: speed * Math.cos(phi) });
+        }
+        bbGeo.setAttribute('position', new THREE.BufferAttribute(bbPos, 3));
+        const bbMat = new THREE.PointsMaterial({ color: 0xFFF8E7, size: 0.4, transparent: true, opacity: 0, blending: THREE.AdditiveBlending });
+        const bigBangSys = new THREE.Points(bbGeo, bbMat); scene.add(bigBangSys);
+
+        const shockGeo = new THREE.TorusGeometry(1, 0.2, 2, 100); const shockMat = new THREE.MeshBasicMaterial({ color: 0xC4A77D, transparent: true, opacity: 0 });
+        const shockwave = new THREE.Mesh(shockGeo, shockMat); shockwave.rotation.x = Math.PI / 2; scene.add(shockwave);
+
+        let bbActive = false;
+        function triggerBigBang() {
+            const positions = bigBangSys.geometry.attributes.position.array;
+            for(let i=0; i<bbCount; i++) {
+                positions[i*3] = 0; positions[i*3+1] = 0; positions[i*3+2] = 0;
+                const theta = Math.random() * Math.PI * 2; const phi = Math.acos((Math.random() * 2) - 1); const speed = (Math.random() * 5) + 1.5; 
+                bbVel[i].x = speed * Math.sin(phi) * Math.cos(theta); bbVel[i].y = speed * Math.sin(phi) * Math.sin(theta); bbVel[i].z = speed * Math.cos(phi);
+            }
+            bigBangSys.geometry.attributes.position.needsUpdate = true;
+            bbActive = true; bbMat.opacity = 1; shockwave.scale.set(0.1, 0.1, 0.1); shockwave.material.opacity = 0.5;
+            const flash = document.getElementById('flash-overlay');
+            gsap.fromTo(flash, { opacity: 0.8 }, { opacity: 0, duration: 1.5, ease: "power2.out" });
+            gsap.to(bbMat, { opacity: 0, duration: 3, ease: "power2.in", delay: 1.5 });
+            gsap.to(shockwave.scale, { x: 150, y: 150, duration: 4, ease: "power2.out" });
+            gsap.to(shockwave.material, { opacity: 0, duration: 3, ease: "power2.out" });
+        }
+        window.reTriggerBigBang = function() {
+            document.getElementById('ui-layer').classList.remove('visible'); document.getElementById('hud-nav').classList.remove('visible');
+            triggerBigBang();
+            setTimeout(() => { document.getElementById('ui-layer').classList.add('visible'); document.getElementById('hud-nav').classList.add('visible'); }, 3000);
+        }
+
+        // --- SHOOTING STARS ---
+        class ShootingStar {
+            constructor() {
+                this.mesh = new THREE.Group();
+                const head = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffffff }));
+                const tail = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.3, 40, 8), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 }));
+                tail.rotation.x = -Math.PI / 2; tail.position.z = -20;
+                this.mesh.add(head); this.mesh.add(tail); scene.add(this.mesh); this.reset();
+            }
+            reset() { this.active = false; this.mesh.visible = false; this.delay = Math.random() * 400 + 100; }
+            spawn() {
+                this.active = true; this.mesh.visible = true; this.speed = 3.0 + Math.random() * 2.0;
+                const startX = (Math.random() - 0.5) * 800; const startY = (Math.random() - 0.5) * 400; const startZ = -200 + (Math.random() * 400);
+                this.mesh.position.set(startX, startY, startZ);
+                const target = new THREE.Vector3(startX + (Math.random() - 0.5) * 400, startY + (Math.random() - 0.5) * 200, startZ + 200);
+                this.velocity = new THREE.Vector3().subVectors(target, this.mesh.position).normalize().multiplyScalar(this.speed);
+                this.mesh.lookAt(target); this.life = 0; this.maxLife = 150;
+            }
+            update() { if(!this.active) { this.delay--; if(this.delay <= 0) this.spawn(); return; } this.mesh.position.add(this.velocity); this.life++; if(this.life > this.maxLife) this.reset(); }
+        }
+        const meteors = []; for(let i=0; i<4; i++) meteors.push(new ShootingStar()); 
+
+        // --- STARFIELD ---
+        function createStarLayer(count, size, color, spread) {
+            const geometry = new THREE.BufferGeometry();
+            const vertices = []; for(let i = 0; i < count; i++) vertices.push((Math.random()-0.5)*spread, (Math.random()-0.5)*spread, (Math.random()-0.5)*spread);
+            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+            const canvas = document.createElement('canvas'); canvas.width = 32; canvas.height = 32;
+            const ctx = canvas.getContext('2d'); const grad = ctx.createRadialGradient(16,16,0,16,16,16);
+            grad.addColorStop(0, 'rgba(255,255,255,1)'); grad.addColorStop(1, 'rgba(0,0,0,0)');
+            ctx.fillStyle = grad; ctx.fillRect(0,0,32,32);
+            const material = new THREE.PointsMaterial({ size: size, color: color, map: new THREE.CanvasTexture(canvas), transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false });
+            return new THREE.Points(geometry, material);
+        }
+        const starsBack = createStarLayer(6000, 0.5, 0xAAAAAA, 2500); scene.add(starsBack);
+        const starsMid = createStarLayer(2000, 1.0, 0xC4A77D, 1500); scene.add(starsMid);
+        const starsFront = createStarLayer(400, 2.0, 0xE5D3B3, 800); scene.add(starsFront);
+
+        // --- THEME TOGGLE ---
+        let isDark = true;
+        window.toggleTheme = function() {
+            isDark = !isDark;
+            document.body.classList.toggle('light-mode');
+            
+            // ANIMATE WORLD
+            const targetBg = isDark ? 0x0A0806 : 0xE6E8EC;
+            const targetFog = isDark ? fogColorDark : fogColorLight;
+            const targetStarColor = isDark ? 0xAAAAAA : 0x222222; // Stars turn dark in light mode
+            const targetSunColor = isDark ? 0xFFDD88 : 0x88CCFF; // Warm vs Cool Sun
+            const targetAmbient = isDark ? 1.0 : 2.5; // Brighter ambient in light mode
+
+            // 1. Fog Transition
+            gsap.to(scene.fog.color, { r: targetFog.r, g: targetFog.g, b: targetFog.b, duration: 1.5 });
+            
+            // 2. Stars Transition (Invert color for visibility on white)
+            const sCol = new THREE.Color(targetStarColor);
+            gsap.to(starsBack.material.color, { r: sCol.r, g: sCol.g, b: sCol.b, duration: 1 });
+            gsap.to(starsMid.material.color, { r: sCol.r, g: sCol.g, b: sCol.b, duration: 1 });
+            gsap.to(starsFront.material.color, { r: sCol.r, g: sCol.g, b: sCol.b, duration: 1 });
+
+            // 3. Sun Transition
+            const sunCol = new THREE.Color(targetSunColor);
+            gsap.to(sunMaterial.color, { r: sunCol.r, g: sunCol.g, b: sunCol.b, duration: 1.5 });
+            gsap.to(sunLight.color, { r: sunCol.r, g: sunCol.g, b: sunCol.b, duration: 1.5 });
+            gsap.to(spriteMaterial.color, { r: sunCol.r, g: sunCol.g, b: sunCol.b, duration: 1.5 });
+
+            // 4. Ambient Light
+            gsap.to(ambientLight, { intensity: targetAmbient, duration: 1 });
+        }
+
+        // --- WARP & ANIM ---
+        let warpSpeed = 0; window.setWarpSpeed = function(active) { gsap.to(window, { warpSpeed: active ? 1 : 0, duration: 1 }); }
+        const mouse = new THREE.Vector2(); const targetMouse = new THREE.Vector2();
+        document.addEventListener('mousemove', (e) => { mouse.x = (e.clientX / window.innerWidth) * 2 - 1; mouse.y = -(e.clientY / window.innerHeight) * 2 + 1; targetMouse.x = e.clientX; targetMouse.y = e.clientY; const card = document.getElementById('holo-card'); if(document.getElementById('profile-module').classList.contains('active')) { card.style.transform = `perspective(1000px) rotateX(${-mouse.y*5}deg) rotateY(${mouse.x*5}deg)`; } });
+        const cursor = document.getElementById('custom-cursor'); let cX = 0, cY = 0;
+        function animCursor() { cX += (targetMouse.x - cX) * 0.15; cY += (targetMouse.y - cY) * 0.15; if(cursor) { cursor.style.left = cX+'px'; cursor.style.top = cY+'px'; } requestAnimationFrame(animCursor); } animCursor();
+        document.querySelectorAll('a, div[onclick]').forEach(el => { el.addEventListener('mouseenter', () => cursor.classList.add('active')); el.addEventListener('mouseleave', () => cursor.classList.remove('active')); });
+
+        const clock = new THREE.Clock();
+        function animate() {
+            requestAnimationFrame(animate);
+            const speedMultiplier = 1 + (warpSpeed * 20); 
+            planets.forEach(p => { p.pivot.rotation.y += p.speed * speedMultiplier; p.mesh.rotation.y += 0.01; });
+            starsBack.rotation.y += 0.0001 * speedMultiplier; starsMid.rotation.y += 0.0003 * speedMultiplier;
+            if (warpSpeed > 0.1) { starsFront.position.z += warpSpeed * 5; if(starsFront.position.z > 200) starsFront.position.z = -200; starsMid.position.z += warpSpeed * 2; if(starsMid.position.z > 200) starsMid.position.z = -200; }
+            if (bbActive) {
+                const pos = bigBangSys.geometry.attributes.position.array; let stillActive = false;
+                for(let i=0; i<bbCount; i++) { pos[i*3] += bbVel[i].x; pos[i*3+1] += bbVel[i].y; pos[i*3+2] += bbVel[i].z; }
+                bigBangSys.geometry.attributes.position.needsUpdate = true; if(bbMat.opacity <= 0.01) bbActive = false;
+            }
+            meteors.forEach(m => m.update());
+            camera.position.x += (mouse.x * 5 - camera.position.x) * 0.05; camera.position.y += (mouse.y * 5 - camera.position.y) * 0.05; camera.lookAt(scene.position);
+            renderer.render(scene, camera);
+        }
+        animate();
+        window.addEventListener('resize', () => { camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix(); renderer.setSize(window.innerWidth, window.innerHeight); });
+        
+        setTimeout(() => {
+            const loader = document.getElementById('loader'); loader.style.opacity = '0';
+            setTimeout(() => { loader.remove(); triggerBigBang(); setTimeout(() => { document.getElementById('ui-layer').classList.add('visible'); document.getElementById('hud-nav').classList.add('visible'); }, 2500); }, 500);
+        }, 2500);
+
+        class TextScramble {
+            constructor(el) { this.el = el; this.chars = '!<>-_\\/[]{}—=+*^?#________'; this.update = this.update.bind(this); }
+            setText(newText) { const oldText = this.el.innerText; const length = Math.max(oldText.length, newText.length); const promise = new Promise((resolve) => this.resolve = resolve); this.queue = []; for (let i = 0; i < length; i++) { const from = oldText[i] || ''; const to = newText[i] || ''; const start = Math.floor(Math.random() * 40); const end = start + Math.floor(Math.random() * 40); this.queue.push({ from, to, start, end }); } cancelAnimationFrame(this.frameRequest); this.frame = 0; this.update(); return promise; }
+            update() { let output = ''; let complete = 0; for (let i = 0, n = this.queue.length; i < n; i++) { let { from, to, start, end, char } = this.queue[i]; if (this.frame >= end) { complete++; output += to; } else if (this.frame >= start) { if (!char || Math.random() < 0.28) { char = this.chars[Math.floor(Math.random() * this.chars.length)]; this.queue[i].char = char; } output += `<span style="color:#C4A77D; opacity:0.5">${char}</span>`; } else { output += from; } } this.el.innerHTML = output; if (complete === this.queue.length) { this.resolve(); } else { this.frameRequest = requestAnimationFrame(this.update); this.frame++; } }
+        }
+        const bioContent = "Profil hybride naviguant entre le design pur et l'ingénierie complexe. Je ne construis pas des sites web, je sculpte des expériences numériques vivantes.";
+        const scrambler = new TextScramble(document.getElementById('bio-text'));
+        window.toggleProfile = function(show) { const mod = document.getElementById('profile-module'); const ui = document.getElementById('ui-layer'); const bars = document.querySelectorAll('.skill-fill'); if(show) { mod.classList.add('active'); ui.classList.add('blurred'); gsap.to(camera.position, { z: 20, duration: 1.5, ease: "power2.inOut" }); scrambler.setText(bioContent); bars.forEach(b => b.style.width = b.getAttribute('data-width')); } else { mod.classList.remove('active'); ui.classList.remove('blurred'); gsap.to(camera.position, { z: 60, duration: 1.5, ease: "power2.inOut" }); bars.forEach(b => b.style.width = '0%'); } }
+    </script>
+</body>
+</html>
