@@ -12,7 +12,7 @@
     
     <style>
         :root {
-            /* DARK MODE (Default - Deep Space) */
+            /* DARK MODE (Default) */
             --bg-deep: #0A0806;
             --text-main: #ffffff;
             --text-dim: rgba(255, 255, 255, 0.4);
@@ -21,7 +21,7 @@
             --font-hero: 'Syncopate', sans-serif;
             --font-tech: 'Space Mono', monospace;
             
-            /* LIGHT MODE (Laboratory / Blueprint) */
+            /* LIGHT MODE */
             --bg-light: #E6E8EC; 
             --text-light: #1A1A20;
             --text-light-dim: rgba(0, 0, 0, 0.5);
@@ -29,15 +29,9 @@
         }
 
         body, html {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--bg-deep);
-            color: var(--text-main);
-            overflow: hidden;
-            cursor: none;
-            touch-action: none; /* Prevent pull-to-refresh on mobile */
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--bg-deep); color: var(--text-main);
+            overflow: hidden; cursor: none; touch-action: none;
             transition: background-color 1.5s cubic-bezier(0.4, 0, 0.2, 1), color 1.5s ease;
         }
 
@@ -47,48 +41,144 @@
         body.light-mode .ui-text-dim { color: var(--text-light-dim); }
         .ui-text-accent { color: var(--neon-cyan); transition: color 1s ease; }
         body.light-mode .ui-text-accent { color: #8C7B6D; font-weight: bold; }
+        
         body.light-mode .hero-title { color: var(--text-light); text-shadow: 0 0 10px rgba(0,0,0,0.1); mix-blend-mode: multiply; }
         body.light-mode .hero-title:hover { color: #000; text-shadow: 0 0 20px rgba(0,0,0,0.2); }
-        body.light-mode .hud-nav { background: rgba(255, 255, 255, 0.6); border-color: rgba(0, 0, 0, 0.1); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); backdrop-filter: blur(15px); }
+        
+        body.light-mode .hud-nav { background: rgba(255, 255, 255, 0.6); border-color: rgba(0, 0, 0, 0.1); box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05); }
         body.light-mode .hud-btn { color: #444; }
-        body.light-mode .hud-btn:hover { color: #000; border-color: #000; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        body.light-mode .hud-btn:hover { color: #000; border-color: #000; }
         body.light-mode .hud-btn.active { background-color: #333; color: white; }
+        
         body.light-mode #custom-cursor { border-color: #111; background-color: rgba(0,0,0,0.05); mix-blend-mode: normal; }
         body.light-mode .tech-ring { border-color: rgba(0,0,0,0.1); }
         body.light-mode .ring-inner { border-color: rgba(0,0,0,0.3); }
         body.light-mode .hero-subtitle { color: #555; font-weight: bold; }
         body.light-mode .layer-base { border-color: #333; }
+        
+        /* Light Mode Projects */
+        body.light-mode .project-card { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); box-shadow: 0 20px 40px rgba(0,0,0,0.05); }
+        body.light-mode .project-title { color: #111; }
+        body.light-mode .project-desc { color: #555; }
 
-        /* --- UI LAYER --- */
-        #ui-layer {
+        /* --- UI LAYERS --- */
+        .full-layer {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
             pointer-events: none; z-index: 10;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             opacity: 0; transform: translateY(20px);
-            transition: opacity 1.5s ease, transform 1.5s ease-out;
-            padding-bottom: 2rem; /* Space for desktop HUD */
+            transition: opacity 1s ease, transform 1s ease-out;
         }
-        #ui-layer.visible { opacity: 1; transform: translateY(0); }
-        #ui-layer.blurred { opacity: 0.2; filter: blur(5px); pointer-events: none; }
+        .full-layer.active { opacity: 1; transform: translateY(0); pointer-events: auto; }
+        .full-layer.hidden { display: none; }
 
-        /* --- TOGGLE BUTTONS --- */
+        /* Home Layer Specifics */
+        #home-layer { padding-bottom: 2rem; }
+        @media (max-width: 768px) { #home-layer { padding-bottom: 0; padding-top: 5vh; } }
+
+        /* --- PROJECTS LAYER --- */
+        #projects-layer {
+            flex-direction: row;
+            overflow-x: scroll; /* Enable horizontal scroll */
+            overflow-y: hidden;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 0 10vw; /* Side padding */
+            gap: 4rem;
+            /* Hide scrollbar */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none;  /* IE */
+        }
+        #projects-layer::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+
+        .project-card {
+            min-width: 300px;
+            width: 350px;
+            height: 500px;
+            background: rgba(10, 8, 6, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--neon-cyan);
+            border-radius: 4px;
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            transform-style: preserve-3d;
+        }
+
+        .project-card:hover {
+            transform: translateY(-20px) scale(1.02);
+            border-color: #fff;
+            box-shadow: 0 0 30px rgba(196, 167, 125, 0.2);
+        }
+
+        .project-image {
+            width: 100%;
+            height: 200px;
+            background-color: #111;
+            margin-bottom: 1.5rem;
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .project-image img {
+            width: 100%; height: 100%; object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .project-card:hover .project-image img { transform: scale(1.1); }
+
+        .project-meta {
+            font-family: var(--font-tech);
+            font-size: 0.7rem;
+            color: var(--neon-cyan);
+            margin-bottom: 0.5rem;
+            display: flex; justify-content: space-between;
+        }
+
+        .project-title {
+            font-family: var(--font-hero);
+            font-size: 1.5rem;
+            color: white;
+            line-height: 1;
+            margin-bottom: 1rem;
+        }
+
+        .project-desc {
+            font-family: var(--font-tech);
+            font-size: 0.8rem;
+            color: #aaa;
+            line-height: 1.5;
+        }
+
+        .project-link {
+            margin-top: auto;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 1rem;
+            font-family: var(--font-tech);
+            font-size: 0.7rem;
+            text-align: right;
+            color: var(--neon-lime);
+        }
+
+        /* --- BUTTONS & CONTROLS --- */
         .toggle-container {
             position: fixed; bottom: 2rem; right: 2rem;
             display: flex; gap: 1rem; z-index: 60; pointer-events: auto;
-            transition: all 0.5s ease;
         }
-
         .ctrl-btn {
             width: 44px; height: 44px;
             border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            cursor: pointer; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer; transition: all 0.3s;
             backdrop-filter: blur(5px); background: rgba(0,0,0,0.2);
             font-family: var(--font-tech); font-size: 0.8rem; color: white;
         }
-        body.light-mode .ctrl-btn { border-color: rgba(0, 0, 0, 0.1); background: rgba(255, 255, 255, 0.6); box-shadow: 0 5px 15px rgba(0,0,0,0.05); color: #111; }
+        body.light-mode .ctrl-btn { border-color: rgba(0,0,0,0.1); background: rgba(255,255,255,0.6); color: #111; }
         .ctrl-btn:hover { transform: scale(1.1); }
-        .icon-sun, .icon-moon { position: absolute; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        .icon-sun, .icon-moon { position: absolute; transition: all 0.5s; }
         .icon-sun { opacity: 0; transform: scale(0.5) rotate(-90deg); }
         .icon-moon { opacity: 1; transform: scale(1) rotate(0deg); }
         body.light-mode .icon-sun { opacity: 1; transform: scale(1) rotate(0deg); color: #111; }
@@ -96,20 +186,16 @@
 
         /* --- TYPOGRAPHY --- */
         .hero-title {
-            font-family: var(--font-hero); font-size: clamp(2.5rem, 8vw, 8rem); /* Adjusted clamp for mobile */
+            font-family: var(--font-hero); font-size: clamp(2.5rem, 8vw, 8rem);
             font-weight: 700; text-transform: uppercase; line-height: 0.9; text-align: center;
             mix-blend-mode: normal; pointer-events: auto; position: relative;
             text-shadow: 0 0 20px rgba(196, 167, 125, 0.3); z-index: 20; cursor: default;
             transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .hero-title:hover { letter-spacing: 0.15em; color: #ffffff; text-shadow: 0 0 30px rgba(196, 167, 125, 0.8), 0 0 60px rgba(196, 167, 125, 0.4); transform: scale(1.05); }
-        body.light-mode .hero-title:hover { color: #111; text-shadow: 0 0 30px rgba(0,0,0,0.2); }
 
-        /* --- PROFILE WRAPPER (Responsive) --- */
-        .profile-wrapper { 
-            position: relative; width: 260px; height: 260px; margin-bottom: 3rem; 
-            perspective: 1000px; pointer-events: auto; cursor: pointer; z-index: 30; 
-        }
+        /* --- PROFILE EFFECT --- */
+        .profile-wrapper { position: relative; width: 260px; height: 260px; margin-bottom: 3rem; perspective: 1000px; pointer-events: auto; cursor: pointer; z-index: 30; }
         .profile-core { position: relative; width: 100%; height: 100%; border-radius: 50%; transform-style: preserve-3d; transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .glitch-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background-image: url('Spynel P KOUTON.jpg'); background-size: cover; background-position: center; opacity: 1; transition: all 0.3s ease; }
         .layer-base { z-index: 10; border: 2px solid var(--neon-cyan); overflow: hidden; }
@@ -124,7 +210,6 @@
         @keyframes spin-slow { to { transform: translate(-50%, -50%) rotate(360deg); } }
         @keyframes spin-reverse { to { transform: translate(-50%, -50%) rotate(-360deg); } }
         
-        /* Hover/Active States */
         .profile-wrapper.active-touch .profile-core, .profile-wrapper:hover .profile-core { transform: scale(1.1); }
         .profile-wrapper.active-touch .layer-red, .profile-wrapper:hover .layer-red { opacity: 0.6; animation: glitch-anim-1 2s infinite linear alternate-reverse; }
         .profile-wrapper.active-touch .layer-blue, .profile-wrapper:hover .layer-blue { opacity: 0.6; animation: glitch-anim-2 2s infinite linear alternate-reverse; }
@@ -132,6 +217,7 @@
         @keyframes glitch-anim-1 { 0% { transform: translate(-2px, 0); } 100% { transform: translate(-6px, 2px); } }
         @keyframes glitch-anim-2 { 0% { transform: translate(2px, 0); } 100% { transform: translate(6px, -2px); } }
 
+        .profile-wrapper:hover ~ .hero-title, .profile-wrapper:hover ~ .hero-subtitle { opacity: 0.3; filter: blur(4px); transform: scale(0.95); }
         .hero-subtitle { font-family: var(--font-tech); color: var(--neon-lime); margin-top: 1rem; font-size: clamp(0.7rem, 1.5vw, 1.2rem); letter-spacing: 2px; pointer-events: auto; transition: all 0.3s; text-align: center; padding: 0 1rem; }
         
         #custom-cursor { position: fixed; top: 0; left: 0; width: 40px; height: 40px; border: 2px solid var(--neon-cyan); border-radius: 50%; transform: translate(-50%, -50%); pointer-events: none; z-index: 9999; transition: width 0.2s, height 0.2s, background-color 0.2s; mix-blend-mode: difference; display: block; }
@@ -160,41 +246,18 @@
         @keyframes load { to { width: 100%; } }
         #flash-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: white; pointer-events: none; opacity: 0; z-index: 100; mix-blend-mode: screen; }
 
-        /* --- MOBILE OPTIMIZATIONS --- */
         @media (max-width: 768px) {
-            /* Move Toggles to Top to clear HUD */
             .toggle-container { bottom: auto; top: 1.5rem; right: 1.5rem; }
-            
-            /* Adjust Profile Size for Mobile */
-            /* Adjusted margin to balance spacing */
             .profile-wrapper { width: 200px; height: 200px; margin-bottom: 3rem; }
-            
-            /* Adjust HUD Nav for Mobile Thumb Zone */
-            .hud-nav { 
-                width: 95%; 
-                justify-content: space-between; 
-                bottom: 1.5rem; 
-                padding: 0.5rem;
-            }
-            .hud-btn { 
-                padding: 0.8rem 0.5rem; 
-                font-size: 0.65rem; 
-                flex: 1; 
-                text-align: center;
-            }
-            
-            /* Hide Desktop Decor */
+            .hud-nav { width: 95%; justify-content: space-between; bottom: 1.5rem; padding: 0.5rem; }
+            .hud-btn { padding: 0.8rem 0.5rem; font-size: 0.65rem; flex: 1; text-align: center; }
             #custom-cursor { display: none !important; }
-            
-            /* FIX: Remove bottom padding to allow true centering, add slight top margin if needed */
-            #ui-layer { 
-                padding-bottom: 0; 
-                justify-content: center; /* Force vertical centering */
-                padding-top: 5vh; /* REMONTÉ : Ajustement de 15vh à 5vh pour un centrage optimal */
-            }
-            
-            /* Larger touch targets */
+            #home-layer { padding-bottom: 0; justify-content: center; padding-top: 5vh; }
             .ctrl-btn { width: 50px; height: 50px; }
+            
+            /* Projects Scroll Adjust for Mobile */
+            #projects-layer { padding: 0 1rem; gap: 2rem; }
+            .project-card { min-width: 280px; width: 280px; height: 450px; }
         }
     </style>
 </head>
@@ -202,7 +265,6 @@
 
     <div id="flash-overlay"></div>
 
-    <!-- TOGGLE BUTTONS -->
     <div class="toggle-container">
         <div class="ctrl-btn" id="lang-toggle" onclick="toggleLanguage()">EN</div>
         <div class="ctrl-btn" id="theme-toggle" onclick="toggleTheme()">
@@ -219,6 +281,7 @@
     <div id="custom-cursor"></div>
     <div id="canvas-container" class="fixed inset-0 z-0"></div>
 
+    <!-- PROFILE MODULE -->
     <div id="profile-module">
         <div class="holo-card" id="holo-card">
             <div class="close-holo" onclick="toggleProfile(false)">[X] TERMINATE</div>
@@ -240,7 +303,8 @@
         </div>
     </div>
 
-    <div id="ui-layer">
+    <!-- HOME LAYER -->
+    <div id="home-layer" class="full-layer">
         <div class="flex flex-col items-center justify-center p-4">
             <div class="profile-wrapper" onclick="toggleProfile(true)" onmouseenter="setWarpSpeed(true)" onmouseleave="setWarpSpeed(false)" ontouchstart="setWarpSpeed(true); this.classList.add('active-touch')" ontouchend="setWarpSpeed(false); this.classList.remove('active-touch')">
                 <div class="tech-ring ring-outer"></div>
@@ -253,7 +317,7 @@
                     </div>
                 </div>
                 <div class="absolute -bottom-10 left-1/2 transform -translate-x-1/2 text-[10px] font-mono ui-text-accent opacity-60 tracking-widest whitespace-nowrap" id="access-text">
-                    [ ACCESS GRANTED ]
+                    [ ACCÈS AUTORISÉ ]
                 </div>
             </div>
 
@@ -277,9 +341,14 @@
         </div>
     </div>
 
+    <!-- PROJECTS LAYER -->
+    <div id="projects-layer" class="full-layer hidden">
+        <!-- JS will populate this -->
+    </div>
+
     <nav class="hud-nav" id="hud-nav">
-        <div class="hud-btn active" onclick="toggleProfile(false)">Index</div>
-        <div class="hud-btn">Projets</div>
+        <div class="hud-btn active" data-target="home" onclick="navigate('home')">Accueil</div>
+        <div class="hud-btn" data-target="projects" onclick="navigate('projects')">Projets</div>
         <div class="hud-btn" onclick="toggleProfile(true)">Profil</div>
         <div class="hud-btn">Comms</div>
     </nav>
@@ -288,316 +357,203 @@
         // --- THREE.JS SETUP ---
         const container = document.getElementById('canvas-container');
         const scene = new THREE.Scene();
-        
         const fogColorDark = new THREE.Color(0x0A0806);
         const fogColorLight = new THREE.Color(0xE6E8EC); 
         scene.fog = new THREE.FogExp2(fogColorDark, 0.0005);
-
         const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 3000);
         camera.position.z = 60; 
-
         const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
         container.appendChild(renderer.domElement);
+        const ambientLight = new THREE.AmbientLight(0x404040, 1.0); scene.add(ambientLight);
+        const sunLight = new THREE.PointLight(0xFFDD88, 2, 1200); sunLight.position.set(-150, 80, -200); scene.add(sunLight);
 
-        const ambientLight = new THREE.AmbientLight(0x404040, 1.0); 
-        scene.add(ambientLight);
-        
-        const sunLight = new THREE.PointLight(0xFFDD88, 2, 1200);
-        sunLight.position.set(-150, 80, -200);
-        scene.add(sunLight);
-
-        // --- SOLAR SYSTEM ---
+        // --- SPACE OBJECTS ---
         const sunGeometry = new THREE.SphereGeometry(40, 32, 32);
         const sunMaterial = new THREE.MeshBasicMaterial({ color: 0xFFDD88 }); 
-        const sun = new THREE.Mesh(sunGeometry, sunMaterial);
-        sun.position.copy(sunLight.position); 
-        
-        const spriteMaterial = new THREE.SpriteMaterial({ 
-            map: new THREE.CanvasTexture(generateGlowTexture()), 
-            color: 0xFFDD88, transparent: true, blending: THREE.AdditiveBlending 
-        });
-        const sunGlow = new THREE.Sprite(spriteMaterial);
-        sunGlow.scale.set(350, 350, 1);
-        sun.add(sunGlow);
-        scene.add(sun);
+        const sun = new THREE.Mesh(sunGeometry, sunMaterial); sun.position.copy(sunLight.position); 
+        function generateGlowTexture() { const c = document.createElement('canvas'); c.width=64; c.height=64; const x = c.getContext('2d'); const g = x.createRadialGradient(32,32,0,32,32,32); g.addColorStop(0,'rgba(255,255,255,1)'); g.addColorStop(0.2,'rgba(255,220,100,0.5)'); g.addColorStop(0.5,'rgba(255,200,50,0.1)'); g.addColorStop(1,'rgba(0,0,0,0)'); x.fillStyle = g; x.fillRect(0,0,64,64); return c; }
+        const sunGlow = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(generateGlowTexture()), color: 0xFFDD88, transparent: true, blending: THREE.AdditiveBlending }));
+        sunGlow.scale.set(350, 350, 1); sun.add(sunGlow); scene.add(sun);
 
-        function generateGlowTexture() {
-            const canvas = document.createElement('canvas'); canvas.width = 64; canvas.height = 64;
-            const ctx = canvas.getContext('2d');
-            const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-            gradient.addColorStop(0, 'rgba(255, 255, 255, 1)');
-            gradient.addColorStop(0.2, 'rgba(255, 220, 100, 0.5)');
-            gradient.addColorStop(0.5, 'rgba(255, 200, 50, 0.1)');
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-            ctx.fillStyle = gradient; ctx.fillRect(0,0,64,64);
-            return canvas;
-        }
-
-        const planets = [];
-        const planetGroup = new THREE.Group();
-        scene.add(planetGroup);
-
+        const planets = []; const planetGroup = new THREE.Group(); scene.add(planetGroup);
         function createPlanet(radius, dist, color, speed, hasRing) {
             const pivot = new THREE.Object3D(); pivot.rotation.y = Math.random() * Math.PI * 2;
             const geo = new THREE.IcosahedronGeometry(radius, 4);
             const mat = new THREE.MeshStandardMaterial({ color: color, roughness: 0.8, metalness: 0.1 });
-            const mesh = new THREE.Mesh(geo, mat);
-            mesh.position.set(dist, (Math.random()-0.5)*10, (Math.random()-0.5)*10);
+            const mesh = new THREE.Mesh(geo, mat); mesh.position.set(dist, (Math.random()-0.5)*10, (Math.random()-0.5)*10);
             pivot.add(mesh); planetGroup.add(pivot);
-            if(hasRing) {
-                const ringGeo = new THREE.TorusGeometry(radius * 1.6, 0.4, 2, 60);
-                const ringMat = new THREE.MeshBasicMaterial({ color: 0x88AAFF, transparent: true, opacity: 0.4 });
-                const ring = new THREE.Mesh(ringGeo, ringMat);
-                ring.rotation.x = Math.PI / 2 + 0.2; mesh.add(ring);
-            }
+            if(hasRing) { const rGeo = new THREE.TorusGeometry(radius*1.6, 0.4, 2, 60); const rMat = new THREE.MeshBasicMaterial({ color: 0x88AAFF, transparent: true, opacity: 0.4 }); const r = new THREE.Mesh(rGeo, rMat); r.rotation.x = Math.PI/2+0.2; mesh.add(r); }
             return { pivot, mesh, speed };
         }
+        planets.push(createPlanet(4, 50, 0x8C7B6D, 0.001, false)); planets.push(createPlanet(8, 90, 0x224466, 0.0008, true)); planets.push(createPlanet(5, 130, 0xC4A77D, 0.0015, false)); planets.push(createPlanet(10, 180, 0x553344, 0.0005, true)); planets.push(createPlanet(3, 220, 0xAAAAAA, 0.002, false)); planets.push(createPlanet(6, 280, 0x335533, 0.001, false)); 
 
-        planets.push(createPlanet(4, 50, 0x8C7B6D, 0.001, false)); 
-        planets.push(createPlanet(8, 90, 0x224466, 0.0008, true));  
-        planets.push(createPlanet(5, 130, 0xC4A77D, 0.0015, false)); 
-        planets.push(createPlanet(10, 180, 0x553344, 0.0005, true)); 
-        planets.push(createPlanet(3, 220, 0xAAAAAA, 0.002, false)); 
-        planets.push(createPlanet(6, 280, 0x335533, 0.001, false)); 
-
-        // --- BIG BANG ---
         const bbCount = 5000; const bbGeo = new THREE.BufferGeometry(); const bbPos = new Float32Array(bbCount * 3); const bbVel = [];
-        for(let i=0; i<bbCount; i++) {
-            bbPos[i*3] = 0; bbPos[i*3+1] = 0; bbPos[i*3+2] = 0;
-            const theta = Math.random() * Math.PI * 2; const phi = Math.acos((Math.random() * 2) - 1); const speed = Math.random() * 4 + 1;
-            bbVel.push({ x: speed * Math.sin(phi) * Math.cos(theta), y: speed * Math.sin(phi) * Math.sin(theta), z: speed * Math.cos(phi) });
-        }
+        for(let i=0; i<bbCount; i++) { bbPos[i*3]=0; bbPos[i*3+1]=0; bbPos[i*3+2]=0; const th=Math.random()*Math.PI*2; const ph=Math.acos((Math.random()*2)-1); const sp=Math.random()*4+1; bbVel.push({ x: sp*Math.sin(ph)*Math.cos(th), y: sp*Math.sin(ph)*Math.sin(th), z: sp*Math.cos(ph) }); }
         bbGeo.setAttribute('position', new THREE.BufferAttribute(bbPos, 3));
         const bbMat = new THREE.PointsMaterial({ color: 0xFFF8E7, size: 0.4, transparent: true, opacity: 0, blending: THREE.AdditiveBlending });
         const bigBangSys = new THREE.Points(bbGeo, bbMat); scene.add(bigBangSys);
-
-        const shockGeo = new THREE.TorusGeometry(1, 0.2, 2, 100); const shockMat = new THREE.MeshBasicMaterial({ color: 0xC4A77D, transparent: true, opacity: 0 });
-        const shockwave = new THREE.Mesh(shockGeo, shockMat); shockwave.rotation.x = Math.PI / 2; scene.add(shockwave);
+        const shockwave = new THREE.Mesh(new THREE.TorusGeometry(1, 0.2, 2, 100), new THREE.MeshBasicMaterial({ color: 0xC4A77D, transparent: true, opacity: 0 })); shockwave.rotation.x = Math.PI/2; scene.add(shockwave);
 
         let bbActive = false;
         function triggerBigBang() {
-            const positions = bigBangSys.geometry.attributes.position.array;
-            for(let i=0; i<bbCount; i++) {
-                positions[i*3] = 0; positions[i*3+1] = 0; positions[i*3+2] = 0;
-                const theta = Math.random() * Math.PI * 2; const phi = Math.acos((Math.random() * 2) - 1); const speed = (Math.random() * 5) + 1.5; 
-                bbVel[i].x = speed * Math.sin(phi) * Math.cos(theta); bbVel[i].y = speed * Math.sin(phi) * Math.sin(theta); bbVel[i].z = speed * Math.cos(phi);
-            }
-            bigBangSys.geometry.attributes.position.needsUpdate = true;
-            bbActive = true; bbMat.opacity = 1; shockwave.scale.set(0.1, 0.1, 0.1); shockwave.material.opacity = 0.5;
-            const flash = document.getElementById('flash-overlay');
-            gsap.fromTo(flash, { opacity: 0.8 }, { opacity: 0, duration: 1.5, ease: "power2.out" });
-            gsap.to(bbMat, { opacity: 0, duration: 3, ease: "power2.in", delay: 1.5 });
-            gsap.to(shockwave.scale, { x: 150, y: 150, duration: 4, ease: "power2.out" });
-            gsap.to(shockwave.material, { opacity: 0, duration: 3, ease: "power2.out" });
+            const p = bigBangSys.geometry.attributes.position.array;
+            for(let i=0; i<bbCount; i++) { p[i*3]=0; p[i*3+1]=0; p[i*3+2]=0; const th=Math.random()*Math.PI*2; const ph=Math.acos((Math.random()*2)-1); const sp=(Math.random()*5)+1.5; bbVel[i].x = sp*Math.sin(ph)*Math.cos(th); bbVel[i].y = sp*Math.sin(ph)*Math.sin(th); bbVel[i].z = sp*Math.cos(ph); }
+            bigBangSys.geometry.attributes.position.needsUpdate = true; bbActive = true; bbMat.opacity = 1; shockwave.scale.set(0.1,0.1,0.1); shockwave.material.opacity = 0.5;
+            const flash = document.getElementById('flash-overlay'); gsap.fromTo(flash, { opacity: 0.8 }, { opacity: 0, duration: 1.5, ease: "power2.out" });
+            gsap.to(bbMat, { opacity: 0, duration: 3, ease: "power2.in", delay: 1.5 }); gsap.to(shockwave.scale, { x: 150, y: 150, duration: 4, ease: "power2.out" }); gsap.to(shockwave.material, { opacity: 0, duration: 3, ease: "power2.out" });
         }
-        window.reTriggerBigBang = function() {
-            document.getElementById('ui-layer').classList.remove('visible'); document.getElementById('hud-nav').classList.remove('visible');
-            triggerBigBang();
-            setTimeout(() => { document.getElementById('ui-layer').classList.add('visible'); document.getElementById('hud-nav').classList.add('visible'); }, 3000);
-        }
+        window.reTriggerBigBang = function() { document.getElementById('home-layer').classList.remove('active'); document.getElementById('hud-nav').classList.remove('visible'); triggerBigBang(); setTimeout(() => { document.getElementById('home-layer').classList.add('active'); document.getElementById('hud-nav').classList.add('visible'); }, 3000); }
 
-        // --- SHOOTING STARS ---
         class ShootingStar {
-            constructor() {
-                this.mesh = new THREE.Group();
-                const head = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffffff }));
-                const tail = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.3, 40, 8), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 }));
-                tail.rotation.x = -Math.PI / 2; tail.position.z = -20;
-                this.mesh.add(head); this.mesh.add(tail); scene.add(this.mesh); this.reset();
-            }
-            reset() { this.active = false; this.mesh.visible = false; this.delay = Math.random() * 400 + 100; }
-            spawn() {
-                this.active = true; this.mesh.visible = true; this.speed = 3.0 + Math.random() * 2.0;
-                const startX = (Math.random() - 0.5) * 800; const startY = (Math.random() - 0.5) * 400; const startZ = -200 + (Math.random() * 400);
-                this.mesh.position.set(startX, startY, startZ);
-                const target = new THREE.Vector3(startX + (Math.random() - 0.5) * 400, startY + (Math.random() - 0.5) * 200, startZ + 200);
-                this.velocity = new THREE.Vector3().subVectors(target, this.mesh.position).normalize().multiplyScalar(this.speed);
-                this.mesh.lookAt(target); this.life = 0; this.maxLife = 150;
-            }
-            update() { if(!this.active) { this.delay--; if(this.delay <= 0) this.spawn(); return; } this.mesh.position.add(this.velocity); this.life++; if(this.life > this.maxLife) this.reset(); }
+            constructor() { this.mesh = new THREE.Group(); const h = new THREE.Mesh(new THREE.SphereGeometry(0.3, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffffff })); const t = new THREE.Mesh(new THREE.CylinderGeometry(0.01, 0.3, 40, 8), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.8 })); t.rotation.x = -Math.PI/2; t.position.z = -20; this.mesh.add(h); this.mesh.add(t); scene.add(this.mesh); this.reset(); }
+            reset() { this.active = false; this.mesh.visible = false; this.delay = Math.random()*400+100; }
+            spawn() { this.active = true; this.mesh.visible = true; this.speed = 3.0+Math.random()*2.0; const sx = (Math.random()-0.5)*800; const sy = (Math.random()-0.5)*400; const sz = -200+(Math.random()*400); this.mesh.position.set(sx, sy, sz); const t = new THREE.Vector3(sx+(Math.random()-0.5)*400, sy+(Math.random()-0.5)*200, sz+200); this.velocity = new THREE.Vector3().subVectors(t, this.mesh.position).normalize().multiplyScalar(this.speed); this.mesh.lookAt(t); this.life = 0; this.maxLife = 150; }
+            update() { if(!this.active) { this.delay--; if(this.delay<=0) this.spawn(); return; } this.mesh.position.add(this.velocity); this.life++; if(this.life>this.maxLife) this.reset(); }
         }
         const meteors = []; for(let i=0; i<4; i++) meteors.push(new ShootingStar()); 
 
-        // --- STARFIELD ---
         function createStarLayer(count, size, color, spread) {
-            const geometry = new THREE.BufferGeometry();
-            const vertices = []; for(let i = 0; i < count; i++) vertices.push((Math.random()-0.5)*spread, (Math.random()-0.5)*spread, (Math.random()-0.5)*spread);
-            geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
-            const canvas = document.createElement('canvas'); canvas.width = 32; canvas.height = 32;
-            const ctx = canvas.getContext('2d'); const grad = ctx.createRadialGradient(16,16,0,16,16,16);
-            grad.addColorStop(0, 'rgba(255,255,255,1)'); grad.addColorStop(1, 'rgba(0,0,0,0)');
-            ctx.fillStyle = grad; ctx.fillRect(0,0,32,32);
-            const material = new THREE.PointsMaterial({ size: size, color: color, map: new THREE.CanvasTexture(canvas), transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false });
-            return new THREE.Points(geometry, material);
+            const g = new THREE.BufferGeometry(); const v = []; for(let i=0; i<count; i++) v.push((Math.random()-0.5)*spread, (Math.random()-0.5)*spread, (Math.random()-0.5)*spread);
+            g.setAttribute('position', new THREE.Float32BufferAttribute(v, 3));
+            const c = document.createElement('canvas'); c.width=32; c.height=32; const x = c.getContext('2d'); const gr = x.createRadialGradient(16,16,0,16,16,16); gr.addColorStop(0,'rgba(255,255,255,1)'); gr.addColorStop(1,'rgba(0,0,0,0)'); x.fillStyle = gr; x.fillRect(0,0,32,32);
+            const m = new THREE.PointsMaterial({ size: size, color: color, map: new THREE.CanvasTexture(c), transparent: true, opacity: 0.8, blending: THREE.AdditiveBlending, depthWrite: false });
+            return new THREE.Points(g, m);
         }
         const starsBack = createStarLayer(6000, 0.5, 0xAAAAAA, 2500); scene.add(starsBack);
         const starsMid = createStarLayer(2000, 1.0, 0xC4A77D, 1500); scene.add(starsMid);
         const starsFront = createStarLayer(400, 2.0, 0xE5D3B3, 800); scene.add(starsFront);
 
-        // --- THEME TOGGLE ---
-        let isDark = true;
-        window.toggleTheme = function() {
-            isDark = !isDark;
-            document.body.classList.toggle('light-mode');
+        // --- NAVIGATION & PROJECTS ---
+        const projectsData = [
+            { title: "NEBULA OS", type: "Interface Design", desc: "Système d'exploitation spatial pour le tourisme orbital.", img: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1080&auto=format&fit=crop" },
+            { title: "CYBER CORE", type: "WebGL Experience", desc: "Visualiseur de données en temps réel pour serveurs quantiques.", img: "https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=1080&auto=format&fit=crop" },
+            { title: "AERO DYNAMICS", type: "3D Modeling", desc: "Concept de véhicule autonome à propulsion ionique.", img: "https://images.unsplash.com/photo-1535378437327-10ff28945486?q=80&w=1080&auto=format&fit=crop" },
+            { title: "VOID WALKER", type: "Game Dev", desc: "Jeu d'exploration procédurale en apesanteur.", img: "https://images.unsplash.com/photo-1614728853913-1e32005e307a?q=80&w=1080&auto=format&fit=crop" }
+        ];
+
+        function initProjects() {
+            const container = document.getElementById('projects-layer');
+            container.innerHTML = '';
+            projectsData.forEach(p => {
+                const card = document.createElement('div');
+                card.className = 'project-card';
+                card.innerHTML = `
+                    <div class="project-meta"><span>${p.type}</span><span>///</span></div>
+                    <div class="project-image"><img src="${p.img}" alt="${p.title}"></div>
+                    <div class="project-title">${p.title}</div>
+                    <div class="project-desc">${p.desc}</div>
+                    <div class="project-link">[ EXPLORE DATA ]</div>
+                `;
+                container.appendChild(card);
+                
+                // Tilt Effect
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                    const cx = rect.width / 2; const cy = rect.height / 2;
+                    const rx = (y - cy) / cy * -10; const ry = (x - cx) / cx * 10;
+                    card.style.transform = `translateY(-20px) scale(1.02) rotateX(${rx}deg) rotateY(${ry}deg)`;
+                });
+                card.addEventListener('mouseleave', () => {
+                    card.style.transform = `translateY(0) scale(1) rotateX(0) rotateY(0)`;
+                });
+            });
+        }
+        initProjects();
+
+        window.navigate = function(target) {
+            const home = document.getElementById('home-layer');
+            const projects = document.getElementById('projects-layer');
+            const btns = document.querySelectorAll('.hud-btn');
             
-            const targetBg = isDark ? 0x0A0806 : 0xE6E8EC;
-            const targetFog = isDark ? fogColorDark : fogColorLight;
-            const targetStarColor = isDark ? 0xAAAAAA : 0x222222; 
-            const targetSunColor = isDark ? 0xFFDD88 : 0x88CCFF; 
-            const targetAmbient = isDark ? 1.0 : 2.5; 
+            btns.forEach(b => b.classList.remove('active'));
+            document.querySelector(`.hud-btn[data-target="${target}"]`).classList.add('active');
 
-            gsap.to(scene.fog.color, { r: targetFog.r, g: targetFog.g, b: targetFog.b, duration: 1.5 });
-            
-            const sCol = new THREE.Color(targetStarColor);
-            gsap.to(starsBack.material.color, { r: sCol.r, g: sCol.g, b: sCol.b, duration: 1 });
-            gsap.to(starsMid.material.color, { r: sCol.r, g: sCol.g, b: sCol.b, duration: 1 });
-            gsap.to(starsFront.material.color, { r: sCol.r, g: sCol.g, b: sCol.b, duration: 1 });
-
-            const sunCol = new THREE.Color(targetSunColor);
-            gsap.to(sunMaterial.color, { r: sunCol.r, g: sunCol.g, b: sunCol.b, duration: 1.5 });
-            gsap.to(sunLight.color, { r: sunCol.r, g: sunCol.g, b: sunCol.b, duration: 1.5 });
-            gsap.to(spriteMaterial.color, { r: sunCol.r, g: sunCol.g, b: sunCol.b, duration: 1.5 });
-
-            gsap.to(ambientLight, { intensity: targetAmbient, duration: 1 });
+            if (target === 'projects') {
+                gsap.to(home, { opacity: 0, y: -50, duration: 0.5, onComplete: () => {
+                    home.classList.add('hidden');
+                    projects.classList.remove('hidden');
+                    // Warp Effect
+                    gsap.to(window, { warpSpeed: 2, duration: 0.5, yoyo: true, repeat: 1 });
+                    gsap.to(camera.position, { x: 200, duration: 2, ease: "power2.inOut" });
+                    
+                    gsap.fromTo(projects, { opacity: 0, x: 100 }, { opacity: 1, x: 0, duration: 1, delay: 0.5 });
+                }});
+            } else if (target === 'home') {
+                gsap.to(projects, { opacity: 0, x: 100, duration: 0.5, onComplete: () => {
+                    projects.classList.add('hidden');
+                    home.classList.remove('hidden');
+                    // Reverse Warp
+                    gsap.to(window, { warpSpeed: 2, duration: 0.5, yoyo: true, repeat: 1 });
+                    gsap.to(camera.position, { x: 0, duration: 2, ease: "power2.inOut" });
+                    
+                    gsap.fromTo(home, { opacity: 0, y: 50 }, { opacity: 1, y: 0, duration: 1, delay: 0.5 });
+                }});
+            }
         }
 
-        // --- LANGUAGE TOGGLE SYSTEM ---
+        // --- THEME & LANG ---
+        let isDark = true;
+        window.toggleTheme = function() {
+            isDark = !isDark; document.body.classList.toggle('light-mode');
+            const tBg = isDark ? 0x0A0806 : 0xE6E8EC; const tFog = isDark ? fogColorDark : fogColorLight;
+            const tStar = isDark ? 0xAAAAAA : 0x222222; const tSun = isDark ? 0xFFDD88 : 0x88CCFF; const tAmb = isDark ? 1.0 : 2.5; 
+            gsap.to(scene.fog.color, { r: tFog.r, g: tFog.g, b: tFog.b, duration: 1.5 });
+            const sCol = new THREE.Color(tStar); gsap.to(starsBack.material.color, { r: sCol.r, g: sCol.g, b: sCol.b, duration: 1 });
+            gsap.to(starsMid.material.color, { r: sCol.r, g: sCol.g, b: sCol.b, duration: 1 }); gsap.to(starsFront.material.color, { r: sCol.r, g: sCol.g, b: sCol.b, duration: 1 });
+            const sunCol = new THREE.Color(tSun); gsap.to(sunMaterial.color, { r: sunCol.r, g: sunCol.g, b: sunCol.b, duration: 1.5 });
+            gsap.to(sunLight.color, { r: sunCol.r, g: sunCol.g, b: sunCol.b, duration: 1.5 }); gsap.to(sunGlow.material.color, { r: sunCol.r, g: sunCol.g, b: sunCol.b, duration: 1.5 });
+            gsap.to(ambientLight, { intensity: tAmb, duration: 1 });
+        }
+
         let currentLang = 'FR';
         const langData = {
-            FR: {
-                subtitle: "[ DESIGNER & DÉVELOPPEUR ]",
-                nav: ["Index", "Projets", "Profil", "Comms"],
-                initBtn: ">> INITIALIZE SEQUENCE_01",
-                cardTitle: "IDENTITÉ",
-                cardStatus: "ID: 5PY-N3L // STATUS: ONLINE",
-                skills: ["CREATIVITY", "WEBGL / 3D"],
-                bio: "Profil hybride naviguant entre le design pur et l'ingénierie complexe. Je ne construis pas des sites web, je sculpte des expériences numériques vivantes.",
-                access: "[ ACCESS GRANTED ]",
-                live: "● LIVE CONNECTION",
-                coords: "COORDS",
-                sys: "SYS: STABLE",
-                loader: "INITIALIZING SYSTEM..."
-            },
-            EN: {
-                subtitle: "[ DESIGNER & DEVELOPER ]",
-                nav: ["Index", "Projects", "Profile", "Contact"],
-                initBtn: ">> INITIALIZE SEQUENCE_01",
-                cardTitle: "IDENTITY",
-                cardStatus: "ID: 5PY-N3L // STATUS: ONLINE",
-                skills: ["CREATIVITY", "WEBGL / 3D"],
-                bio: "Hybrid profile navigating between pure design and complex engineering. I don't build websites, I sculpt living digital experiences.",
-                access: "[ ACCESS GRANTED ]",
-                live: "● LIVE CONNECTION",
-                coords: "COORDS",
-                sys: "SYS: STABLE",
-                loader: "INITIALIZING SYSTEM..."
-            }
+            FR: { subtitle: "[ DESIGNER & DÉVELOPPEUR ]", nav: ["Accueil", "Projets", "Profil", "Comms"], initBtn: ">> INITIALIZE SEQUENCE_01", cardTitle: "IDENTITÉ", cardStatus: "ID: 5PY-N3L // STATUS: ONLINE", skills: ["CREATIVITY", "WEBGL / 3D"], bio: "Profil hybride naviguant entre le design pur et l'ingénierie complexe. Je ne construis pas des sites web, je sculpte des expériences numériques vivantes.", access: "[ ACCÈS AUTORISÉ ]", live: "● LIVE CONNECTION", coords: "COORDS", sys: "SYS: STABLE", loader: "INITIALIZING SYSTEM..." },
+            EN: { subtitle: "[ DESIGNER & DEVELOPER ]", nav: ["Home", "Projects", "Profile", "Contact"], initBtn: ">> INITIALIZE SEQUENCE_01", cardTitle: "IDENTITY", cardStatus: "ID: 5PY-N3L // STATUS: ONLINE", skills: ["CREATIVITY", "WEBGL / 3D"], bio: "Hybrid profile navigating between pure design and complex engineering. I don't build websites, I sculpt living digital experiences.", access: "[ ACCESS GRANTED ]", live: "● LIVE CONNECTION", coords: "COORDS", sys: "SYS: STABLE", loader: "INITIALIZING SYSTEM..." }
         };
 
         window.toggleLanguage = function() {
-            currentLang = currentLang === 'FR' ? 'EN' : 'FR';
-            const data = langData[currentLang];
-            const btn = document.getElementById('lang-toggle');
-            
-            // Animate Button
-            gsap.to(btn, { scale: 0.8, duration: 0.1, yoyo: true, repeat: 1 });
-            btn.innerText = currentLang === 'FR' ? 'EN' : 'FR';
-
-            // Helper for safe updates
-            const safeSetText = (id, text) => {
-                const el = document.getElementById(id);
-                if(el) el.innerText = text;
-            }
-
-            // Update Content
-            safeSetText('hero-subtitle', data.subtitle);
-            safeSetText('init-btn-text', data.initBtn);
-            safeSetText('holo-title', data.cardTitle);
-            safeSetText('holo-status', data.cardStatus);
-            safeSetText('skill-1', data.skills[0]);
-            safeSetText('skill-2', data.skills[1]);
-            safeSetText('access-text', data.access);
-            safeSetText('live-text', data.live);
-            safeSetText('coords-label', data.coords);
-            safeSetText('sys-label', data.sys);
-            safeSetText('loader-text', data.loader);
-
-            const navBtns = document.querySelectorAll('.hud-btn');
-            navBtns.forEach((btn, index) => {
-                if(data.nav[index]) btn.innerText = data.nav[index];
-            });
-
+            currentLang = currentLang === 'FR' ? 'EN' : 'FR'; const data = langData[currentLang]; const btn = document.getElementById('lang-toggle');
+            gsap.to(btn, { scale: 0.8, duration: 0.1, yoyo: true, repeat: 1 }); btn.innerText = currentLang;
+            const safeSet = (id, txt) => { const el = document.getElementById(id); if(el) el.innerText = txt; }
+            safeSet('hero-subtitle', data.subtitle); safeSet('init-btn-text', data.initBtn); safeSet('holo-title', data.cardTitle); safeSet('holo-status', data.cardStatus); safeSet('skill-1', data.skills[0]); safeSet('skill-2', data.skills[1]); safeSet('access-text', data.access); safeSet('live-text', data.live); safeSet('coords-label', data.coords); safeSet('sys-label', data.sys); if(document.getElementById('loader-text')) document.getElementById('loader-text').innerText = data.loader;
+            const navBtns = document.querySelectorAll('.hud-btn'); navBtns.forEach((b, i) => { if(data.nav[i]) b.innerText = data.nav[i]; });
             scrambler.setText(data.bio);
         }
 
-        // --- WARP & ANIM ---
+        // --- ANIMATION LOOP ---
         let warpSpeed = 0; window.setWarpSpeed = function(active) { gsap.to(window, { warpSpeed: active ? 1 : 0, duration: 1 }); }
-        const mouse = new THREE.Vector2(); 
-        const targetMouse = new THREE.Vector2();
-        
-        // --- MOUSE + TOUCH HANDLING ---
-        const updateInput = (x, y) => {
-            mouse.x = (x / window.innerWidth) * 2 - 1; 
-            mouse.y = -(y / window.innerHeight) * 2 + 1; 
-            targetMouse.x = x; 
-            targetMouse.y = y;
-            
-            // 3D Tilt Logic
-            const card = document.getElementById('holo-card'); 
-            if(document.getElementById('profile-module').classList.contains('active')) { 
-                card.style.transform = `perspective(1000px) rotateX(${-mouse.y*5}deg) rotateY(${mouse.x*5}deg)`; 
-            }
-        };
-
+        const mouse = new THREE.Vector2(); const targetMouse = new THREE.Vector2();
+        const updateInput = (x, y) => { mouse.x = (x / window.innerWidth) * 2 - 1; mouse.y = -(y / window.innerHeight) * 2 + 1; targetMouse.x = x; targetMouse.y = y; const card = document.getElementById('holo-card'); if(document.getElementById('profile-module').classList.contains('active')) { card.style.transform = `perspective(1000px) rotateX(${-mouse.y*5}deg) rotateY(${mouse.x*5}deg)`; } };
         document.addEventListener('mousemove', (e) => updateInput(e.clientX, e.clientY));
+        document.addEventListener('touchmove', (e) => { const touch = e.touches[0]; updateInput(touch.clientX, touch.clientY); }, { passive: false });
         
-        // Touch support for interaction
-        document.addEventListener('touchmove', (e) => {
-            const touch = e.touches[0];
-            updateInput(touch.clientX, touch.clientY);
-        }, { passive: false });
-
-        // Custom Cursor (Desktop)
         const cursor = document.getElementById('custom-cursor'); let cX = 0, cY = 0;
         function animCursor() { cX += (targetMouse.x - cX) * 0.15; cY += (targetMouse.y - cY) * 0.15; if(cursor) { cursor.style.left = cX+'px'; cursor.style.top = cY+'px'; } requestAnimationFrame(animCursor); } animCursor();
         document.querySelectorAll('a, div[onclick]').forEach(el => { el.addEventListener('mouseenter', () => cursor.classList.add('active')); el.addEventListener('mouseleave', () => cursor.classList.remove('active')); });
 
-        // --- GYROSCOPE (Mobile) ---
         let gyroX = 0; let gyroY = 0;
-        window.addEventListener('deviceorientation', (event) => {
-            if(event.beta && event.gamma) {
-                // Scale down for subtlety
-                gyroX = event.gamma / 90; 
-                gyroY = event.beta / 90;
-            }
-        });
+        window.addEventListener('deviceorientation', (e) => { if(e.beta && e.gamma) { gyroX = e.gamma / 90; gyroY = e.beta / 90; } });
 
-        const clock = new THREE.Clock();
         function animate() {
             requestAnimationFrame(animate);
-            const speedMultiplier = 1 + (warpSpeed * 20); 
-            
-            // Combine Mouse + Gyro for Camera
-            const targetCamX = (mouse.x * 5) + (gyroX * 10);
-            const targetCamY = (mouse.y * 5) + (gyroY * 10);
-
+            const speedMultiplier = 1 + (warpSpeed * 20); const targetCamX = (mouse.x * 5) + (gyroX * 10); const targetCamY = (mouse.y * 5) + (gyroY * 10);
             planets.forEach(p => { p.pivot.rotation.y += p.speed * speedMultiplier; p.mesh.rotation.y += 0.01; });
             starsBack.rotation.y += 0.0001 * speedMultiplier; starsMid.rotation.y += 0.0003 * speedMultiplier;
             if (warpSpeed > 0.1) { starsFront.position.z += warpSpeed * 5; if(starsFront.position.z > 200) starsFront.position.z = -200; starsMid.position.z += warpSpeed * 2; if(starsMid.position.z > 200) starsMid.position.z = -200; }
-            if (bbActive) {
-                const pos = bigBangSys.geometry.attributes.position.array; let stillActive = false;
-                for(let i=0; i<bbCount; i++) { pos[i*3] += bbVel[i].x; pos[i*3+1] += bbVel[i].y; pos[i*3+2] += bbVel[i].z; }
-                bigBangSys.geometry.attributes.position.needsUpdate = true; if(bbMat.opacity <= 0.01) bbActive = false;
-            }
+            if (bbActive) { const p = bigBangSys.geometry.attributes.position.array; let active = false; for(let i=0; i<bbCount; i++) { p[i*3] += bbVel[i].x; p[i*3+1] += bbVel[i].y; p[i*3+2] += bbVel[i].z; } bigBangSys.geometry.attributes.position.needsUpdate = true; if(bbMat.opacity <= 0.01) bbActive = false; }
             meteors.forEach(m => m.update());
             
-            // Apply Camera Movement
-            camera.position.x += (targetCamX - camera.position.x) * 0.05; 
-            camera.position.y += (targetCamY - camera.position.y) * 0.05; 
+            // Only update camera if NOT in projects transition
+            if (!document.getElementById('projects-layer').classList.contains('hidden')) {
+               // Projects mode camera logic (maybe slide right)
+            } else {
+               camera.position.x += (targetCamX - camera.position.x) * 0.05; 
+               camera.position.y += (targetCamY - camera.position.y) * 0.05; 
+            }
             camera.lookAt(scene.position);
-
             renderer.render(scene, camera);
         }
         animate();
@@ -605,7 +561,7 @@
         
         setTimeout(() => {
             const loader = document.getElementById('loader'); loader.style.opacity = '0';
-            setTimeout(() => { loader.remove(); triggerBigBang(); setTimeout(() => { document.getElementById('ui-layer').classList.add('visible'); document.getElementById('hud-nav').classList.add('visible'); }, 2500); }, 500);
+            setTimeout(() => { loader.remove(); triggerBigBang(); setTimeout(() => { document.getElementById('home-layer').classList.add('active'); document.getElementById('hud-nav').classList.add('visible'); }, 2500); }, 500);
         }, 2500);
 
         class TextScramble {
