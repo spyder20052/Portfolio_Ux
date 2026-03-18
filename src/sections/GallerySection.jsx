@@ -4,20 +4,21 @@ import { RevealText, ScrambleText } from '../components/utils/TextAnimations';
 import { ProjectCard } from '../components/portfolio/Portfolio';
 import { PROJECTS } from '../data/projects';
 
-export const GallerySection = React.forwardRef(({ setCursorType, isActive, onOpenProject, isScrolling }, ref) => (
+export const GallerySection = React.forwardRef(({ setCursorType, onOpenProject, isScrolling }, ref) => (
     <div ref={ref} className="w-full md:w-auto min-h-screen flex flex-col md:flex-row items-center px-6 md:px-40 shrink-0 z-10 relative py-12 md:py-0">
         <div className="w-full md:w-auto md:mr-60 shrink-0 mb-16 md:mb-0 text-center md:text-left">
             <h2 className="text-5xl sm:text-6xl md:text-[10rem] font-serif leading-[0.85] relative inline-block">
-                <ScrambleText active={isActive} delay={0}>Œuvres</ScrambleText>
+                <ScrambleText delay={0}>Œuvres</ScrambleText>
                 <motion.div
                     initial={{ width: 0 }}
-                    animate={{ width: isActive ? '50%' : 0 }}
+                    whileInView={{ width: '50%' }}
+                    viewport={{ once: true }}
                     transition={{ duration: 1, delay: 0.6 }}
                     className="absolute -bottom-4 left-0 h-1 md:h-2 bg-blue-500"
                 ></motion.div>
             </h2>
             <p className="mt-8 md:mt-12 text-gray-400 uppercase tracking-widest text-[10px] sm:text-xs">
-                <ScrambleText active={isActive} delay={400}>Défilez pour explorer la galerie</ScrambleText>
+                <ScrambleText delay={400}>Défilez pour explorer la galerie</ScrambleText>
             </p>
         </div>
         <div className="flex flex-col md:flex-row items-center w-full md:w-auto gap-4 md:gap-0">

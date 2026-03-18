@@ -40,7 +40,6 @@ export default function App() {
   const scrollingTimeoutRef = useRef(null);
   const scrollCooldownRef = useRef(false);
   const scrollDeltaRef = useRef(0);
-  const [visibleSections, setVisibleSections] = useState(new Array(6).fill(false));
 
   // Transform for progress - dynamic function to react to totalWidth changes
   const progressPercent = useTransform(xMotionValue, (val) => {
@@ -144,45 +143,7 @@ export default function App() {
     };
   }, [isMenuOpen, isMobile, selectedProject, xMotionValue, currentActiveIndex]);
 
-  // Intersection Observer for reactive activation
-  useEffect(() => {
-    const options = {
-      root: null,
-      threshold: 0.1,
-      rootMargin: '0px 100px 0px 100px'
-    };
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        const index = sectionRefs.current.indexOf(entry.target);
-        if (index !== -1) {
-          if (entry.isIntersecting) {
-            setVisibleSections((prev) => {
-              const next = [...prev];
-              next[index] = true;
-              return next;
-            });
-            // Update primary index for indicators - only if mobile
-            // On desktop, handleWheel is the source of truth for snapping
-            if (isMobile) {
-              setCurrentActiveIndex(index);
-            }
-          }
-        }
-      });
-    }, options);
-
-    const currentRefs = sectionRefs.current;
-    currentRefs.forEach((ref) => {
-      if (ref) observer.observe(ref);
-    });
-
-    return () => {
-      currentRefs.forEach((ref) => {
-        if (ref) observer.unobserve(ref);
-      });
-    };
-  }, [isMobile]); // Re-run if layout changes drastically, though refs stay same
+  // Intersection Observer removed - Sections handled internally via whileInView for better performance
 
   useEffect(() => {
     const handleMouseMove = (e) => {
@@ -236,7 +197,7 @@ export default function App() {
         }
       `}</style>
 
-      <ParallaxBackground xMotionValue={xMotionValue} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />
+      {!isMobile && <ParallaxBackground xMotionValue={xMotionValue} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />}
 
       {!isMobile && <CustomCursor mouseX={mouseX} mouseY={mouseY} cursorType={cursorType} />}
 
@@ -246,6 +207,7 @@ export default function App() {
           project={selectedProject}
           onClose={() => setSelectedProject(null)}
           onOpenProject={setSelectedProject}
+          isMobile={isMobile}
         />
       )}
 
@@ -320,12 +282,12 @@ export default function App() {
           transformStyle: 'preserve-3d'
         } : {}}
       >
-        <LandingSection ref={el => sectionRefs.current[0] = el} isActive={visibleSections[0]} />
-        <IntroSection ref={el => sectionRefs.current[1] = el} mouseX={mouseX} mouseY={mouseY} isActive={visibleSections[1]} isMobile={isMobile} />
-        <GallerySection ref={el => sectionRefs.current[2] = el} setCursorType={setCursorType} isActive={visibleSections[2]} onOpenProject={setSelectedProject} isScrolling={isScrolling} />
-        <BioSection ref={el => sectionRefs.current[3] = el} isActive={visibleSections[3]} />
-        <ExpertiseSection ref={el => sectionRefs.current[4] = el} isActive={visibleSections[4]} />
-        <ContactSection ref={el => sectionRefs.current[5] = el} isActive={visibleSections[5] || currentActiveIndex >= 5} />
+        <LandingSection ref={el => sectionRefs.current[0] = el} />
+        <IntroSection ref={el => sectionRefs.current[1] = el} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />
+        <GallerySection ref={el => sectionRefs.current[2] = el} setCursorType={setCursorType} onOpenProject={setSelectedProject} isScrolling={isScrolling} />
+        <BioSection ref={el => sectionRefs.current[3] = el} />
+        <ExpertiseSection ref={el => sectionRefs.current[4] = el} />
+        <ContactSection ref={el => sectionRefs.current[5] = el} />
       </motion.div>
 
 

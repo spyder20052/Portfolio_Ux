@@ -30,7 +30,7 @@ export const ProjectCard = ({ project, setCursorType, onOpen, index, isScrolling
     </div>
 );
 
-export const ProjectDetail = ({ project, onClose, onOpenProject }) => {
+export const ProjectDetail = ({ project, onClose, onOpenProject, isMobile }) => {
     if (!project) return null;
 
     const currentIndex = PROJECTS.findIndex(p => p.id === project.id);
@@ -68,8 +68,8 @@ export const ProjectDetail = ({ project, onClose, onOpenProject }) => {
                         {project.images.map((img, i) => (
                             <motion.div
                                 key={i}
-                                initial={{ opacity: 0, y: 50 }}
-                                whileInView={{ opacity: 1, y: 0 }}
+                                initial={!isMobile ? { opacity: 0, y: 50 } : { opacity: 1, y: 0 }}
+                                whileInView={!isMobile ? { opacity: 1, y: 0 } : {}}
                                 viewport={{ once: true, margin: "-10%" }}
                                 transition={{
                                     duration: 1,

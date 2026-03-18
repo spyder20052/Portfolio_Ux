@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { RevealText } from '../components/utils/TextAnimations';
 
-export const BioSection = React.forwardRef(({ isActive }, ref) => (
+export const BioSection = React.forwardRef((props, ref) => (
     <div ref={ref} className="w-full md:min-w-screen min-h-screen flex items-center justify-center px-6 md:px-20 py-20 md:py-0 shrink-0 bg-[#0A0A0A] text-white relative">
         <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-20 items-center">
             <div className="relative group overflow-hidden rounded-2xl aspect-[4/5] max-h-[50vh] md:max-h-[70vh] shadow-2xl">
@@ -15,19 +15,20 @@ export const BioSection = React.forwardRef(({ isActive }, ref) => (
                 <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-60"></div>
             </div>
             <div>
-                <RevealText active={isActive} delay={100}>
+                <RevealText delay={100}>
                     <span className="text-blue-500 font-bold tracking-widest text-xs uppercase mb-8 block">À propos de moi</span>
                 </RevealText>
                 <h2 className="text-2xl md:text-3xl lg:text-4xl font-serif leading-relaxed mb-12">
-                    <RevealText active={isActive} delay={300}>Spynel KOUTON — Développeur & Graphic Designer.</RevealText>{" "}
-                    <RevealText active={isActive} delay={400}><span className="text-gray-500">Avec plus de 3 ans d'expérience,</span></RevealText>{" "}
-                    <RevealText active={isActive} delay={500}>j'ai réalisé plus de 50 projets variés et stimulants.</RevealText>{" "}
-                    <RevealText active={isActive} delay={600}><span className="italic text-blue-400">Mon approche combine une solide expertise technique</span></RevealText>{" "}
-                    <RevealText active={isActive} delay={700}>avec une sensibilité artistique aiguisée.</RevealText>
+                    <RevealText delay={300}>Spynel KOUTON — Développeur & Graphic Designer.</RevealText>{" "}
+                    <RevealText delay={400}><span className="text-gray-500">Avec plus de 3 ans d'expérience,</span></RevealText>{" "}
+                    <RevealText delay={500}>j'ai réalisé plus de 50 projets variés et stimulants.</RevealText>{" "}
+                    <RevealText delay={600}><span className="italic text-blue-400">Mon approche combine une solide expertise technique</span></RevealText>{" "}
+                    <RevealText delay={700}>avec une sensibilité artistique aiguisée.</RevealText>
                 </h2>
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: isActive ? 1 : 0, y: isActive ? 0 : 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
                     transition={{ duration: 0.6, delay: 0.4 }}
                     className="grid grid-cols-2 gap-8"
                 >

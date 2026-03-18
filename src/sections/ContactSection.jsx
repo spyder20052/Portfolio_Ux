@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { Mail, Github, Linkedin, ArrowRight } from 'lucide-react';
 import { RevealText, ScrambleText } from '../components/utils/TextAnimations';
 
-export const ContactSection = React.forwardRef(({ isActive }, ref) => {
+export const ContactSection = React.forwardRef((props, ref) => {
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
     return (
         <div ref={ref} className="w-full md:min-w-screen min-h-[100dvh] flex flex-col items-center justify-center px-6 md:px-20 shrink-0 bg-[#0A0A0A] text-white relative overflow-hidden py-20">
-            {/* Background visual accent */}
-            <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-600/5 blur-[150px] transition-transform duration-[2000ms] ${isActive ? 'scale-100' : 'scale-50'}`}></div>
+            {/* Background visual accent - Removed heavy blur for mobile stability */}
 
             <div className="relative z-10 w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-20">
                 <div className="flex flex-col justify-center">

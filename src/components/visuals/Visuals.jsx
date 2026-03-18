@@ -69,7 +69,7 @@ export const ParallaxBackground = ({ xMotionValue, mouseX, mouseY, isMobile }) =
                     style={{ transform: txMouse }}
                 >
                     <svg className="w-full h-full" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
-                        <circle cx="960" cy="540" r="200" fill={COLORS.accent} className="opacity-[0.03] blur-3xl" />
+                        <circle cx="960" cy="540" r="200" fill={COLORS.accent} className="opacity-[0.03] blur-[20px]" />
                         <g className="opacity-10">
                             <circle cx="100" cy="100" r="4" fill={COLORS.accent} />
                             <circle cx="1800" cy="900" r="6" fill={COLORS.accent} />
@@ -132,14 +132,14 @@ export const BalanceGraphic = ({ mouseX, mouseY, isMobile }) => {
                     stroke={COLORS.accent}
                     strokeWidth="2"
                     fill="none"
-                    animate={{
+                    animate={!isMobile ? {
                         rotate: 360,
                         scale: [1, 1.1, 1]
-                    }}
-                    transition={{
+                    } : {}}
+                    transition={!isMobile ? {
                         rotate: { duration: 15, repeat: Infinity, ease: "linear" },
                         scale: { duration: 4, repeat: Infinity, ease: "easeInOut" }
-                    }}
+                    } : {}}
                     style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
                 />
 
