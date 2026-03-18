@@ -1,18 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Mail, Github, Linkedin, ArrowRight } from 'lucide-react';
 import { RevealText, ScrambleText } from '../components/utils/TextAnimations';
+import { useInView } from 'framer-motion';
 
 export const ContactSection = React.forwardRef((props, ref) => {
+    const localRef = useRef(null);
+    const sectionInView = useInView(localRef, { once: true, margin: "-10%" });
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
+    // Sync localRef with the forwarded ref
+    useEffect(() => {
+        if (!ref) return;
+        if (typeof ref === 'function') {
+            ref(localRef.current);
+        } else {
+            ref.current = localRef.current;
+        }
+    }, [ref]);
+
     return (
-        <div ref={ref} className="w-full md:min-w-screen min-h-[100dvh] flex flex-col items-center justify-center px-6 md:px-20 shrink-0 bg-[#0A0A0A] text-white relative overflow-hidden py-20">
+        <div ref={localRef} className="w-full md:min-w-screen min-h-[100dvh] flex flex-col items-center justify-center px-6 md:px-20 shrink-0 bg-[#0A0A0A] text-white relative overflow-hidden py-20">
             {/* Background visual accent - Removed heavy blur for mobile stability */}
 
             <div className="relative z-10 w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-20">
                 <div className="flex flex-col justify-center">
                     <h2 className="text-5xl sm:text-6xl md:text-9xl font-serif mb-6 md:mb-12 leading-none">
-                        <ScrambleText active={isActive} delay={200}>Contact.</ScrambleText>
+                        <ScrambleText active={sectionInView} delay={200}>Contact.</ScrambleText>
                     </h2>
                     <p className="text-gray-400 text-sm sm:text-base md:text-2xl mb-8 md:mb-12 max-w-md leading-relaxed">
                         Un projet, une question ou simplement envie de discuter ? Mon studio est ouvert à de nouvelles aventures.

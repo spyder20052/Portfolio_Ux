@@ -1,8 +1,21 @@
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useRef, useEffect } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { RevealText } from '../components/utils/TextAnimations';
 
 export const ExpertiseSection = React.forwardRef((props, ref) => {
+    const localRef = useRef(null);
+    const sectionInView = useInView(localRef, { once: true, margin: "-10%" });
+
+    // Sync localRef with the forwarded ref
+    useEffect(() => {
+        if (!ref) return;
+        if (typeof ref === 'function') {
+            ref(localRef.current);
+        } else {
+            ref.current = localRef.current;
+        }
+    }, [ref]);
+
     const services = [
         { title: "Développement Web", desc: "Sites modernes et applications performantes (React, Vue.js, Node.js, API REST)." },
         { title: "Applications Mobiles", desc: "Développement natif et hybride iOS/Android (React Native, Flutter, PWA)." },
@@ -29,10 +42,10 @@ export const ExpertiseSection = React.forwardRef((props, ref) => {
     ];
 
     return (
-        <div ref={ref} className="w-full md:min-w-screen min-h-screen flex items-center justify-center px-6 md:px-20 shrink-0 bg-white relative py-20">
+        <div ref={localRef} className="w-full md:min-w-screen min-h-screen flex items-center justify-center px-6 md:px-20 shrink-0 bg-white relative py-20">
             <div className="max-w-7xl w-full">
                 <div className="mb-12">
-                    <RevealText delay={100}>
+                    <RevealText active={sectionInView} delay={100}>
                         <span className="text-blue-500 font-bold tracking-widest text-xs uppercase mb-4 block">Expertise</span>
                     </RevealText>
                     <h2 className="text-5xl md:text-7xl font-serif">Mes Services.</h2>
@@ -43,8 +56,7 @@ export const ExpertiseSection = React.forwardRef((props, ref) => {
                         <motion.div
                             key={i}
                             initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
+                            animate={sectionInView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
                             transition={{ duration: 0.5, delay: i * 0.1 }}
                             className="group border-b border-gray-100 pb-6 transition-colors"
                         >
@@ -63,8 +75,7 @@ export const ExpertiseSection = React.forwardRef((props, ref) => {
                                 <motion.div
                                     key={i}
                                     initial={{ opacity: 0, x: -10 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
-                                    viewport={{ once: true }}
+                                    animate={sectionInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
                                     transition={{ duration: 0.4, delay: 0.3 + i * 0.05 }}
                                 >
                                     <div className="flex justify-between mb-2">
@@ -74,8 +85,7 @@ export const ExpertiseSection = React.forwardRef((props, ref) => {
                                     <div className="h-[1px] w-full bg-gray-100 overflow-hidden">
                                         <motion.div
                                             initial={{ width: 0 }}
-                                            whileInView={{ width: `${skill.level}%` }}
-                                            viewport={{ once: true }}
+                                            animate={sectionInView ? { width: `${skill.level}%` } : { width: 0 }}
                                             transition={{ duration: 1, delay: 0.5 + i * 0.05, ease: "easeOut" }}
                                             className="h-full bg-blue-500"
                                         ></motion.div>
@@ -91,8 +101,7 @@ export const ExpertiseSection = React.forwardRef((props, ref) => {
                                 <motion.div
                                     key={i}
                                     initial={{ opacity: 0, x: -10 }}
-                                    whileInView={{ opacity: 1, x: 0 }}
-                                    viewport={{ once: true }}
+                                    animate={sectionInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -10 }}
                                     transition={{ duration: 0.4, delay: 0.4 + i * 0.05 }}
                                 >
                                     <div className="flex justify-between mb-2">
@@ -102,8 +111,7 @@ export const ExpertiseSection = React.forwardRef((props, ref) => {
                                     <div className="h-[1px] w-full bg-gray-100 overflow-hidden">
                                         <motion.div
                                             initial={{ width: 0 }}
-                                            whileInView={{ width: `${tool.level}%` }}
-                                            viewport={{ once: true }}
+                                            animate={sectionInView ? { width: `${tool.level}%` } : { width: 0 }}
                                             transition={{ duration: 1, delay: 0.6 + i * 0.05, ease: "easeOut" }}
                                             className="h-full bg-blue-500"
                                         ></motion.div>
