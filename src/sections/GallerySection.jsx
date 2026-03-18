@@ -8,9 +8,7 @@ export const GallerySection = React.forwardRef(({ setCursorType, isActive, onOpe
     <div ref={ref} className="w-full md:w-auto min-h-screen flex flex-col md:flex-row items-center px-6 md:px-40 shrink-0 z-10 relative py-12 md:py-0">
         <div className="w-full md:w-auto md:mr-60 shrink-0 mb-16 md:mb-0 text-center md:text-left">
             <h2 className="text-5xl sm:text-6xl md:text-[10rem] font-serif leading-[0.85] relative inline-block">
-                <RevealText active={isActive} delay={0}>
-                    <ScrambleText active={isActive} delay={0}>Œuvres</ScrambleText>
-                </RevealText>
+                <ScrambleText active={isActive} delay={0}>Œuvres</ScrambleText>
                 <motion.div
                     initial={{ width: 0 }}
                     animate={{ width: isActive ? '50%' : 0 }}

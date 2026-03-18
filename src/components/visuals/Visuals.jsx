@@ -82,7 +82,7 @@ export const ParallaxBackground = ({ xMotionValue, mouseX, mouseY, isMobile }) =
     );
 };
 
-export const BalanceGraphic = ({ mouseX, mouseY }) => {
+export const BalanceGraphic = ({ mouseX, mouseY, isMobile }) => {
     const factor = 0.015;
     const tx = useTransform(mouseX, (x) => (x - window.innerWidth / 2) * factor);
     const ty = useTransform(mouseY, (y) => (y - window.innerHeight / 2) * factor);
@@ -94,8 +94,8 @@ export const BalanceGraphic = ({ mouseX, mouseY }) => {
             style={{ x: tx, y: ty, rotate }}
         >
             <svg viewBox="0 0 400 400" className="w-full h-full opacity-90">
-                {/* Background Particles - The "Living" part */}
-                {[...Array(6)].map((_, i) => (
+                {/* Background Particles - The "Living" part - Disabled on mobile for stability */}
+                {!isMobile && [...Array(6)].map((_, i) => (
                     <motion.circle
                         key={i}
                         cx={100 + Math.random() * 200}

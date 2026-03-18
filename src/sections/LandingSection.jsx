@@ -28,9 +28,6 @@ export const LandingSection = React.forwardRef(({ isActive }, ref) => (
                 J'aide les entreprises et créateurs à transformer leurs idées en expériences digitales modernes, élégantes et performantes.
             </motion.p>
         </div>
-        <div className="absolute bottom-10 flex flex-col items-center">
-            <div className="w-[1px] h-10 md:h-20 bg-gradient-to-b from-transparent via-black/20 to-black animate-shimmer"></div>
-        </div>
     </div>
 ));
 LandingSection.displayName = 'LandingSection';

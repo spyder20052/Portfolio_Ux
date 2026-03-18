@@ -31,7 +31,7 @@ export const ScrambleText = ({ children, active, delay = 0 }) => {
                 }
 
                 iteration += 1 / 2;
-            }, 10);
+            }, 30);
         }, delay);
 
         return () => {

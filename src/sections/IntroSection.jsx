@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { RevealText } from '../components/utils/TextAnimations';
 import { BalanceGraphic } from '../components/visuals/Visuals';
 
-export const IntroSection = React.forwardRef(({ mouseX, mouseY, isActive }, ref) => (
+export const IntroSection = React.forwardRef(({ mouseX, mouseY, isActive, isMobile }, ref) => (
     <div ref={ref} className="w-full md:min-w-screen min-h-screen flex items-center justify-center px-6 md:px-20 shrink-0 relative bg-white md:bg-transparent">
         <div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-7xl items-center gap-10 md:gap-32">
             <div className="relative z-10 order-2 md:order-1">
@@ -33,7 +33,7 @@ export const IntroSection = React.forwardRef(({ mouseX, mouseY, isActive }, ref)
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="w-full aspect-square order-1 md:order-2 flex items-center justify-center transition-transform"
             >
-                <BalanceGraphic mouseX={mouseX} mouseY={mouseY} />
+                <BalanceGraphic mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />
             </motion.div>
         </div>
     </div>

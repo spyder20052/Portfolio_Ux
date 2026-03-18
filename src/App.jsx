@@ -130,7 +130,7 @@ export default function App() {
 
             setTimeout(() => {
               scrollCooldownRef.current = false;
-            }, 1000);
+            }, 600);
           }
         } else {
           scrollDeltaRef.current = 0;
@@ -148,10 +148,8 @@ export default function App() {
   useEffect(() => {
     const options = {
       root: null,
-      // Trigger as soon as any part of the section is visible
-      threshold: 0,
-      // For horizontal scroll on desktop, we need to ensure the root margin is correct
-      // but usually null (viewport) works for both axes.
+      threshold: 0.1,
+      rootMargin: '0px 100px 0px 100px'
     };
 
     const observer = new IntersectionObserver((entries) => {
@@ -269,7 +267,7 @@ export default function App() {
           <motion.div
             initial={{ clipPath: 'circle(0% at 95% 5%)' }}
             animate={{ clipPath: 'circle(150% at 95% 5%)' }}
-            exit={{ clipPath: 'circle(0% at 95% 5%)', transition: { delay: 0.5 } }}
+            exit={{ clipPath: 'circle(0% at 95% 5%)' }}
             transition={{ duration: 0.8, ease: [0.77, 0, 0.175, 1] }}
             className="fixed inset-0 z-[90] bg-[#0A0A0A] text-white flex flex-col items-center justify-center"
           >
@@ -323,7 +321,7 @@ export default function App() {
         } : {}}
       >
         <LandingSection ref={el => sectionRefs.current[0] = el} isActive={visibleSections[0]} />
-        <IntroSection ref={el => sectionRefs.current[1] = el} mouseX={mouseX} mouseY={mouseY} isActive={visibleSections[1]} />
+        <IntroSection ref={el => sectionRefs.current[1] = el} mouseX={mouseX} mouseY={mouseY} isActive={visibleSections[1]} isMobile={isMobile} />
         <GallerySection ref={el => sectionRefs.current[2] = el} setCursorType={setCursorType} isActive={visibleSections[2]} onOpenProject={setSelectedProject} isScrolling={isScrolling} />
         <BioSection ref={el => sectionRefs.current[3] = el} isActive={visibleSections[3]} />
         <ExpertiseSection ref={el => sectionRefs.current[4] = el} isActive={visibleSections[4]} />
