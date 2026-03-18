@@ -30,7 +30,7 @@ export const ScrambleText = ({ children, active, delay = 0 }) => {
                     clearInterval(interval);
                 }
 
-                iteration += 1 / 2;
+                iteration += 1;
             }, 30);
         }, delay);
 

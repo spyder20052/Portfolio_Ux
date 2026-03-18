@@ -6,16 +6,14 @@ export const ContactSection = React.forwardRef(({ isActive }, ref) => {
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
     return (
-        <div ref={ref} className="w-full md:min-w-screen min-h-screen flex flex-col items-center justify-center px-6 md:px-20 shrink-0 bg-[#0A0A0A] text-white relative overflow-hidden py-10 md:py-20">
+        <div ref={ref} className="w-full md:min-w-screen min-h-[100dvh] flex flex-col items-center justify-center px-6 md:px-20 shrink-0 bg-[#0A0A0A] text-white relative overflow-hidden py-20">
             {/* Background visual accent */}
             <div className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120%] h-[120%] bg-blue-600/5 blur-[150px] transition-transform duration-[2000ms] ${isActive ? 'scale-100' : 'scale-50'}`}></div>
 
             <div className="relative z-10 w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-20">
                 <div className="flex flex-col justify-center">
                     <h2 className="text-5xl sm:text-6xl md:text-9xl font-serif mb-6 md:mb-12 leading-none">
-                        <RevealText active={isActive} delay={200}>
-                            <ScrambleText active={isActive} delay={300}>Contact.</ScrambleText>
-                        </RevealText>
+                        <ScrambleText active={isActive} delay={200}>Contact.</ScrambleText>
                     </h2>
                     <p className="text-gray-400 text-sm sm:text-base md:text-2xl mb-8 md:mb-12 max-w-md leading-relaxed">
                         Un projet, une question ou simplement envie de discuter ? Mon studio est ouvert à de nouvelles aventures.
@@ -76,8 +74,11 @@ export const ContactSection = React.forwardRef(({ isActive }, ref) => {
                 </form>
             </div>
 
-            <div className="absolute bottom-10 left-10 text-[9px] opacity-20 uppercase tracking-[0.8em] hidden md:block">
-                Design & Code by Spynel Kouton — All rights reserved © 2026
+            <div className="absolute bottom-6 md:bottom-10 left-0 w-full flex flex-col items-center gap-2 px-6">
+                <div className="w-12 h-[1px] bg-blue-500/30 md:hidden"></div>
+                <div className="text-[8px] md:text-[9px] opacity-30 uppercase tracking-[0.4em] md:tracking-[0.8em] text-center">
+                    Design & Code by Spynel Kouton — All rights reserved © 2026
+                </div>
             </div>
         </div>
     );

@@ -37,13 +37,13 @@ export const ProjectDetail = ({ project, onClose, onOpenProject }) => {
     const nextProject = PROJECTS[(currentIndex + 1) % PROJECTS.length];
 
     return (
-        <div className="fixed inset-0 z-[150] bg-[#0A0A0A] text-white overflow-y-auto transform-gpu">
-            {/* PREVIOUS LAYER BUTTON */}
+        <div className="fixed inset-0 z-[150] bg-[#0A0A0A] text-white overflow-y-auto">
+            {/* RETOUR BUTTON */}
             <button
                 onClick={onClose}
-                className="fixed top-10 left-10 z-[160] px-4 py-2 text-[10px] font-bold tracking-[0.2em] uppercase text-white hover:text-blue-500 transition-colors bg-white/5 backdrop-blur-md border border-white/10"
+                className="fixed top-6 left-6 md:top-10 md:left-10 z-[250] px-4 py-2 text-[10px] font-bold tracking-[0.2em] uppercase text-white mix-blend-difference hover:text-blue-500 transition-colors border border-white/20 rounded-full"
             >
-                &lt; Previous Layer
+                &lt; Retour
             </button>
 
             <div className="min-h-screen flex flex-col">
