@@ -1,22 +1,15 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useImperativeHandle } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { RevealText, ScrambleText } from '../components/utils/TextAnimations';
 import { ProjectCard } from '../components/portfolio/Portfolio';
 import { PROJECTS } from '../data/projects';
 
-export const GallerySection = React.forwardRef(({ setCursorType, onOpenProject, isScrolling }, ref) => {
+export const GallerySection = React.forwardRef(({ onOpenProject, isScrolling }, ref) => {
     const localRef = useRef(null);
     const sectionInView = useInView(localRef, { once: true, margin: "-10%" });
 
     // Sync localRef with the forwarded ref
-    useEffect(() => {
-        if (!ref) return;
-        if (typeof ref === 'function') {
-            ref(localRef.current);
-        } else {
-            ref.current = localRef.current;
-        }
-    }, [ref]);
+    useImperativeHandle(ref, () => localRef.current);
 
     return (
         <div ref={localRef} className="w-full md:w-auto min-h-screen flex flex-col md:flex-row items-center px-6 md:px-40 shrink-0 z-10 relative py-12 md:py-0">
@@ -36,7 +29,7 @@ export const GallerySection = React.forwardRef(({ setCursorType, onOpenProject, 
             </div>
             <div className="flex flex-col md:flex-row items-center w-full md:w-auto gap-4 md:gap-0">
                 {PROJECTS.map((p, i) => (
-                    <ProjectCard key={p.id} project={p} setCursorType={setCursorType} onOpen={onOpenProject} index={i} isScrolling={isScrolling} />
+                    <ProjectCard key={p.id} project={p} onOpen={onOpenProject} index={i} isScrolling={isScrolling} />
                 ))}
             </div>
             <div className="w-8 md:w-80 shrink-0 h-1 hidden md:block"></div>

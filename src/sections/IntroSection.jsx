@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useImperativeHandle } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { RevealText } from '../components/utils/TextAnimations';
 import { BalanceGraphic } from '../components/visuals/Visuals';
@@ -8,14 +8,7 @@ export const IntroSection = React.forwardRef(({ mouseX, mouseY, isMobile }, ref)
     const sectionInView = useInView(localRef, { once: true, margin: "-10%" });
 
     // Sync localRef with the forwarded ref
-    useEffect(() => {
-        if (!ref) return;
-        if (typeof ref === 'function') {
-            ref(localRef.current);
-        } else {
-            ref.current = localRef.current;
-        }
-    }, [ref]);
+    useImperativeHandle(ref, () => localRef.current);
 
     return (
         <div ref={localRef} className="w-full md:min-w-screen min-h-screen flex items-center justify-center px-6 md:px-20 shrink-0 relative bg-white md:bg-transparent">

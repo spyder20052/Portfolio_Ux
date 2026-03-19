@@ -277,7 +277,7 @@ export const PROJECTS = [
     },
     {
         id: 18,
-        title: "BDE Agency",
+        title: "BDE",
         category: "Design / Promo",
         img: "/Projets/Visuel pour le BDE/1.webp",
         images: [
@@ -296,7 +296,7 @@ export const PROJECTS = [
             "/Projets/Visuel pour le BDE/MEILLEURS VŒUX (1).webp",
             "/Projets/Visuel pour le BDE/Red & Green Modern Christmas Party Flyer.webp"
         ],
-        description: "Supports de communication et visuels promotionnels pour la vie étudiante."
+        description: "Supports de communication et visuels promotionnels pour le Bureau Des Étudiants."
     },
     {
         id: 19,

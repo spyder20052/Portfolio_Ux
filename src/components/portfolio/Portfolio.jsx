@@ -2,12 +2,10 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { PROJECTS } from '../../data/projects';
 
-export const ProjectCard = ({ project, setCursorType, onOpen, index, isScrolling }) => (
+export const ProjectCard = ({ project, onOpen, index, isScrolling }) => (
     <div
-        className={`h-[40vh] sm:h-[45vh] md:h-[75vh] w-full md:w-[550px] shrink-0 md:mx-10 relative group bg-gray-200 cursor-pointer md:cursor-none transition-[transform,opacity] duration-1000 my-6 md:my-0 content-visibility-auto contain-intrinsic-size-project-card ${index % 2 === 0 ? 'md:translate-y-[-5%]' : 'md:translate-y-[5%]'} ${isScrolling ? 'pointer-events-none' : ''}`}
-        style={{ transform: 'translateZ(0)' }}
-        onMouseEnter={() => !isScrolling && setCursorType('project')}
-        onMouseLeave={() => setCursorType('default')}
+        className={`h-[40vh] sm:h-[45vh] md:h-[75vh] w-full md:w-[550px] shrink-0 md:mx-10 relative group bg-gray-200 cursor-pointer transition-[transform,opacity] duration-1000 my-6 md:my-0 content-visibility-auto contain-intrinsic-size-project-card ${index % 2 === 0 ? 'md:translate-y-[-5%]' : 'md:translate-y-[5%]'} ${isScrolling ? 'pointer-events-none' : ''} will-change-transform`}
+        style={{ transform: 'translate3d(0,0,0)' }}
         onClick={() => !isScrolling && onOpen(project)}
     >
         <div className="absolute inset-0 overflow-hidden">
@@ -41,7 +39,7 @@ export const ProjectDetail = ({ project, onClose, onOpenProject, isMobile }) => 
             {/* RETOUR BUTTON */}
             <button
                 onClick={onClose}
-                className="fixed top-6 left-6 md:top-10 md:left-10 z-[250] px-4 py-2 text-[10px] font-bold tracking-[0.2em] uppercase text-white mix-blend-difference hover:text-blue-500 transition-colors border border-white/20 rounded-full"
+                className={`fixed top-6 left-6 md:top-10 md:left-10 z-[250] px-4 py-2 text-[10px] font-bold tracking-[0.2em] uppercase text-white ${isMobile ? 'bg-black/50 backdrop-blur-md' : 'mix-blend-difference'} hover:text-blue-500 transition-colors border border-white/20 rounded-full`}
             >
                 &lt; Retour
             </button>
@@ -65,9 +63,9 @@ export const ProjectDetail = ({ project, onClose, onOpenProject, isMobile }) => 
                 {/* Creative Column-Based Masonry Gallery */}
                 <div className="bg-[#0A0A0A] py-20 px-4 md:px-12">
                     <div className="max-w-[1600px] mx-auto columns-1 md:columns-2 lg:columns-3 gap-12 space-y-12">
-                        {project.images.map((img, i) => (
+                        {project.images.slice(0, 9).map((img, i) => (
                             <motion.div
-                                key={i}
+                                key={`${project.id}-img-${i}`}
                                 initial={!isMobile ? { opacity: 0, y: 50 } : { opacity: 1, y: 0 }}
                                 whileInView={!isMobile ? { opacity: 1, y: 0 } : {}}
                                 viewport={{ once: true, margin: "-10%" }}

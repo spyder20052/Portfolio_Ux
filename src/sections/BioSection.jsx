@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useImperativeHandle } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { RevealText } from '../components/utils/TextAnimations';
@@ -8,14 +8,7 @@ export const BioSection = React.forwardRef((props, ref) => {
     const sectionInView = useInView(localRef, { once: true, margin: "-10%" });
 
     // Sync localRef with the forwarded ref
-    useEffect(() => {
-        if (!ref) return;
-        if (typeof ref === 'function') {
-            ref(localRef.current);
-        } else {
-            ref.current = localRef.current;
-        }
-    }, [ref]);
+    useImperativeHandle(ref, () => localRef.current);
 
     return (
         <div ref={localRef} className="w-full md:min-w-screen min-h-screen flex items-center justify-center px-6 md:px-20 py-20 md:py-0 shrink-0 bg-[#0A0A0A] text-white relative">

@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useImperativeHandle } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { RevealText } from '../components/utils/TextAnimations';
 
@@ -7,14 +7,7 @@ export const ExpertiseSection = React.forwardRef((props, ref) => {
     const sectionInView = useInView(localRef, { once: true, margin: "-10%" });
 
     // Sync localRef with the forwarded ref
-    useEffect(() => {
-        if (!ref) return;
-        if (typeof ref === 'function') {
-            ref(localRef.current);
-        } else {
-            ref.current = localRef.current;
-        }
-    }, [ref]);
+    useImperativeHandle(ref, () => localRef.current);
 
     const services = [
         { title: "Développement Web", desc: "Sites modernes et applications performantes (React, Vue.js, Node.js, API REST)." },

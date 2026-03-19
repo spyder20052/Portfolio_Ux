@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X } from 'lucide-react';
-import { motion, AnimatePresence, useSpring, useMotionValue, useTransform } from 'framer-motion';
+import { Menu, X, ArrowRight, Instagram, Github, Linkedin, Mail } from 'lucide-react';
+import { motion, AnimatePresence, useSpring, useMotionValue, useTransform, animate } from 'framer-motion';
 
 // Data
 import { PROJECTS } from './data/projects';
 
 // Components
 import { ParallaxBackground } from './components/visuals/Visuals';
-import { CustomCursor } from './components/visuals/CustomCursor';
 import { ProjectDetail } from './components/portfolio/Portfolio';
 
 // Sections
@@ -23,12 +22,11 @@ import { ContactSection } from './sections/ContactSection';
  */
 export default function App() {
   const xMotionValue = useMotionValue(0);
-  const xSpring = useSpring(xMotionValue, { stiffness: 40, damping: 20, mass: 1 });
+  const xSpring = useSpring(xMotionValue, { stiffness: 120, damping: 30, mass: 1, restDelta: 0.1 });
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
   const [totalWidth, setTotalWidth] = useState(0);
-  const [cursorType, setCursorType] = useState('default');
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentActiveIndex, setCurrentActiveIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
@@ -59,6 +57,38 @@ export default function App() {
 
   // Performance refs
 
+  // Helper function for smooth scrolling to sections
+  const scrollToSection = (index) => {
+    if (index < 0 || index >= sectionRefs.current.length) return;
+
+    const target = sectionRefs.current[index];
+    if (!target) return;
+
+    scrollCooldownRef.current = true;
+    scrollDeltaRef.current = 0;
+
+    let targetOffset = target.offsetLeft;
+    if (index < currentActiveIndex && target.offsetWidth > window.innerWidth) {
+      targetOffset = target.offsetLeft + target.offsetWidth - window.innerWidth;
+    }
+
+    setIsScrolling(true);
+    setCurrentActiveIndex(index);
+
+    // Use controlled animate instead of just spring for large programmatic jumps
+    animate(xMotionValue, targetOffset, {
+      duration: 1.2,
+      ease: [0.76, 0, 0.24, 1],
+      onComplete: () => {
+        scrollPosRef.current = targetOffset;
+        scrollCooldownRef.current = false;
+        setIsScrolling(false);
+      }
+    });
+
+    if (scrollingTimeoutRef.current) clearTimeout(scrollingTimeoutRef.current);
+  };
+
   useEffect(() => {
     if (isMobile) return;
 
@@ -66,41 +96,32 @@ export default function App() {
       if (isMenuOpen || selectedProject || scrollCooldownRef.current) return;
 
       const delta = e.deltaY;
-
-      // Determine if we are in a "long" section that needs internal scrolling
       const currentSection = sectionRefs.current[currentActiveIndex];
       const isLongSection = currentSection && currentSection.offsetWidth > window.innerWidth;
 
       if (isLongSection) {
-        // Internal scrolling for long sections (like Gallery)
         const sectionStart = currentSection.offsetLeft;
         const sectionEnd = sectionStart + currentSection.offsetWidth - window.innerWidth;
 
-        // If we are scrolling forward and haven't reached the end of the section
-        if (delta > 0 && scrollPosRef.current < sectionEnd - 10) {
-          e.preventDefault();
-          scrollDeltaRef.current = 0;
-          const newPos = Math.min(scrollPosRef.current + delta, sectionEnd);
-          scrollPosRef.current = newPos;
-          xMotionValue.set(newPos);
-          return;
-        }
+        // Internal scrolling for long sections
+        const isNearStart = scrollPosRef.current <= sectionStart + 2;
+        const isNearEnd = scrollPosRef.current >= sectionEnd - 2;
 
-        // If we are scrolling backward and haven't reached the start of the section
-        if (delta < 0 && scrollPosRef.current > sectionStart + 10) {
+        if ((delta > 0 && !isNearEnd) || (delta < 0 && !isNearStart)) {
           e.preventDefault();
           scrollDeltaRef.current = 0;
-          const newPos = Math.max(scrollPosRef.current + delta, sectionStart);
+
+          const newPos = Math.max(sectionStart, Math.min(scrollPosRef.current + delta * 1.8, sectionEnd));
           scrollPosRef.current = newPos;
           xMotionValue.set(newPos);
           return;
         }
       }
 
-      // Snapping logic for normal sections or when at boundaries of long sections
+      // Snapping logic
       scrollDeltaRef.current += delta;
 
-      if (Math.abs(scrollDeltaRef.current) > 50) {
+      if (Math.abs(scrollDeltaRef.current) > 100) {
         e.preventDefault();
 
         let nextIndex = currentActiveIndex;
@@ -111,26 +132,7 @@ export default function App() {
         }
 
         if (nextIndex !== currentActiveIndex) {
-          const target = sectionRefs.current[nextIndex];
-          if (target) {
-            scrollCooldownRef.current = true;
-            scrollDeltaRef.current = 0;
-
-            // SPECIAL CASE: When moving BACKWARD into a LONG section
-            // We should land at the END of that section
-            let targetOffset = target.offsetLeft;
-            if (nextIndex < currentActiveIndex && target.offsetWidth > window.innerWidth) {
-              targetOffset = target.offsetLeft + target.offsetWidth - window.innerWidth;
-            }
-
-            scrollPosRef.current = targetOffset;
-            xMotionValue.set(targetOffset);
-            setCurrentActiveIndex(nextIndex);
-
-            setTimeout(() => {
-              scrollCooldownRef.current = false;
-            }, 600);
-          }
+          scrollToSection(nextIndex);
         } else {
           scrollDeltaRef.current = 0;
         }
@@ -138,10 +140,8 @@ export default function App() {
     };
 
     window.addEventListener('wheel', handleWheel, { passive: false });
-    return () => {
-      window.removeEventListener('wheel', handleWheel);
-    };
-  }, [isMenuOpen, isMobile, selectedProject, xMotionValue, currentActiveIndex]);
+    return () => window.removeEventListener('wheel', handleWheel);
+  }, [isMenuOpen, isMobile, selectedProject, xMotionValue, currentActiveIndex, totalWidth]);
 
   // Intersection Observer removed - Sections handled internally via whileInView for better performance
 
@@ -155,14 +155,27 @@ export default function App() {
   }, [mouseX, mouseY]);
 
   useEffect(() => {
-    if (containerRef.current) {
+    const updateWidth = () => {
+      if (!containerRef.current) return;
       if (isMobile) {
         setTotalWidth(document.documentElement.scrollHeight - window.innerHeight);
       } else {
         setTotalWidth(containerRef.current.scrollWidth - window.innerWidth);
       }
-    }
-  }, [isMobile, currentActiveIndex]);
+    };
+
+    updateWidth();
+    window.addEventListener('resize', updateWidth);
+    // Also update after a long delay to catch image loads
+    const t1 = setTimeout(updateWidth, 1000);
+    const t2 = setTimeout(updateWidth, 3000);
+
+    return () => {
+      window.removeEventListener('resize', updateWidth);
+      clearTimeout(t1);
+      clearTimeout(t2);
+    };
+  }, [isMobile]);
 
   useEffect(() => {
     if (isMobile) {
@@ -176,30 +189,15 @@ export default function App() {
   }, [isMobile, xMotionValue]);
 
 
+  const isDarkSection = [3, 5].includes(currentActiveIndex);
+  const headerColorClass = isMenuOpen || (isMobile && isDarkSection) ? 'text-white' : (isMobile ? 'text-black' : 'mix-blend-difference text-white');
+  const iconColor = isMenuOpen || (isMobile && isDarkSection) ? 'white' : (isMobile ? 'black' : 'white');
+
   return (
     <div className={`min-h-screen bg-[#FAFAFA] font-sans ${isMobile ? '' : 'fixed inset-0 overflow-hidden'}`}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,700;1,400&family=Inter:wght@100;300;400;700&display=swap');
-        .font-serif { font-family: 'Cormorant Garamond', serif; }
-        .font-sans { font-family: 'Inter', sans-serif; }
-        @media (min-width: 768px) {
-          * { cursor: none !important; }
-        }
-        
-        @keyframes shimmer {
-          0% { background-position: 0% 0%; }
-          100% { background-position: 0% -200%; }
-        }
-        .animate-shimmer {
-          background: linear-gradient(to bottom, #1A1A1A 0%, #3B82F6 50%, #1A1A1A 100%);
-          background-size: 100% 200%;
-          animation: shimmer 2s linear infinite;
-        }
-      `}</style>
 
       {!isMobile && <ParallaxBackground xMotionValue={xMotionValue} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />}
 
-      {!isMobile && <CustomCursor mouseX={mouseX} mouseY={mouseY} cursorType={cursorType} />}
 
       {/* Project Detail Modal */}
       {selectedProject && (
@@ -212,54 +210,109 @@ export default function App() {
       )}
 
       {/* Header */}
-      <div className="fixed top-6 left-6 md:top-12 md:left-12 z-[100] mix-blend-difference text-white">
+      <div className={`fixed top-6 left-6 md:top-12 md:left-12 z-[100] ${headerColorClass}`}>
         <div className="text-[10px] md:text-xs font-bold tracking-[0.5em] uppercase">Spynel K.</div>
       </div>
 
       <button
-        className="fixed top-4 right-4 md:top-10 md:right-10 z-[100] p-4 text-black mix-blend-difference"
+        className={`fixed top-4 right-4 md:top-10 md:right-10 z-[100] p-4 ${headerColorClass}`}
         onClick={() => setIsMenuOpen(!isMenuOpen)}
       >
-        {isMenuOpen ? <X size={30} color="white" /> : <Menu size={30} color="white" />}
+        {isMenuOpen ? <X size={30} color="white" /> : <Menu size={30} color={iconColor} />}
       </button>
 
       {/* Menu Overlay */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
-            initial={{ clipPath: 'circle(0% at 95% 5%)' }}
-            animate={{ clipPath: 'circle(150% at 95% 5%)' }}
-            exit={{ clipPath: 'circle(0% at 95% 5%)' }}
-            transition={{ duration: 0.8, ease: [0.77, 0, 0.175, 1] }}
-            className="fixed inset-0 z-[90] bg-[#0A0A0A] text-white flex flex-col items-center justify-center"
+            initial={{ y: '-100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '-100%' }}
+            transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+            className="fixed inset-0 z-[90] bg-[#0A0A0A] flex flex-col md:flex-row overflow-hidden"
           >
-            <nav className="flex flex-col items-center gap-6 md:gap-10">
-              {['Accueil', 'Philosophie', 'Œuvres', 'Bio', 'Services', 'Contact'].map((item, i) => (
-                <motion.button
-                  key={item}
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.3 + i * 0.1 }}
-                  onClick={() => {
-                    setIsMenuOpen(false);
-                    const target = sectionRefs.current[i];
-                    if (!target) return;
+            {/* Left Decorative Panel (Desktop) */}
+            {!isMobile && (
+              <motion.div
+                initial={{ opacity: 0, x: -50 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.4, duration: 0.8 }}
+                className="w-1/3 h-full bg-[#0F0F0F] border-r border-white/5 flex flex-col justify-between p-16"
+              >
+                <div className="text-white/20 text-xs font-bold tracking-[0.5em] uppercase">Spynel K. Portfolio</div>
+                <div className="flex flex-col gap-8">
+                  <div className="text-blue-500/40 text-8xl font-serif italic select-none leading-none">Explore.</div>
+                  <p className="text-white/30 max-w-xs text-sm leading-relaxed font-light">
+                    Chaque projet est une nouvelle aventure entre design minimaliste et performance technique.
+                  </p>
+                </div>
+                <div className="flex gap-4">
+                  {[
+                    { icon: Mail, link: "mailto:kspynel@gmail.com" },
+                    { icon: Github, link: "https://github.com/spynelkouton" },
+                    { icon: Linkedin, link: "https://www.linkedin.com/in/spynel-kouton-756444273" },
+                    { icon: Instagram, link: "https://instagram.com/spynelkouton" }
+                  ].map((social, i) => (
+                    <a key={i} href={social.link} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-blue-500 hover:border-blue-500 transition-all">
+                      <social.icon size={16} />
+                    </a>
+                  ))}
+                </div>
+              </motion.div>
+            )}
 
-                    if (isMobile) {
-                      const offsetTop = target.offsetTop;
-                      window.scrollTo({ top: offsetTop, behavior: 'smooth' });
-                    } else {
-                      const offsetLeft = target.offsetLeft;
-                      scrollPosRef.current = offsetLeft;
-                      xMotionValue.set(offsetLeft);
-                    }
-                  }}
-                  className="text-4xl md:text-7xl font-serif hover:text-blue-500 transition-colors hover:italic"
-                >
-                  {item}
-                </motion.button>
-              ))}
-            </nav>
+            {/* Main Navigation Panel */}
+            <div className={`flex-1 flex flex-col justify-center relative ${isMobile ? 'px-8 py-20' : 'px-20'}`}>
+              {!isMobile && (
+                <div className="absolute top-16 right-16 text-white/10 text-9xl font-serif select-none pointer-events-none">MENU</div>
+              )}
+
+              <nav className="flex flex-col gap-4 md:gap-2">
+                {['Accueil', 'Philosophie', 'Œuvres', 'Bio', 'Services', 'Contact'].map((item, i) => (
+                  <motion.button
+                    key={item}
+                    initial={{ opacity: 0, x: 50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 + i * 0.08, duration: 0.6, ease: "easeOut" }}
+                    onClick={() => {
+                      setIsMenuOpen(false);
+                      if (isMobile) {
+                        const target = sectionRefs.current[i];
+                        if (target) {
+                          const offsetTop = target.offsetTop;
+                          window.scrollTo({ top: offsetTop, behavior: 'smooth' });
+                        }
+                      } else {
+                        scrollToSection(i);
+                      }
+                    }}
+                    className="group flex items-baseline gap-4 text-5xl md:text-[6.5rem] font-serif text-white/30 hover:text-white transition-all duration-500 text-left w-fit"
+                  >
+                    <span className="text-blue-500 text-xs md:text-sm font-bold font-sans tracking-[0.3em] opacity-0 group-hover:opacity-100 transition-opacity">0{i + 1}</span>
+                    <span className="transition-transform duration-500 group-hover:italic group-hover:translate-x-4 uppercase md:lowercase tracking-tighter">{item}</span>
+                  </motion.button>
+                ))}
+              </nav>
+
+              {/* Mobile Footer (Socials) */}
+              {isMobile && (
+                <div className="mt-auto flex flex-col gap-6 ">
+                  <div className="h-[1px] w-12 bg-blue-500"></div>
+                  <div className="flex gap-6">
+                    {[
+                      { icon: Mail, link: "mailto:kspynel@gmail.com" },
+                      { icon: Github, link: "https://github.com/spynelkouton" },
+                      { icon: Linkedin, link: "https://www.linkedin.com/in/spynel-kouton-756444273" },
+                      { icon: Instagram, link: "https://instagram.com/spynelkouton" }
+                    ].map((social, i) => (
+                      <a key={i} href={social.link} target="_blank" rel="noopener noreferrer">
+                        <social.icon size={20} className="text-white/40" />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
@@ -284,7 +337,7 @@ export default function App() {
       >
         <LandingSection ref={el => sectionRefs.current[0] = el} />
         <IntroSection ref={el => sectionRefs.current[1] = el} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />
-        <GallerySection ref={el => sectionRefs.current[2] = el} setCursorType={setCursorType} onOpenProject={setSelectedProject} isScrolling={isScrolling} />
+        <GallerySection ref={el => sectionRefs.current[2] = el} onOpenProject={setSelectedProject} isScrolling={isScrolling} />
         <BioSection ref={el => sectionRefs.current[3] = el} />
         <ExpertiseSection ref={el => sectionRefs.current[4] = el} />
         <ContactSection ref={el => sectionRefs.current[5] = el} />

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useImperativeHandle } from 'react';
 import { Mail, Github, Linkedin, ArrowRight } from 'lucide-react';
 import { RevealText, ScrambleText } from '../components/utils/TextAnimations';
 import { useInView } from 'framer-motion';
@@ -9,14 +9,7 @@ export const ContactSection = React.forwardRef((props, ref) => {
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
 
     // Sync localRef with the forwarded ref
-    useEffect(() => {
-        if (!ref) return;
-        if (typeof ref === 'function') {
-            ref(localRef.current);
-        } else {
-            ref.current = localRef.current;
-        }
-    }, [ref]);
+    useImperativeHandle(ref, () => localRef.current);
 
     return (
         <div ref={localRef} className="w-full md:min-w-screen min-h-[100dvh] flex flex-col items-center justify-center px-6 md:px-20 shrink-0 bg-[#0A0A0A] text-white relative overflow-hidden py-20">
@@ -41,7 +34,7 @@ export const ContactSection = React.forwardRef((props, ref) => {
                         <div className="flex gap-4 mt-4 md:mt-8">
                             {[
                                 { icon: <Github size={20} />, link: "https://github.com/spynelkouton" },
-                                { icon: <Linkedin size={20} />, link: "https://linkedin.com/in/spynel-kouton" },
+                                { icon: <Linkedin size={20} />, link: "https://www.linkedin.com/in/spynel-kouton-756444273" },
                                 { icon: <span className="font-bold text-[10px]">WA</span>, link: "https://wa.me/22943202239" }
                             ].map((social, i) => (
                                 <a key={i} href={social.link} target="_blank" rel="noopener noreferrer" className="w-12 h-12 md:w-14 md:h-14 rounded-full border border-white/10 flex items-center justify-center hover:border-blue-500 hover:text-blue-500 transition-all">
