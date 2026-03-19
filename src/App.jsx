@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Menu, X, ArrowRight, Instagram, Github, Linkedin, Mail } from 'lucide-react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Menu, X, Instagram, Github, Linkedin, Mail } from 'lucide-react';
 import { motion, AnimatePresence, useSpring, useMotionValue, useTransform, animate } from 'framer-motion';
 
 // Data
@@ -28,17 +28,38 @@ export default function App() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [isScrolling, setIsScrolling] = useState(false);
 
-  const xMotionValue = useMotionValue(0);
-  const xSpring = useSpring(xMotionValue, { stiffness: 100, damping: 25, mass: 1, restDelta: 0.1 });
-
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
   const containerRef = useRef(null);
   const sectionRefs = useRef([]);
   const scrollPosRef = useRef(0);
-  const scrollingTimeoutRef = useRef(null);
-  const scrollCooldownRef = useRef(false);
   const scrollDeltaRef = useRef(0);
+  const scrollCooldownRef = useRef(false);
+  const currentIndexRef = useRef(0);
+  const rafRef = useRef(null);
+  const isScrollingTimeoutRef = useRef(null);
+
+  // ---------- Spring plus réactif ----------
+  const xMotionValue = useMotionValue(0);
+  const xSpring = useSpring(xMotionValue, {
+    stiffness: 240,
+    damping: 38,
+    mass: 0.7,
+    restDelta: 0.1
+  });
+
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
+
+  // Sync du ref miroir
+  useEffect(() => {
+    currentIndexRef.current = currentActiveIndex;
+  }, [currentActiveIndex]);
+
+  // Gestion du flag isScrolling
+  const markScrolling = useCallback(() => {
+    setIsScrolling(true);
+    if (isScrollingTimeoutRef.current) clearTimeout(isScrollingTimeoutRef.current);
+    isScrollingTimeoutRef.current = setTimeout(() => setIsScrolling(false), 150);
+  }, []);
 
   // Transform for progress - dynamic function to react to totalWidth changes
   const progressPercent = useTransform(xMotionValue, (val) => {
@@ -59,80 +80,115 @@ export default function App() {
   // Performance refs
 
   // Helper function for smooth scrolling to sections
-  const scrollToSection = (index) => {
-    if (index < 0 || index >= sectionRefs.current.length) return;
-
-    const target = sectionRefs.current[index];
-    if (!target) return;
+  const scrollToSection = useCallback((index) => {
+    const section = sectionRefs.current[index];
+    if (!section) return;
 
     scrollCooldownRef.current = true;
     scrollDeltaRef.current = 0;
 
-    let targetOffset = target.offsetLeft;
-    if (index < currentActiveIndex && target.offsetWidth > window.innerWidth) {
-      targetOffset = target.offsetLeft + target.offsetWidth - window.innerWidth;
+    let targetOffset = section.offsetLeft;
+    if (index < currentIndexRef.current && section.offsetWidth > window.innerWidth) {
+      targetOffset = section.offsetLeft + section.offsetWidth - window.innerWidth;
     }
 
-    setIsScrolling(true);
     setCurrentActiveIndex(index);
+    markScrolling();
 
-    // Smoothly animate the target position. The spring (xSpring) will follow xMotionValue.
+    // We animate xMotionValue which the spring (xSpring) follows.
     animate(xMotionValue, targetOffset, {
       duration: 1.2,
       ease: [0.76, 0, 0.24, 1],
+      onUpdate: (latest) => {
+        // Keep the ref in perfect sync during animation
+        scrollPosRef.current = latest;
+      },
       onComplete: () => {
         scrollPosRef.current = targetOffset;
-        scrollCooldownRef.current = false;
-        setIsScrolling(false);
+        xMotionValue.set(targetOffset);
+
+        // Short delay before releasing the wheel to absorb final inertia momentum
+        setTimeout(() => {
+          scrollCooldownRef.current = false;
+          setIsScrolling(false);
+          scrollDeltaRef.current = 0;
+        }, 100);
       }
     });
 
-    if (scrollingTimeoutRef.current) clearTimeout(scrollingTimeoutRef.current);
-  };
+    if (isScrollingTimeoutRef.current) clearTimeout(isScrollingTimeoutRef.current);
+  }, [xMotionValue, markScrolling]);
 
   useEffect(() => {
     if (isMobile) return;
 
+    const container = containerRef.current;
+    if (!container) return;
+
     const handleWheel = (e) => {
+      e.preventDefault();
+
       if (isMenuOpen || selectedProject || scrollCooldownRef.current) return;
 
-      const delta = e.deltaY;
-      const currentSection = sectionRefs.current[currentActiveIndex];
-      const isLongSection = currentSection && currentSection.offsetWidth > window.innerWidth;
+      const idx = currentIndexRef.current;
+      const delta = e.deltaY !== 0 ? e.deltaY : e.deltaX;
+      const currentSection = sectionRefs.current[idx];
+
+      if (!currentSection) return;
+
+      const isLongSection = currentSection.offsetWidth > window.innerWidth;
 
       if (isLongSection) {
         const sectionStart = currentSection.offsetLeft;
         const sectionEnd = sectionStart + currentSection.offsetWidth - window.innerWidth;
 
-        // Internal scrolling for long sections
-        const isNearStart = scrollPosRef.current <= sectionStart + 2;
-        const isNearEnd = scrollPosRef.current >= sectionEnd - 2;
+        const isNearStart = scrollPosRef.current <= sectionStart + 5;
+        const isNearEnd = scrollPosRef.current >= sectionEnd - 5;
 
-        if ((delta > 0 && !isNearEnd) || (delta < 0 && !isNearStart)) {
-          e.preventDefault();
+        const scrollingForward = delta > 0;
+        const scrollingBackward = delta < 0;
+
+        if ((scrollingForward && !isNearEnd) || (scrollingBackward && !isNearStart)) {
           scrollDeltaRef.current = 0;
 
-          const newPos = Math.max(sectionStart, Math.min(scrollPosRef.current + delta * 1.8, sectionEnd));
-          scrollPosRef.current = newPos;
-          xMotionValue.set(newPos);
+          if (rafRef.current) cancelAnimationFrame(rafRef.current);
+          rafRef.current = requestAnimationFrame(() => {
+            const speed = 1.4; // Tuned for better control
+            const currentVal = xMotionValue.get();
+
+            // Re-sync if they drifted
+            if (Math.abs(currentVal - scrollPosRef.current) > 10) {
+              scrollPosRef.current = currentVal;
+            }
+
+            const newPos = Math.max(
+              sectionStart,
+              Math.min(scrollPosRef.current + delta * speed, sectionEnd)
+            );
+
+            scrollPosRef.current = newPos;
+            xMotionValue.set(newPos);
+            markScrolling();
+          });
           return;
         }
       }
 
-      // Snapping logic
+      // --- Snapping entre sections ---
       scrollDeltaRef.current += delta;
 
-      if (Math.abs(scrollDeltaRef.current) > 100) {
-        e.preventDefault();
+      if (Math.abs(scrollDeltaRef.current) > 130) {
+        let nextIndex = idx;
+        const forward = scrollDeltaRef.current > 0;
 
-        let nextIndex = currentActiveIndex;
-        if (scrollDeltaRef.current > 0 && currentActiveIndex < sectionRefs.current.length - 1) {
+        if (forward && idx < sectionRefs.current.length - 1) {
           nextIndex++;
-        } else if (scrollDeltaRef.current < 0 && currentActiveIndex > 0) {
+        } else if (!forward && idx > 0) {
           nextIndex--;
         }
 
-        if (nextIndex !== currentActiveIndex) {
+        if (nextIndex !== idx) {
+          scrollDeltaRef.current = 0;
           scrollToSection(nextIndex);
         } else {
           scrollDeltaRef.current = 0;
@@ -140,9 +196,72 @@ export default function App() {
       }
     };
 
-    window.addEventListener('wheel', handleWheel, { passive: false });
-    return () => window.removeEventListener('wheel', handleWheel);
-  }, [isMenuOpen, isMobile, selectedProject, xMotionValue, currentActiveIndex, totalWidth]);
+    container.addEventListener('wheel', handleWheel, { passive: false });
+
+    // ---------- touch handling for mobile ----------
+    let lastTouchTime = 0;
+    let touchStartY = 0;
+    const handleTouchStart = (e) => { touchStartY = e.touches[0].clientY; };
+    const handleTouchMove = (e) => {
+      const now = performance.now();
+      if (now - lastTouchTime < 32) return;
+      lastTouchTime = now;
+
+      if (isMenuOpen || selectedProject || scrollCooldownRef.current) return;
+      const touchY = e.touches[0].clientY;
+      const delta = touchStartY - touchY;
+      touchStartY = touchY;
+
+      const idx = currentIndexRef.current;
+      const currentSection = sectionRefs.current[idx];
+      if (!currentSection) return;
+
+      const isLongSection = currentSection.offsetWidth > window.innerWidth;
+      if (isLongSection) {
+        // Only prevent default for horizontal scroll area on mobile
+        const sectionStart = currentSection.offsetLeft;
+        const sectionEnd = sectionStart + currentSection.offsetWidth - window.innerWidth;
+        const isNearStart = scrollPosRef.current <= sectionStart + 5;
+        const isNearEnd = scrollPosRef.current >= sectionEnd - 5;
+
+        if ((delta > 0 && !isNearEnd) || (delta < 0 && !isNearStart)) {
+          e.preventDefault();
+          const speed = 1.2;
+          const newPos = Math.max(sectionStart, Math.min(scrollPosRef.current + delta * speed, sectionEnd));
+          scrollPosRef.current = newPos;
+          xMotionValue.set(newPos);
+          markScrolling();
+          return;
+        }
+      }
+
+      // Snap logic for simple sections on mobile
+      scrollDeltaRef.current += delta;
+      if (Math.abs(scrollDeltaRef.current) > 60) {
+        let nxtIdx = idx;
+        if (scrollDeltaRef.current > 0 && idx < sectionRefs.current.length - 1) nxtIdx++;
+        else if (scrollDeltaRef.current < 0 && idx > 0) nxtIdx--;
+
+        if (nxtIdx !== idx) {
+          scrollDeltaRef.current = 0;
+          scrollToSection(nxtIdx);
+          markScrolling();
+        } else {
+          scrollDeltaRef.current = 0;
+        }
+      }
+    };
+
+    container.addEventListener('touchstart', handleTouchStart, { passive: true });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+
+    return () => {
+      container.removeEventListener('wheel', handleWheel);
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    };
+  }, [isMenuOpen, isMobile, selectedProject, xMotionValue, scrollToSection, markScrolling]);
 
   // Intersection Observer removed - Sections handled internally via whileInView for better performance
 
@@ -195,9 +314,9 @@ export default function App() {
   const iconColor = isMenuOpen || (isMobile && isDarkSection) ? 'white' : (isMobile ? 'black' : 'white');
 
   return (
-    <div className={`min-h-screen bg-[#FAFAFA] font-sans ${isMobile ? '' : 'fixed inset-0 overflow-hidden'}`}>
-
+    <div ref={containerRef} className="h-screen w-screen overflow-hidden bg-[#FAFAFA] font-sans">
       {!isMobile && <ParallaxBackground xMotionValue={xMotionValue} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />}
+
 
 
       {/* Project Detail Modal */}
@@ -328,7 +447,6 @@ export default function App() {
 
       {/* Main Canvas */}
       <motion.div
-        ref={containerRef}
         className={`flex ${isMobile ? 'flex-col w-full h-auto' : 'h-screen will-change-transform'}`}
         style={!isMobile ? {
           x: mainXTransform,

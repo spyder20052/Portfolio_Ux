@@ -35,6 +35,23 @@ export const LandingSection = React.forwardRef((props, ref) => {
                     J'aide les entreprises et créateurs à transformer leurs idées en expériences digitales modernes, élégantes et performantes.
                 </motion.p>
             </div>
+
+            {/* Scroll Indicator */}
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.4 }}
+                transition={{ delay: 1.5, duration: 1 }}
+                className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4"
+            >
+                <div className="w-6 h-10 border-2 border-gray-400 rounded-full relative">
+                    <motion.div
+                        animate={{ y: [4, 20, 4] }}
+                        transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                        className="w-1.5 h-1.5 bg-blue-500 rounded-full absolute top-2 left-1/2 -translate-x-1/2"
+                    />
+                </div>
+                <span className="text-[10px] tracking-[0.4em] uppercase text-gray-400 font-bold">Scroll</span>
+            </motion.div>
         </div>
     );
 });

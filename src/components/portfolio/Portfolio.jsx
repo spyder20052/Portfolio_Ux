@@ -1,33 +1,47 @@
-import { motion } from 'framer-motion';
+import { useRef, useState, useCallback } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { PROJECTS } from '../../data/projects';
 
-export const ProjectCard = ({ project, onOpen, index, isScrolling }) => (
-    <div
-        className={`h-[40vh] sm:h-[45vh] md:h-[75vh] w-full md:w-[550px] shrink-0 md:mx-10 relative group bg-gray-200 cursor-pointer transition-[transform,opacity] duration-1000 my-6 md:my-0 content-visibility-auto contain-intrinsic-size-project-card ${index % 2 === 0 ? 'md:translate-y-[-5%]' : 'md:translate-y-[5%]'} ${isScrolling ? 'pointer-events-none' : ''}`}
-        style={{ contain: 'layout style' }}
-        onClick={() => !isScrolling && onOpen(project)}
-    >
-        <div className="absolute inset-0 overflow-hidden">
-            <img
-                src={project.img}
-                alt={project.title}
-                loading={index < 3 ? "eager" : "lazy"}
-                decoding="async"
-                className={`w-full h-full object-cover transition-transform duration-[2000ms] ${isScrolling ? '' : 'group-hover:scale-110'}`}
-            />
-        </div>
-        <div className={`absolute top-0 right-0 p-8 mix-blend-difference text-white opacity-0 ${isScrolling ? '' : 'group-hover:opacity-100'} transition-opacity hidden md:block`}>
-            <ArrowRight size={40} />
-        </div>
-        <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white z-20">
-            <span className="text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase mb-2 block text-blue-400">{project.category}</span>
-            <h3 className="text-2xl md:text-5xl font-serif">{project.title}</h3>
-        </div>
-        <div className={`absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-70 md:opacity-0 ${isScrolling ? '' : 'md:group-hover:opacity-100'} transition-opacity duration-500`}></div>
-    </div >
-);
+export const ProjectCard = ({ project, onOpen, index, isScrolling }) => {
+    const cardRef = useRef(null);
+    const isInView = useInView(cardRef, { margin: "200%", once: true });
+    const [imageLoaded, setImageLoaded] = useState(false);
 
+    const handleImageLoad = useCallback(() => {
+        setImageLoaded(true);
+    }, []);
+
+    return (
+        <div
+            ref={cardRef}
+            className={`h-[40vh] sm:h-[45vh] md:h-[75vh] w-full md:w-[550px] shrink-0 md:mx-10 relative group bg-gray-200 cursor-pointer my-6 md:my-0 ${index % 2 === 0 ? 'md:translate-y-[-5%]' : 'md:translate-y-[5%]'} ${isScrolling ? 'pointer-events-none' : ''}`}
+            style={{ contain: 'layout style paint size' }}
+            onClick={() => !isScrolling && onOpen(project)}
+        >
+            <div className="absolute inset-0 overflow-hidden bg-gray-100">
+                {isInView && (
+                    <img
+                        onLoad={handleImageLoad}
+                        src={project.img}
+                        alt={project.title}
+                        loading={index < 2 ? "eager" : "lazy"}
+                        decoding="async"
+                        className={`w-full h-full object-cover transition-all duration-700 ease-out ${imageLoaded ? 'opacity-100' : 'opacity-0'} ${isScrolling ? '' : 'group-hover:scale-110'}`}
+                    />
+                )}
+            </div>
+            <div className={`absolute top-0 right-0 p-8 mix-blend-difference text-white opacity-0 ${isScrolling ? '' : 'group-hover:opacity-100'} transition-opacity hidden md:block`}>
+                <ArrowRight size={40} />
+            </div>
+            <div className="absolute bottom-6 left-6 md:bottom-10 md:left-10 text-white z-20">
+                <span className="text-[10px] md:text-xs font-bold tracking-[0.3em] uppercase mb-2 block text-blue-400">{project.category}</span>
+                <h3 className="text-2xl md:text-5xl font-serif">{project.title}</h3>
+            </div>
+            <div className={`absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-70 md:opacity-0 ${isScrolling ? '' : 'md:group-hover:opacity-100'} transition-opacity duration-500`}></div>
+        </div>
+    );
+};
 export const ProjectDetail = ({ project, onClose, onOpenProject, isMobile }) => {
     if (!project) return null;
 

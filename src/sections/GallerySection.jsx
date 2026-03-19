@@ -12,7 +12,10 @@ export const GallerySection = React.forwardRef(({ onOpenProject, isScrolling }, 
     useImperativeHandle(ref, () => localRef.current);
 
     return (
-        <div ref={localRef} className="w-full md:w-auto min-h-screen flex flex-col md:flex-row items-center px-6 md:px-40 shrink-0 z-10 relative py-12 md:py-0">
+        <div
+            ref={localRef}
+            className="w-full md:w-auto min-h-screen flex flex-col md:flex-row items-center px-6 md:px-40 shrink-0 z-10 relative py-12 md:py-0 bg-[#FAFAFA]"
+        >
             <div className="w-full md:w-auto md:mr-60 shrink-0 mb-16 md:mb-0 text-center md:text-left">
                 <h2 className="text-5xl sm:text-6xl md:text-[10rem] font-serif leading-[0.85] relative inline-block">
                     <ScrambleText active={sectionInView} delay={0}>Œuvres</ScrambleText>
