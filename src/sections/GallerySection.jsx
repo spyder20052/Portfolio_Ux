@@ -4,7 +4,7 @@ import { RevealText, ScrambleText } from '../components/utils/TextAnimations';
 import { ProjectCard } from '../components/portfolio/Portfolio';
 import { PROJECTS } from '../data/projects';
 
-export const GallerySection = React.forwardRef(({ onOpenProject, isScrolling }, ref) => {
+export const GallerySection = React.forwardRef(({ onOpenProject, isScrolling, isMobile }, ref) => {
     const localRef = useRef(null);
     const sectionInView = useInView(localRef, { once: true, margin: "-10%" });
 
@@ -14,9 +14,9 @@ export const GallerySection = React.forwardRef(({ onOpenProject, isScrolling }, 
     return (
         <div
             ref={localRef}
-            className="w-full md:w-auto min-h-screen flex flex-col md:flex-row items-center px-6 md:px-40 shrink-0 z-10 relative py-12 md:py-0 bg-[#FAFAFA]"
+            className={`w-full shrink-0 z-10 relative bg-[#FAFAFA] ${isMobile ? 'py-20 flex flex-col' : 'md:w-auto min-h-screen flex flex-row items-center px-6 md:px-40 py-12 md:py-0'}`}
         >
-            <div className="w-full md:w-auto md:mr-60 shrink-0 mb-16 md:mb-0 text-center md:text-left">
+            <div className={`shrink-0 text-center md:text-left ${isMobile ? 'mb-12 px-6' : 'md:w-auto md:mr-60 mb-16 md:mb-0'}`}>
                 <h2 className="text-5xl sm:text-6xl md:text-[10rem] font-serif leading-[0.85] relative inline-block">
                     <ScrambleText active={sectionInView} delay={0}>Œuvres</ScrambleText>
                     <motion.div
@@ -27,21 +27,38 @@ export const GallerySection = React.forwardRef(({ onOpenProject, isScrolling }, 
                     ></motion.div>
                 </h2>
                 <div className="mt-8 md:mt-12 text-gray-400 uppercase tracking-widest text-[10px] sm:text-xs">
-                    <ScrambleText active={sectionInView} delay={400}>Défilez pour explorer la galerie</ScrambleText>
+                    <ScrambleText active={sectionInView} delay={400}>
+                        {isMobile ? "Glissez horizontalement pour explorer" : "Défilez pour explorer la galerie"}
+                    </ScrambleText>
                 </div>
+
+                {isMobile && (
+                    <motion.div
+                        animate={{ x: [0, 20, 0] }}
+                        transition={{ repeat: Infinity, duration: 1.5 }}
+                        className="mt-6 flex justify-center gap-2 text-blue-500 opacity-60"
+                    >
+                        <span className="text-[10px] font-bold uppercase tracking-[0.3em]">Swipe →</span>
+                    </motion.div>
+                )}
             </div>
-            <div className="flex flex-col md:flex-row items-center w-full md:w-auto gap-4 md:gap-0">
+
+            <div className={`
+                flex flex-row items-center gap-4 md:gap-0
+                ${isMobile ? 'overflow-x-auto w-full px-6 snap-x snap-mandatory no-scrollbar' : 'w-auto'}
+            `}>
                 {PROJECTS.map((p, i) => (
-                    <ProjectCard
-                        key={p.id}
-                        project={p}
-                        onOpen={onOpenProject}
-                        index={i}
-                        isScrolling={isScrolling}
-                    />
+                    <div key={p.id} className={isMobile ? 'snap-center shrink-0 w-[85vw]' : ''}>
+                        <ProjectCard
+                            project={p}
+                            onOpen={onOpenProject}
+                            index={i}
+                            isScrolling={isScrolling}
+                        />
+                    </div>
                 ))}
             </div>
-            <div className="w-8 md:w-80 shrink-0 h-1 hidden md:block"></div>
+            {!isMobile && <div className="w-8 md:w-80 shrink-0 h-1 hidden md:block"></div>}
         </div>
     );
 });

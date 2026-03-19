@@ -34,3 +34,12 @@
 .contain-intrinsic-size-project-card {
   contain-intrinsic-size: 550px 75vh;
 }
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

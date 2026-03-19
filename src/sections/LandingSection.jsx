@@ -41,7 +41,7 @@ export const LandingSection = React.forwardRef((props, ref) => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.4 }}
                 transition={{ delay: 1.5, duration: 1 }}
-                className="absolute bottom-12 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4"
+                className="absolute bottom-12 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-4"
             >
                 <div className="w-6 h-10 border-2 border-gray-400 rounded-full relative">
                     <motion.div

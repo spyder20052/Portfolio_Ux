@@ -198,62 +198,14 @@ export default function App() {
 
     container.addEventListener('wheel', handleWheel, { passive: false });
 
-    // ---------- touch handling for mobile ----------
-    let lastTouchTime = 0;
-    let touchStartY = 0;
-    const handleTouchStart = (e) => { touchStartY = e.touches[0].clientY; };
-    const handleTouchMove = (e) => {
-      const now = performance.now();
-      if (now - lastTouchTime < 32) return;
-      lastTouchTime = now;
-
-      if (isMenuOpen || selectedProject || scrollCooldownRef.current) return;
-      const touchY = e.touches[0].clientY;
-      const delta = touchStartY - touchY;
-      touchStartY = touchY;
-
-      const idx = currentIndexRef.current;
-      const currentSection = sectionRefs.current[idx];
-      if (!currentSection) return;
-
-      const isLongSection = currentSection.offsetWidth > window.innerWidth;
-      if (isLongSection) {
-        // Only prevent default for horizontal scroll area on mobile
-        const sectionStart = currentSection.offsetLeft;
-        const sectionEnd = sectionStart + currentSection.offsetWidth - window.innerWidth;
-        const isNearStart = scrollPosRef.current <= sectionStart + 5;
-        const isNearEnd = scrollPosRef.current >= sectionEnd - 5;
-
-        if ((delta > 0 && !isNearEnd) || (delta < 0 && !isNearStart)) {
-          e.preventDefault();
-          const speed = 1.2;
-          const newPos = Math.max(sectionStart, Math.min(scrollPosRef.current + delta * speed, sectionEnd));
-          scrollPosRef.current = newPos;
-          xMotionValue.set(newPos);
-          markScrolling();
-          return;
-        }
-      }
-
-      // Snap logic for simple sections on mobile
-      scrollDeltaRef.current += delta;
-      if (Math.abs(scrollDeltaRef.current) > 60) {
-        let nxtIdx = idx;
-        if (scrollDeltaRef.current > 0 && idx < sectionRefs.current.length - 1) nxtIdx++;
-        else if (scrollDeltaRef.current < 0 && idx > 0) nxtIdx--;
-
-        if (nxtIdx !== idx) {
-          scrollDeltaRef.current = 0;
-          scrollToSection(nxtIdx);
-          markScrolling();
-        } else {
-          scrollDeltaRef.current = 0;
-        }
-      }
-    };
+    // ---------- touch handling (Native only on mobile) ----------
+    // We let the browser handle vertical scroll. 
+    // The GallerySection handles its own horizontal scroll via native CSS overflow.
+    const handleTouchStart = (e) => { /* Native behavior */ };
+    const handleTouchMove = (e) => { /* Native behavior */ };
 
     container.addEventListener('touchstart', handleTouchStart, { passive: true });
-    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchmove', handleTouchMove, { passive: true });
 
     return () => {
       container.removeEventListener('wheel', handleWheel);
@@ -314,7 +266,7 @@ export default function App() {
   const iconColor = isMenuOpen || (isMobile && isDarkSection) ? 'white' : (isMobile ? 'black' : 'white');
 
   return (
-    <div ref={containerRef} className="h-screen w-screen overflow-hidden bg-[#FAFAFA] font-sans">
+    <div ref={containerRef} className={`${isMobile ? 'w-full' : 'h-screen w-screen overflow-hidden'} bg-[#FAFAFA] font-sans relative`}>
       {!isMobile && <ParallaxBackground xMotionValue={xMotionValue} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />}
 
 
@@ -456,8 +408,8 @@ export default function App() {
       >
         <LandingSection ref={el => sectionRefs.current[0] = el} />
         <IntroSection ref={el => sectionRefs.current[1] = el} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />
-        <GallerySection ref={el => sectionRefs.current[2] = el} onOpenProject={setSelectedProject} isScrolling={isScrolling} />
-        <BioSection ref={el => sectionRefs.current[3] = el} />
+        <GallerySection ref={el => sectionRefs.current[2] = el} onOpenProject={setSelectedProject} isScrolling={isScrolling} isMobile={isMobile} />
+        <BioSection ref={el => sectionRefs.current[3] = el} isScrolling={isScrolling} />
         <ExpertiseSection ref={el => sectionRefs.current[4] = el} />
         <ContactSection ref={el => sectionRefs.current[5] = el} />
       </motion.div>
