@@ -76,7 +76,7 @@ export const ProjectDetail = ({ project, onClose, onOpenProject, isMobile }) => 
 
                 <div className="bg-[#0A0A0A] py-20 px-4 md:px-12">
                     <div className="max-w-[1600px] mx-auto columns-1 md:columns-2 lg:columns-3 gap-12 space-y-12">
-                        {project.images.map((img, i) => (
+                        {project.images.slice(0, 9).map((img, i) => (
                             <motion.div
                                 key={`${project.id}-img-${i}`}
                                 initial={!isMobile ? { opacity: 0, y: 50 } : { opacity: 1, y: 0 }}

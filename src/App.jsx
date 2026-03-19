@@ -8,19 +8,23 @@ import { PROJECTS } from './data/projects';
 // Components
 import { ParallaxBackground } from './components/visuals/Visuals';
 import { ProjectDetail } from './components/portfolio/Portfolio';
+import { Loader } from './components/utils/Loader';
 
 // Sections
 import { LandingSection } from './sections/LandingSection';
 import { IntroSection } from './sections/IntroSection';
-import { GallerySection } from './sections/GallerySection';
-import { BioSection } from './sections/BioSection';
-import { ExpertiseSection } from './sections/ExpertiseSection';
-import { ContactSection } from './sections/ContactSection';
+
+// Lazy Loaded Sections
+const GallerySection = React.lazy(() => import('./sections/GallerySection').then(m => ({ default: m.GallerySection })));
+const BioSection = React.lazy(() => import('./sections/BioSection').then(m => ({ default: m.BioSection })));
+const ExpertiseSection = React.lazy(() => import('./sections/ExpertiseSection').then(m => ({ default: m.ExpertiseSection })));
+const ContactSection = React.lazy(() => import('./sections/ContactSection').then(m => ({ default: m.ContactSection })));
 
 /**
  * MAIN APP
  */
 export default function App() {
+  const [isLoading, setIsLoading] = useState(true);
   const [totalWidth, setTotalWidth] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentActiveIndex, setCurrentActiveIndex] = useState(0);
@@ -128,9 +132,9 @@ export default function App() {
     if (!container) return;
 
     const handleWheel = (e) => {
-      e.preventDefault();
-
       if (isMenuOpen || selectedProject || scrollCooldownRef.current) return;
+
+      e.preventDefault();
 
       const idx = currentIndexRef.current;
       const delta = e.deltaY !== 0 ? e.deltaY : e.deltaX;
@@ -272,6 +276,10 @@ export default function App() {
 
   return (
     <div ref={containerRef} className={`${isMobile ? 'w-full' : 'h-screen w-screen overflow-hidden'} bg-[#FAFAFA] font-sans relative`}>
+      <AnimatePresence>
+        {isLoading && <Loader onComplete={() => setIsLoading(false)} />}
+      </AnimatePresence>
+
       {!isMobile && <ParallaxBackground xMotionValue={xMotionValue} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />}
 
 
@@ -413,10 +421,13 @@ export default function App() {
       >
         <LandingSection ref={el => sectionRefs.current[0] = el} isMobile={isMobile} />
         <IntroSection ref={el => sectionRefs.current[1] = el} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />
-        <GallerySection ref={el => sectionRefs.current[2] = el} onOpenProject={setSelectedProject} isScrolling={isScrolling} isMobile={isMobile} />
-        <BioSection ref={el => sectionRefs.current[3] = el} isScrolling={isScrolling} />
-        <ExpertiseSection ref={el => sectionRefs.current[4] = el} />
-        <ContactSection ref={el => sectionRefs.current[5] = el} />
+
+        <React.Suspense fallback={null}>
+          <GallerySection ref={el => sectionRefs.current[2] = el} onOpenProject={setSelectedProject} isScrolling={isScrolling} isMobile={isMobile} />
+          <BioSection ref={el => sectionRefs.current[3] = el} isScrolling={isScrolling} />
+          <ExpertiseSection ref={el => sectionRefs.current[4] = el} />
+          <ContactSection ref={el => sectionRefs.current[5] = el} />
+        </React.Suspense>
       </motion.div>
 
 
