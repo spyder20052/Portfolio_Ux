@@ -4,7 +4,7 @@ import { RevealText, ScrambleText } from '../components/utils/TextAnimations';
 import { ProjectCard } from '../components/portfolio/Portfolio';
 import { PROJECTS } from '../data/projects';
 
-export const GallerySection = React.forwardRef(({ onOpenProject, isScrolling, isMobile }, ref) => {
+const GallerySection = React.forwardRef(({ onOpenProject, isScrolling, isMobile }, ref) => {
     const localRef = useRef(null);
     const sectionInView = useInView(localRef, { once: true, margin: "-10%" });
 
@@ -65,3 +65,4 @@ export const GallerySection = React.forwardRef(({ onOpenProject, isScrolling, is
     );
 });
 GallerySection.displayName = 'GallerySection';
+export default GallerySection;

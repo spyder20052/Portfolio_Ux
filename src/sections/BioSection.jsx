@@ -3,7 +3,7 @@ import { motion, useInView } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { RevealText } from '../components/utils/TextAnimations';
 
-export const BioSection = React.forwardRef((props, ref) => {
+const BioSection = React.forwardRef((props, ref) => {
     const localRef = useRef(null);
     const sectionInView = useInView(localRef, { once: true, margin: "-10%" });
 
@@ -63,3 +63,4 @@ export const BioSection = React.forwardRef((props, ref) => {
     );
 });
 BioSection.displayName = 'BioSection';
+export default BioSection;

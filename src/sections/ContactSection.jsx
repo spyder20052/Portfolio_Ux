@@ -3,7 +3,7 @@ import { Mail, Github, Linkedin, ArrowRight } from 'lucide-react';
 import { RevealText, ScrambleText } from '../components/utils/TextAnimations';
 import { useInView } from 'framer-motion';
 
-export const ContactSection = React.forwardRef((props, ref) => {
+const ContactSection = React.forwardRef((props, ref) => {
     const localRef = useRef(null);
     const sectionInView = useInView(localRef, { once: true, margin: "-10%" });
     const [formData, setFormData] = useState({ name: '', email: '', message: '' });
@@ -89,3 +89,4 @@ export const ContactSection = React.forwardRef((props, ref) => {
     );
 });
 ContactSection.displayName = 'ContactSection';
+export default ContactSection;

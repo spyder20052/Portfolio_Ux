@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useImperativeHandle } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { RevealText } from '../components/utils/TextAnimations';
 
-export const ExpertiseSection = React.forwardRef((props, ref) => {
+const ExpertiseSection = React.forwardRef((props, ref) => {
     const localRef = useRef(null);
     const sectionInView = useInView(localRef, { once: true, margin: "-10%" });
 
@@ -119,3 +119,4 @@ export const ExpertiseSection = React.forwardRef((props, ref) => {
     );
 });
 ExpertiseSection.displayName = 'ExpertiseSection';
+export default ExpertiseSection;

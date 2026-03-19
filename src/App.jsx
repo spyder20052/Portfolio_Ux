@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback, lazy, Suspense } from 'react';
 import { Menu, X, Instagram, Github, Linkedin, Mail } from 'lucide-react';
 import { motion, AnimatePresence, useSpring, useMotionValue, useTransform, animate } from 'framer-motion';
 
@@ -10,15 +10,15 @@ import { ParallaxBackground } from './components/visuals/Visuals';
 import { ProjectDetail } from './components/portfolio/Portfolio';
 import { Loader } from './components/utils/Loader';
 
-// Sections
-import { LandingSection } from './sections/LandingSection';
+// Sections (Direct Import for immediate visible sections)
+import LandingSection from './sections/LandingSection';
 import { IntroSection } from './sections/IntroSection';
 
-// Lazy Loaded Sections
-const GallerySection = React.lazy(() => import('./sections/GallerySection').then(m => ({ default: m.GallerySection })));
-const BioSection = React.lazy(() => import('./sections/BioSection').then(m => ({ default: m.BioSection })));
-const ExpertiseSection = React.lazy(() => import('./sections/ExpertiseSection').then(m => ({ default: m.ExpertiseSection })));
-const ContactSection = React.lazy(() => import('./sections/ContactSection').then(m => ({ default: m.ContactSection })));
+// Lazy Loaded Sections (Heavy sections)
+const GallerySection = lazy(() => import('./sections/GallerySection'));
+const BioSection = lazy(() => import('./sections/BioSection'));
+const ExpertiseSection = lazy(() => import('./sections/ExpertiseSection'));
+const ContactSection = lazy(() => import('./sections/ContactSection'));
 
 /**
  * MAIN APP COMPONENT
@@ -219,129 +219,139 @@ export default function App() {
   const iconColor = isMenuOpen || (isMobile && isDarkSection) ? 'white' : (isMobile ? 'black' : 'white');
 
   return (
-    <div ref={containerRef} className={`${isMobile ? 'w-full' : 'h-screen w-screen overflow-hidden'} bg-[#FAFAFA] font-sans relative`}>
-      <AnimatePresence>
-        {isLoading && <Loader onComplete={() => setIsLoading(false)} />}
+    <div ref={containerRef} className={`${isMobile ? 'w-full' : 'h-screen w-screen overflow-hidden'} bg-[#0A0A0A] font-sans relative`}>
+      <AnimatePresence mode="wait">
+        {isLoading && <Loader key="loader" onComplete={() => setIsLoading(false)} />}
       </AnimatePresence>
 
-      {!isMobile && <ParallaxBackground xMotionValue={xMotionValue} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />}
+      {!isLoading && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className={`flex ${isMobile ? 'flex-col w-full h-auto' : 'h-screen will-change-transform'} bg-[#FAFAFA]`}
+          style={!isMobile ? { x: mainXTransform } : {}}
+        >
+          <LandingSection ref={el => sectionRefs.current[0] = el} isMobile={isMobile} />
+          <IntroSection ref={el => sectionRefs.current[1] = el} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />
 
-      {selectedProject && (
-        <ProjectDetail
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
-          onOpenProject={setSelectedProject}
-          isMobile={isMobile}
-        />
+          <Suspense fallback={null}>
+            <GallerySection ref={el => sectionRefs.current[2] = el} onOpenProject={setSelectedProject} isScrolling={isScrolling} isMobile={isMobile} />
+            <BioSection ref={el => sectionRefs.current[3] = el} isScrolling={isScrolling} />
+            <ExpertiseSection ref={el => sectionRefs.current[4] = el} />
+            <ContactSection ref={el => sectionRefs.current[5] = el} />
+          </Suspense>
+        </motion.div>
       )}
 
-      {/* Brand Header */}
-      <div className={`fixed top-6 left-6 md:top-12 md:left-12 z-[100] ${headerColorClass}`}>
-        <div className="text-[10px] md:text-xs font-bold tracking-[0.5em] uppercase">Spynel K.</div>
-      </div>
+      {/* Global Foreground Elements - Only active once loaded */}
+      {!isLoading && (
+        <>
+          {!isMobile && <ParallaxBackground xMotionValue={xMotionValue} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />}
 
-      {/* Menu Toggle */}
-      <button
-        className={`fixed top-4 right-4 md:top-10 md:right-10 z-[100] p-4 ${headerColorClass}`}
-        onClick={() => setIsMenuOpen(!isMenuOpen)}
-      >
-        {isMenuOpen ? <X size={30} color="white" /> : <Menu size={30} color={iconColor} />}
-      </button>
+          {selectedProject && (
+            <ProjectDetail
+              project={selectedProject}
+              onClose={() => setSelectedProject(null)}
+              onOpenProject={setSelectedProject}
+              isMobile={isMobile}
+            />
+          )}
 
-      {/* Fullscreen Menu */}
-      <AnimatePresence>
-        {isMenuOpen && (
-          <motion.div
-            initial={{ y: '-100%' }}
-            animate={{ y: 0 }}
-            exit={{ y: '-100%' }}
-            transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
-            className="fixed inset-0 z-[90] bg-[#0A0A0A] flex flex-col md:flex-row overflow-hidden"
+          {/* Brand Header */}
+          <div className={`fixed top-6 left-6 md:top-12 md:left-12 z-[100] ${headerColorClass}`}>
+            <div className="text-[10px] md:text-xs font-bold tracking-[0.5em] uppercase">Spynel K.</div>
+          </div>
+
+          {/* Menu Toggle */}
+          <button
+            className={`fixed top-4 right-4 md:top-10 md:right-10 z-[100] p-4 ${headerColorClass}`}
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
-            {!isMobile && (
+            {isMenuOpen ? <X size={30} color="white" /> : <Menu size={30} color={iconColor} />}
+          </button>
+
+          {/* Fullscreen Menu */}
+          <AnimatePresence>
+            {isMenuOpen && (
               <motion.div
-                initial={{ opacity: 0, x: -50 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.4, duration: 0.8 }}
-                className="w-1/3 h-full bg-[#0F0F0F] border-r border-white/5 flex flex-col justify-between p-16"
+                initial={{ y: '-100%' }}
+                animate={{ y: 0 }}
+                exit={{ y: '-100%' }}
+                transition={{ duration: 0.8, ease: [0.76, 0, 0.24, 1] }}
+                className="fixed inset-0 z-[90] bg-[#0A0A0A] flex flex-col md:flex-row overflow-hidden"
               >
-                <div className="text-white/20 text-xs font-bold tracking-[0.5em] uppercase">Portfolio © 2026</div>
-                <div className="flex flex-col gap-8">
-                  <div className="text-blue-500/40 text-8xl font-serif italic select-none leading-none">Explore.</div>
-                  <p className="text-white/30 max-w-xs text-sm leading-relaxed font-light">
-                    Transformons vos idées en expériences digitales mémorables.
-                  </p>
-                </div>
-                <div className="flex gap-4">
-                  {[
-                    { icon: Mail, link: "mailto:kspynel@gmail.com" },
-                    { icon: Github, link: "https://github.com/spynelkouton" },
-                    { icon: Linkedin, link: "https://www.linkedin.com/in/pynel-kouton-756444273" }
-                  ].map((social, i) => (
-                    <a key={i} href={social.link} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-blue-500 hover:border-blue-500 transition-all">
-                      <social.icon size={16} />
-                    </a>
-                  ))}
+                {!isMobile && (
+                  <motion.div
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.4, duration: 0.8 }}
+                    className="w-1/3 h-full bg-[#0F0F0F] border-r border-white/5 flex flex-col justify-between p-16"
+                  >
+                    <div className="text-white/20 text-xs font-bold tracking-[0.5em] uppercase">Portfolio © 2026</div>
+                    <div className="flex flex-col gap-8">
+                      <div className="text-blue-500/40 text-8xl font-serif italic select-none leading-none">Explore.</div>
+                      <p className="text-white/30 max-w-xs text-sm leading-relaxed font-light">
+                        Transformons vos idées en expériences digitales mémorables.
+                      </p>
+                    </div>
+                    <div className="flex gap-4">
+                      {[
+                        { icon: Mail, link: "mailto:kspynel@gmail.com" },
+                        { icon: Github, link: "https://github.com/spynelkouton" },
+                        { icon: Linkedin, link: "https://www.linkedin.com/in/pynel-kouton-756444273" }
+                      ].map((social, i) => (
+                        <a key={i} href={social.link} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-blue-500 hover:border-blue-500 transition-all">
+                          <social.icon size={16} />
+                        </a>
+                      ))}
+                    </div>
+                  </motion.div>
+                )}
+
+                <div className={`flex-1 flex flex-col justify-center relative ${isMobile ? 'px-8 py-20' : 'px-20'}`}>
+                  <nav className="flex flex-col gap-4 md:gap-2">
+                    {['Accueil', 'Philosophie', 'Œuvres', 'Bio', 'Services', 'Contact'].map((item, i) => (
+                      <motion.button
+                        key={item}
+                        initial={{ opacity: 0, x: 50 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.2 + i * 0.08, duration: 0.6 }}
+                        onClick={() => {
+                          setIsMenuOpen(false);
+                          if (isMobile) {
+                            const target = sectionRefs.current[i];
+                            if (target) window.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
+                          } else scrollToSection(i);
+                        }}
+                        className="group flex items-baseline gap-4 text-5xl md:text-[6.5rem] font-serif text-white/30 hover:text-white transition-all text-left w-fit"
+                      >
+                        <span className="text-blue-500 text-xs md:text-sm font-bold font-sans opacity-0 group-hover:opacity-100 uppercase">0{i + 1}</span>
+                        <span className="group-hover:translate-x-4 uppercase md:lowercase tracking-tighter">{item}</span>
+                      </motion.button>
+                    ))}
+                  </nav>
                 </div>
               </motion.div>
             )}
+          </AnimatePresence>
 
-            <div className={`flex-1 flex flex-col justify-center relative ${isMobile ? 'px-8 py-20' : 'px-20'}`}>
-              <nav className="flex flex-col gap-4 md:gap-2">
-                {['Accueil', 'Philosophie', 'Œuvres', 'Bio', 'Services', 'Contact'].map((item, i) => (
-                  <motion.button
-                    key={item}
-                    initial={{ opacity: 0, x: 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.2 + i * 0.08, duration: 0.6 }}
-                    onClick={() => {
-                      setIsMenuOpen(false);
-                      if (isMobile) {
-                        const target = sectionRefs.current[i];
-                        if (target) window.scrollTo({ top: target.offsetTop, behavior: 'smooth' });
-                      } else scrollToSection(i);
-                    }}
-                    className="group flex items-baseline gap-4 text-5xl md:text-[6.5rem] font-serif text-white/30 hover:text-white transition-all text-left w-fit"
-                  >
-                    <span className="text-blue-500 text-xs md:text-sm font-bold font-sans opacity-0 group-hover:opacity-100 uppercase">0{i + 1}</span>
-                    <span className="group-hover:translate-x-4 uppercase md:lowercase tracking-tighter">{item}</span>
-                  </motion.button>
-                ))}
-              </nav>
+          {/* Global Progress Bar */}
+          <div className="fixed top-0 left-0 w-full h-1 z-[110] pointer-events-none opacity-30">
+            <motion.div className="h-full bg-blue-500" style={{ width: progressStyleWidth }} />
+          </div>
+
+          {/* Sidebar Section Counter (Desktop) */}
+          <div className="fixed left-12 bottom-12 z-10 pointer-events-none overflow-hidden h-20 w-40 hidden md:block">
+            <div
+              className={`text-8xl font-serif opacity-[0.05] italic transition-transform duration-700`}
+              style={{ transform: `translateY(-${currentActiveIndex * 100}%)` }}
+            >
+              {['01', '02', '03', '04', '05', '06'].map(n => <div key={n} className="h-20">{n}</div>)}
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Global Progress Bar */}
-      <div className="fixed top-0 left-0 w-full h-1 z-[110] pointer-events-none opacity-30">
-        <motion.div className="h-full bg-blue-500" style={{ width: progressStyleWidth }} />
-      </div>
-
-      {/* Main Experience Canvas */}
-      <motion.div
-        className={`flex ${isMobile ? 'flex-col w-full h-auto' : 'h-screen will-change-transform'}`}
-        style={!isMobile ? { x: mainXTransform } : {}}
-      >
-        <LandingSection ref={el => sectionRefs.current[0] = el} isMobile={isMobile} />
-        <IntroSection ref={el => sectionRefs.current[1] = el} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />
-        <React.Suspense fallback={null}>
-          <GallerySection ref={el => sectionRefs.current[2] = el} onOpenProject={setSelectedProject} isScrolling={isScrolling} isMobile={isMobile} />
-          <BioSection ref={el => sectionRefs.current[3] = el} isScrolling={isScrolling} />
-          <ExpertiseSection ref={el => sectionRefs.current[4] = el} />
-          <ContactSection ref={el => sectionRefs.current[5] = el} />
-        </React.Suspense>
-      </motion.div>
-
-      {/* Sidebar Section Counter (Desktop) */}
-      <div className="fixed left-12 bottom-12 z-10 pointer-events-none overflow-hidden h-20 w-40 hidden md:block">
-        <div
-          className="text-8xl font-serif opacity-[0.05] italic transition-transform duration-700"
-          style={{ transform: `translateY(-${currentActiveIndex * 100}%)` }}
-        >
-          {['01', '02', '03', '04', '05', '06'].map(n => <div key={n} className="h-20">{n}</div>)}
-        </div>
-      </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }

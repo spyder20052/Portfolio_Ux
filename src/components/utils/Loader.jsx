@@ -1,64 +1,117 @@
+import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
-import { useEffect, useState } from 'react';
+
+// Images critiques à précharger pendant le Loader
+const CRITICAL_IMAGES = [
+    '/Ma_photo.webp',
+    '/Projets/Arbitra/Accueil.webp',
+    '/Projets/Crispy/crispy.webp'
+];
+
+function preloadImage(src) {
+    return new Promise((resolve) => {
+        const img = new Image();
+        img.onload = resolve;
+        img.onerror = resolve; // On ne bloque pas si une image échoue
+        img.src = src;
+    });
+}
 
 export const Loader = ({ onComplete }) => {
     const [counter, setCounter] = useState(0);
+    const [assetsReady, setAssetsReady] = useState(false);
+    const counterRef = useRef(0);
+    const completedRef = useRef(false);
 
+    // FIX: Retrait du splash screen HTML dès que React est monté
     useEffect(() => {
-        let startTime = performance.now();
-        const duration = 1200; // 1.2 seconds for a snappier feel
+        const splash = document.getElementById('splash-screen');
+        if (splash) {
+            splash.classList.add('hide');
+            // On le retire physiquement du DOM après la transition CSS (0.5s)
+            const t = setTimeout(() => splash.remove(), 600);
+            return () => clearTimeout(t);
+        }
+    }, []);
 
-        const update = (now) => {
-            const elapsed = now - startTime;
-            const progress = Math.min(Math.floor((elapsed / duration) * 100), 100);
+    // Préchargement réel des assets
+    useEffect(() => {
+        let cancelled = false;
 
-            setCounter(progress);
-
-            if (progress < 100) {
-                requestAnimationFrame(update);
-            } else {
-                setTimeout(onComplete, 500);
+        const loadAssets = async () => {
+            try {
+                await Promise.all(CRITICAL_IMAGES.map(preloadImage));
+                if (document.fonts && document.fonts.ready) {
+                    await document.fonts.ready;
+                }
+            } catch (e) {
+                console.warn("Asset preloading failed, continuing...", e);
+            } finally {
+                if (!cancelled) setAssetsReady(true);
             }
         };
 
-        requestAnimationFrame(update);
-    }, [onComplete]);
+        loadAssets();
+        return () => { cancelled = true; };
+    }, []);
 
-    const containerVariants = {
-        exit: {
-            y: "-100%",
-            transition: {
-                duration: 1.2,
-                ease: [0.76, 0, 0.24, 1],
-                delay: 0.2
+    // Animation du compteur synchronisée
+    useEffect(() => {
+        const startTime = performance.now();
+        const MAX_DURATION = 4000; // Sécurité : on finit après 4s quoi qu'il arrive
+        let rafId;
+
+        const update = (now) => {
+            if (completedRef.current) return;
+            const elapsed = now - startTime;
+            let newValue;
+
+            if (assetsReady) {
+                // Accélérer vers 100 une fois les assets prêts
+                const remaining = 100 - counterRef.current;
+                newValue = Math.min(counterRef.current + Math.max(remaining * 0.12, 1), 100);
+            } else if (elapsed < MAX_DURATION) {
+                // Avancer progressivement jusqu'à 85% en attendant les assets
+                newValue = Math.min(Math.floor((elapsed / MAX_DURATION) * 85), 85);
+            } else {
+                // Timeout atteint
+                newValue = 100;
             }
-        }
-    };
+
+            counterRef.current = newValue;
+            setCounter(Math.floor(newValue));
+
+            if (newValue >= 100 && !completedRef.current) {
+                completedRef.current = true;
+                setTimeout(onComplete, 500);
+                return;
+            }
+
+            rafId = requestAnimationFrame(update);
+        };
+
+        rafId = requestAnimationFrame(update);
+        return () => { if (rafId) cancelAnimationFrame(rafId); };
+    }, [assetsReady, onComplete]);
 
     const textVariants = {
         initial: { y: 100, opacity: 0 },
         animate: {
             y: 0,
             opacity: 1,
-            transition: {
-                duration: 0.8,
-                ease: [0.16, 1, 0.3, 1]
-            }
+            transition: { duration: 0.8, ease: [0.16, 1, 0.3, 1] }
         },
         exit: {
             y: -100,
             opacity: 0,
-            transition: {
-                duration: 0.5,
-                ease: [0.16, 1, 0.3, 1]
-            }
+            transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1] }
         }
     };
 
     return (
         <motion.div
-            variants={containerVariants}
-            exit="exit"
+            exit={{ y: "-100%" }}
+            transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
             className="fixed inset-0 z-[2000] bg-[#0A0A0A] flex flex-col items-center justify-center overflow-hidden"
         >
             <div className="relative">
@@ -66,7 +119,6 @@ export const Loader = ({ onComplete }) => {
                     {"SPYNEL".split("").map((char, index) => (
                         <motion.span
                             key={index}
-                            custom={index}
                             variants={textVariants}
                             initial="initial"
                             animate="animate"
@@ -78,32 +130,18 @@ export const Loader = ({ onComplete }) => {
                     ))}
                 </div>
 
-                {/* Minimalist Progress Indicator */}
                 <div className="absolute -bottom-8 left-0 w-full flex flex-col items-center gap-4">
                     <div className="w-48 h-[1px] bg-white/10 relative overflow-hidden">
-                        <motion.div
-                            className="absolute top-0 left-0 h-full bg-blue-500"
-                            initial={{ width: 0 }}
-                            animate={{ width: `${counter}%` }}
+                        <div
+                            className="absolute top-0 left-0 h-full bg-blue-500 transition-all duration-200 ease-out"
+                            style={{ width: `${counter}%` }}
                         />
                     </div>
                     <span className="text-[10px] font-mono tracking-[0.3em] text-white/30 uppercase italic">
-                        Loading {counter}%
+                        {counter < 100 ? `Loading ${counter}%` : "Ready"}
                     </span>
                 </div>
             </div>
-
-            {/* Split Screen Decorative Elements on exit */}
-            <motion.div
-                className="absolute top-0 left-0 w-full h-1/2 bg-[#0C0C0C] z-[-1]"
-                exit={{ y: "-100%" }}
-                transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
-            />
-            <motion.div
-                className="absolute bottom-0 left-0 w-full h-1/2 bg-[#0C0C0C] z-[-1]"
-                exit={{ y: "100%" }}
-                transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
-            />
         </motion.div>
     );
 };

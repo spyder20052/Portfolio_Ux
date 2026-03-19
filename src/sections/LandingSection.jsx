@@ -2,7 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { RevealText, ScrambleText } from '../components/utils/TextAnimations';
 
-export const LandingSection = React.forwardRef(({ isMobile }, ref) => {
+const LandingSection = React.forwardRef(({ isMobile }, ref) => {
     return (
         <div ref={ref} className={`w-full md:min-w-screen ${isMobile ? 'min-h-[85vh] py-20' : 'h-screen'} flex flex-col items-center justify-center relative px-6 md:px-20 shrink-0 border-b md:border-b-0 md:border-r border-gray-100 bg-white`}>
             <div className="relative text-center md:text-left scale-[0.9] md:scale-100">
@@ -56,3 +56,4 @@ export const LandingSection = React.forwardRef(({ isMobile }, ref) => {
     );
 });
 LandingSection.displayName = 'LandingSection';
+export default LandingSection;
