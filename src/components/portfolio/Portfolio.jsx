@@ -4,15 +4,15 @@ import { PROJECTS } from '../../data/projects';
 
 export const ProjectCard = ({ project, onOpen, index, isScrolling }) => (
     <div
-        className={`h-[40vh] sm:h-[45vh] md:h-[75vh] w-full md:w-[550px] shrink-0 md:mx-10 relative group bg-gray-200 cursor-pointer transition-[transform,opacity] duration-1000 my-6 md:my-0 content-visibility-auto contain-intrinsic-size-project-card ${index % 2 === 0 ? 'md:translate-y-[-5%]' : 'md:translate-y-[5%]'} ${isScrolling ? 'pointer-events-none' : ''} will-change-transform`}
-        style={{ transform: 'translate3d(0,0,0)' }}
+        className={`h-[40vh] sm:h-[45vh] md:h-[75vh] w-full md:w-[550px] shrink-0 md:mx-10 relative group bg-gray-200 cursor-pointer transition-[transform,opacity] duration-1000 my-6 md:my-0 content-visibility-auto contain-intrinsic-size-project-card ${index % 2 === 0 ? 'md:translate-y-[-5%]' : 'md:translate-y-[5%]'} ${isScrolling ? 'pointer-events-none' : ''}`}
+        style={{ contain: 'layout style' }}
         onClick={() => !isScrolling && onOpen(project)}
     >
         <div className="absolute inset-0 overflow-hidden">
             <img
                 src={project.img}
                 alt={project.title}
-                loading="lazy"
+                loading={index < 3 ? "eager" : "lazy"}
                 decoding="async"
                 className={`w-full h-full object-cover transition-transform duration-[2000ms] ${isScrolling ? '' : 'group-hover:scale-110'}`}
             />
@@ -25,7 +25,7 @@ export const ProjectCard = ({ project, onOpen, index, isScrolling }) => (
             <h3 className="text-2xl md:text-5xl font-serif">{project.title}</h3>
         </div>
         <div className={`absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-70 md:opacity-0 ${isScrolling ? '' : 'md:group-hover:opacity-100'} transition-opacity duration-500`}></div>
-    </div>
+    </div >
 );
 
 export const ProjectDetail = ({ project, onClose, onOpenProject, isMobile }) => {

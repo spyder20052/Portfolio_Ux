@@ -21,17 +21,18 @@ import { ContactSection } from './sections/ContactSection';
  * MAIN APP
  */
 export default function App() {
-  const xMotionValue = useMotionValue(0);
-  const xSpring = useSpring(xMotionValue, { stiffness: 120, damping: 30, mass: 1, restDelta: 0.1 });
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
-
   const [totalWidth, setTotalWidth] = useState(0);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [currentActiveIndex, setCurrentActiveIndex] = useState(0);
   const [isMobile, setIsMobile] = useState(false);
   const [selectedProject, setSelectedProject] = useState(null);
   const [isScrolling, setIsScrolling] = useState(false);
+
+  const xMotionValue = useMotionValue(0);
+  const xSpring = useSpring(xMotionValue, { stiffness: 100, damping: 25, mass: 1, restDelta: 0.1 });
+
+  const mouseX = useMotionValue(0);
+  const mouseY = useMotionValue(0);
   const containerRef = useRef(null);
   const sectionRefs = useRef([]);
   const scrollPosRef = useRef(0);
@@ -75,7 +76,7 @@ export default function App() {
     setIsScrolling(true);
     setCurrentActiveIndex(index);
 
-    // Use controlled animate instead of just spring for large programmatic jumps
+    // Smoothly animate the target position. The spring (xSpring) will follow xMotionValue.
     animate(xMotionValue, targetOffset, {
       duration: 1.2,
       ease: [0.76, 0, 0.24, 1],

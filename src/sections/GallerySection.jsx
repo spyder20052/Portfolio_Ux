@@ -29,7 +29,13 @@ export const GallerySection = React.forwardRef(({ onOpenProject, isScrolling }, 
             </div>
             <div className="flex flex-col md:flex-row items-center w-full md:w-auto gap-4 md:gap-0">
                 {PROJECTS.map((p, i) => (
-                    <ProjectCard key={p.id} project={p} onOpen={onOpenProject} index={i} isScrolling={isScrolling} />
+                    <ProjectCard
+                        key={p.id}
+                        project={p}
+                        onOpen={onOpenProject}
+                        index={i}
+                        isScrolling={isScrolling}
+                    />
                 ))}
             </div>
             <div className="w-8 md:w-80 shrink-0 h-1 hidden md:block"></div>
