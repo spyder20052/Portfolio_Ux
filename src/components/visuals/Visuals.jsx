@@ -23,6 +23,8 @@ export const ParallaxBackground = ({ xMotionValue, mouseX, mouseY, isMobile }) =
     const tx1 = useTransform(xMotionValue, (val) => `translate3d(${-val * p1}px, 0, 0)`);
     const tx2 = useTransform(xMotionValue, (val) => `translate3d(${-val * p2}px, 0, 0)`);
 
+    if (isMobile) return null;
+
     return (
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
             {/* LAYER 1: Deep / Slow / Large Shapes (#F0F0F0) - Subtly visible */}

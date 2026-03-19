@@ -21,7 +21,7 @@ const ExpertiseSection = React.lazy(() => import('./sections/ExpertiseSection').
 const ContactSection = React.lazy(() => import('./sections/ContactSection').then(m => ({ default: m.ContactSection })));
 
 /**
- * MAIN APP
+ * MAIN APP COMPONENT
  */
 export default function App() {
   const [isLoading, setIsLoading] = useState(true);
@@ -54,12 +54,12 @@ export default function App() {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
-  // Sync ref
+  // Synchronize index ref
   useEffect(() => {
     currentIndexRef.current = currentActiveIndex;
   }, [currentActiveIndex]);
 
-  // ---------- Transforms ----------
+  // ---------- Animation Hooks ----------
   const progressPercent = useTransform(xMotionValue, (val) => {
     const width = totalWidthRef.current;
     return width > 0 ? (val / width) * 100 : 0;
@@ -68,14 +68,14 @@ export default function App() {
   const progressStyleWidth = useTransform(progressPercent, (v) => `${v}%`);
   const mainXTransform = useTransform(xSpring, (val) => -val);
 
-  // Gestion du flag isScrolling
+  // Helper: Mark scrolling state
   const markScrolling = useCallback(() => {
     setIsScrolling(true);
     if (isScrollingTimeoutRef.current) clearTimeout(isScrollingTimeoutRef.current);
     isScrollingTimeoutRef.current = setTimeout(() => setIsScrolling(false), 150);
   }, []);
 
-  // Helper function for smooth scrolling to sections
+  // Helper: Smooth scroll to specific index
   const scrollToSection = useCallback((index) => {
     const section = sectionRefs.current[index];
     if (!section) return;
@@ -109,6 +109,7 @@ export default function App() {
     });
   }, [xMotionValue, markScrolling]);
 
+  // Main interaction effect: Wheel handling (Desktop)
   useEffect(() => {
     if (isMobile) return;
 
@@ -168,6 +169,7 @@ export default function App() {
     };
   }, [isMenuOpen, isMobile, selectedProject, xMotionValue, scrollToSection, markScrolling]);
 
+  // Ambient mouse tracking
   useEffect(() => {
     const handleMouseMove = (e) => {
       mouseX.set(e.clientX);
@@ -177,6 +179,7 @@ export default function App() {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [mouseX, mouseY]);
 
+  // Responsive: Check mobile state
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768);
     checkMobile();
@@ -184,6 +187,7 @@ export default function App() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
+  // Responsive: Update container width for scroll logic
   useEffect(() => {
     const updateWidth = () => {
       if (!containerRef.current) return;
@@ -200,6 +204,7 @@ export default function App() {
     };
   }, [isMobile]);
 
+  // Sync scroll for mobile (vertical to horizontal mapping)
   useEffect(() => {
     if (isMobile) {
       const handleScroll = () => xMotionValue.set(window.scrollY);
@@ -208,6 +213,7 @@ export default function App() {
     }
   }, [isMobile, xMotionValue]);
 
+  // Visual state helpers
   const isDarkSection = [3, 5].includes(currentActiveIndex);
   const headerColorClass = isMenuOpen || (isMobile && isDarkSection) ? 'text-white' : (isMobile ? 'text-black' : 'mix-blend-difference text-white');
   const iconColor = isMenuOpen || (isMobile && isDarkSection) ? 'white' : (isMobile ? 'black' : 'white');
@@ -229,11 +235,12 @@ export default function App() {
         />
       )}
 
-      {/* Header */}
+      {/* Brand Header */}
       <div className={`fixed top-6 left-6 md:top-12 md:left-12 z-[100] ${headerColorClass}`}>
         <div className="text-[10px] md:text-xs font-bold tracking-[0.5em] uppercase">Spynel K.</div>
       </div>
 
+      {/* Menu Toggle */}
       <button
         className={`fixed top-4 right-4 md:top-10 md:right-10 z-[100] p-4 ${headerColorClass}`}
         onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -241,7 +248,7 @@ export default function App() {
         {isMenuOpen ? <X size={30} color="white" /> : <Menu size={30} color={iconColor} />}
       </button>
 
-      {/* Menu Overlay */}
+      {/* Fullscreen Menu */}
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
@@ -258,19 +265,18 @@ export default function App() {
                 transition={{ delay: 0.4, duration: 0.8 }}
                 className="w-1/3 h-full bg-[#0F0F0F] border-r border-white/5 flex flex-col justify-between p-16"
               >
-                <div className="text-white/20 text-xs font-bold tracking-[0.5em] uppercase">Spynel K. Portfolio</div>
+                <div className="text-white/20 text-xs font-bold tracking-[0.5em] uppercase">Portfolio © 2026</div>
                 <div className="flex flex-col gap-8">
                   <div className="text-blue-500/40 text-8xl font-serif italic select-none leading-none">Explore.</div>
                   <p className="text-white/30 max-w-xs text-sm leading-relaxed font-light">
-                    Chaque projet est une nouvelle aventure entre design minimaliste et performance technique.
+                    Transformons vos idées en expériences digitales mémorables.
                   </p>
                 </div>
                 <div className="flex gap-4">
                   {[
                     { icon: Mail, link: "mailto:kspynel@gmail.com" },
                     { icon: Github, link: "https://github.com/spynelkouton" },
-                    { icon: Linkedin, link: "https://www.linkedin.com/in/spynel-kouton-756444273" },
-                    { icon: Instagram, link: "https://instagram.com/spynelkouton" }
+                    { icon: Linkedin, link: "https://www.linkedin.com/in/pynel-kouton-756444273" }
                   ].map((social, i) => (
                     <a key={i} href={social.link} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full border border-white/10 flex items-center justify-center text-white/40 hover:text-blue-500 hover:border-blue-500 transition-all">
                       <social.icon size={16} />
@@ -298,7 +304,7 @@ export default function App() {
                     className="group flex items-baseline gap-4 text-5xl md:text-[6.5rem] font-serif text-white/30 hover:text-white transition-all text-left w-fit"
                   >
                     <span className="text-blue-500 text-xs md:text-sm font-bold font-sans opacity-0 group-hover:opacity-100 uppercase">0{i + 1}</span>
-                    <span className="group-hover:translate-x-4 uppercase md:lowercase">{item}</span>
+                    <span className="group-hover:translate-x-4 uppercase md:lowercase tracking-tighter">{item}</span>
                   </motion.button>
                 ))}
               </nav>
@@ -307,12 +313,12 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* Progress Bar */}
+      {/* Global Progress Bar */}
       <div className="fixed top-0 left-0 w-full h-1 z-[110] pointer-events-none opacity-30">
         <motion.div className="h-full bg-blue-500" style={{ width: progressStyleWidth }} />
       </div>
 
-      {/* Main Canvas */}
+      {/* Main Experience Canvas */}
       <motion.div
         className={`flex ${isMobile ? 'flex-col w-full h-auto' : 'h-screen will-change-transform'}`}
         style={!isMobile ? { x: mainXTransform } : {}}
@@ -327,7 +333,7 @@ export default function App() {
         </React.Suspense>
       </motion.div>
 
-      {/* Section Indicator */}
+      {/* Sidebar Section Counter (Desktop) */}
       <div className="fixed left-12 bottom-12 z-10 pointer-events-none overflow-hidden h-20 w-40 hidden md:block">
         <div
           className="text-8xl font-serif opacity-[0.05] italic transition-transform duration-700"

@@ -47,10 +47,7 @@ export const ScrambleText = ({ children, delay = 0, active }) => {
     }, [active, isComplete, children]);
 
     return (
-        <motion.span
-            onViewportEnter={() => !active && !isComplete && startScramble()}
-            viewport={{ once: true, amount: 0 }}
-        >
+        <motion.span>
             {display}
         </motion.span>
     );
