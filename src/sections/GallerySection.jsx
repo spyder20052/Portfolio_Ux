@@ -15,6 +15,7 @@ export const GallerySection = React.forwardRef(({ onOpenProject, isScrolling, is
         <div
             ref={localRef}
             className={`w-full shrink-0 z-10 relative bg-[#FAFAFA] ${isMobile ? 'py-20 flex flex-col' : 'md:w-auto min-h-screen flex flex-row items-center px-6 md:px-40 py-12 md:py-0'}`}
+            style={{ contentVisibility: 'auto' }}
         >
             <div className={`shrink-0 text-center md:text-left ${isMobile ? 'mb-12 px-6' : 'md:w-auto md:mr-60 mb-16 md:mb-0'}`}>
                 <h2 className="text-5xl sm:text-6xl md:text-[10rem] font-serif leading-[0.85] relative inline-block">
@@ -54,6 +55,7 @@ export const GallerySection = React.forwardRef(({ onOpenProject, isScrolling, is
                             onOpen={onOpenProject}
                             index={i}
                             isScrolling={isScrolling}
+                            isMobile={isMobile}
                         />
                     </div>
                 ))}

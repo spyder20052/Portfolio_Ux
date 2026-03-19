@@ -43,8 +43,8 @@ export const ParallaxBackground = ({ xMotionValue, mouseX, mouseY, isMobile }) =
                 className="absolute inset-0 will-change-transform"
                 style={{ transform: tx2 }}
             >
-                <div className="absolute top-[20%] right-[10%] w-[40vw] h-[40vw] bg-blue-500/5 rounded-full blur-[100px]" />
-                <div className="absolute bottom-[10%] left-[5%] w-[30vw] h-[30vw] bg-blue-500/5 rounded-full blur-[80px]" />
+                <div className={`absolute top-[20%] right-[10%] w-[40vw] h-[40vw] bg-blue-500/5 rounded-full ${isMobile ? 'blur-[40px]' : 'blur-[100px]'}`} />
+                <div className={`absolute bottom-[10%] left-[5%] w-[30vw] h-[30vw] bg-blue-500/5 rounded-full ${isMobile ? 'blur-[30px]' : 'blur-[80px]'}`} />
             </motion.div>
         </div>
     );
@@ -63,7 +63,7 @@ export const ModernGraphic = ({ mouseX, mouseY, isMobile }) => {
         >
             {/* Dynamic Ambient Glows */}
             <motion.div
-                className="absolute w-[150%] h-[150%] bg-blue-500/10 rounded-full blur-[100px] pointer-events-none"
+                className={`absolute w-[150%] h-[150%] bg-blue-500/10 rounded-full ${isMobile ? 'blur-[40px]' : 'blur-[100px]'} pointer-events-none`}
                 animate={{
                     scale: [1, 1.3, 1],
                     opacity: [0.3, 0.5, 0.3],

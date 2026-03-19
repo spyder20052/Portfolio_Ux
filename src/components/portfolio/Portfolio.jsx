@@ -3,9 +3,9 @@ import { motion, useInView } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { PROJECTS } from '../../data/projects';
 
-export const ProjectCard = ({ project, onOpen, index, isScrolling }) => {
+export const ProjectCard = ({ project, onOpen, index, isScrolling, isMobile }) => {
     const cardRef = useRef(null);
-    const isInView = useInView(cardRef, { margin: "200%", once: true });
+    const isInView = useInView(cardRef, { margin: isMobile ? "20%" : "100%", once: true });
     const [imageLoaded, setImageLoaded] = useState(false);
 
     const handleImageLoad = useCallback(() => {
@@ -15,8 +15,8 @@ export const ProjectCard = ({ project, onOpen, index, isScrolling }) => {
     return (
         <div
             ref={cardRef}
-            className={`h-[40vh] sm:h-[45vh] md:h-[75vh] w-full md:w-[550px] shrink-0 md:mx-10 relative group bg-gray-200 cursor-pointer my-6 md:my-0 ${index % 2 === 0 ? 'md:translate-y-[-5%]' : 'md:translate-y-[5%]'} ${isScrolling ? 'pointer-events-none' : ''}`}
-            style={{ contain: 'layout style paint size' }}
+            className={`h-[40vh] sm:h-[45vh] md:h-[75vh] w-full md:w-[550px] shrink-0 md:mx-10 relative group bg-gray-200 cursor-pointer my-6 md:my-0 ${index % 2 === 0 ? 'md:translate-y-[-5%]' : 'md:translate-y-[5%]'} ${isScrolling ? 'pointer-events-none' : ''} will-change-transform`}
+            style={{ contain: 'layout style paint size', transform: 'translate3d(0,0,0)' }}
             onClick={() => !isScrolling && onOpen(project)}
         >
             <div className="absolute inset-0 overflow-hidden bg-gray-100">

@@ -5,17 +5,23 @@ export const Loader = ({ onComplete }) => {
     const [counter, setCounter] = useState(0);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setCounter((prev) => {
-                if (prev >= 100) {
-                    clearInterval(interval);
-                    setTimeout(onComplete, 500);
-                    return 100;
-                }
-                return prev + 1;
-            });
-        }, 25);
-        return () => clearInterval(interval);
+        let startTime = performance.now();
+        const duration = 1200; // 1.2 seconds for a snappier feel
+
+        const update = (now) => {
+            const elapsed = now - startTime;
+            const progress = Math.min(Math.floor((elapsed / duration) * 100), 100);
+
+            setCounter(progress);
+
+            if (progress < 100) {
+                requestAnimationFrame(update);
+            } else {
+                setTimeout(onComplete, 500);
+            }
+        };
+
+        requestAnimationFrame(update);
     }, [onComplete]);
 
     const containerVariants = {
