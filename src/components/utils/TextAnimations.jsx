@@ -1,19 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
 
 export const ScrambleText = ({ children, delay = 0, active }) => {
     const [display, setDisplay] = useState(children);
     const [isComplete, setIsComplete] = useState(false);
+    const intervalRef = useRef(null);
+    const timeoutRef = useRef(null);
     const chars = "!<>-_\\/[]{}—=+*^?#________";
 
     const startScramble = () => {
         if (isComplete) return;
 
-        let interval;
         let iteration = 0;
-
-        setTimeout(() => {
-            interval = setInterval(() => {
+        timeoutRef.current = setTimeout(() => {
+            intervalRef.current = setInterval(() => {
                 setDisplay(
                     children
                         .split("")
@@ -27,7 +27,7 @@ export const ScrambleText = ({ children, delay = 0, active }) => {
                 );
 
                 if (iteration >= children.length) {
-                    clearInterval(interval);
+                    if (intervalRef.current) clearInterval(intervalRef.current);
                     setIsComplete(true);
                 }
 
@@ -37,14 +37,18 @@ export const ScrambleText = ({ children, delay = 0, active }) => {
     };
 
     useEffect(() => {
-        if (active) {
+        if (active && !isComplete) {
             startScramble();
         }
-    }, [active]);
+        return () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+            if (intervalRef.current) clearInterval(intervalRef.current);
+        };
+    }, [active, isComplete, children]);
 
     return (
         <motion.span
-            onViewportEnter={() => !active && startScramble()}
+            onViewportEnter={() => !active && !isComplete && startScramble()}
             viewport={{ once: true, amount: 0 }}
         >
             {display}

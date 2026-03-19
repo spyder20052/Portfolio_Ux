@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useImperativeHandle } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { RevealText } from '../components/utils/TextAnimations';
-import { BalanceGraphic } from '../components/visuals/Visuals';
+import { ModernGraphic } from '../components/visuals/Visuals';
 
 export const IntroSection = React.forwardRef(({ mouseX, mouseY, isMobile }, ref) => {
     const localRef = useRef(null);
@@ -11,8 +11,8 @@ export const IntroSection = React.forwardRef(({ mouseX, mouseY, isMobile }, ref)
     useImperativeHandle(ref, () => localRef.current);
 
     return (
-        <div ref={localRef} className="w-full md:min-w-screen min-h-screen flex items-center justify-center px-6 md:px-20 shrink-0 relative bg-white md:bg-transparent">
-            <div className="grid grid-cols-1 md:grid-cols-2 w-full max-w-7xl items-center gap-10 md:gap-32">
+        <div ref={localRef} className={`w-full md:min-w-screen ${isMobile ? 'min-h-auto py-24' : 'min-h-screen'} flex items-center justify-center px-6 md:px-20 shrink-0 relative bg-white md:bg-transparent`}>
+            <div className={`w-full max-w-7xl items-center gap-10 md:gap-32 ${isMobile ? 'flex flex-col' : 'grid grid-cols-2'}`}>
                 <div className="relative z-10 order-2 md:order-1">
                     <RevealText active={sectionInView} delay={100}>
                         <span className="text-blue-500 font-bold tracking-widest text-xs md:text-sm uppercase mb-4 block">Philosophie</span>
@@ -34,14 +34,16 @@ export const IntroSection = React.forwardRef(({ mouseX, mouseY, isMobile }, ref)
                         Passionné par la technologie et le design, je combine créativité et expertise technique pour créer des expériences digitales exceptionnelles.
                     </motion.p>
                 </div>
-                <motion.div
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.8, delay: 0.2 }}
-                    className="w-full aspect-square order-1 md:order-2 flex items-center justify-center transition-transform"
-                >
-                    <BalanceGraphic mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />
-                </motion.div>
+                {!isMobile && (
+                    <motion.div
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 0.8, delay: 0.2 }}
+                        className="w-full aspect-square order-1 md:order-2 flex items-center justify-center transition-transform"
+                    >
+                        <ModernGraphic mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />
+                    </motion.div>
+                )}
             </div>
         </div>
     );

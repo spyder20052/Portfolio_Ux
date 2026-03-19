@@ -25,151 +25,129 @@ export const ParallaxBackground = ({ xMotionValue, mouseX, mouseY, isMobile }) =
 
     return (
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-            {/* LAYER 1: Deep / Slow / Large Shapes (#F0F0F0) */}
+            {/* LAYER 1: Deep / Slow / Large Shapes (#F0F0F0) - Subtly visible */}
             <motion.div
                 className="absolute inset-0 will-change-transform"
                 style={{ transform: tx1 }}
             >
-                <svg className="w-full h-full opacity-60" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
-                    <circle cx="200" cy="200" r="300" fill="#F0F0F0" />
-                    <circle cx="1600" cy="800" r="400" fill="#F0F0F0" />
-                    <circle cx="800" cy="-100" r="250" fill="#F0F0F0" />
+                <svg className="w-full h-full opacity-40" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+                    <circle cx="200" cy="200" r="300" fill="#F5F5F5" />
+                    <circle cx="1600" cy="800" r="400" fill="#F5F5F5" />
                 </svg>
             </motion.div>
 
-            {/* LAYER 2: Mid / Medium / Flowing Lines (#EAEAEA) */}
+            {/* LAYER 2: Mid / Medium / Glows */}
             <motion.div
                 className="absolute inset-0 will-change-transform"
                 style={{ transform: tx2 }}
             >
-                <svg className="w-full h-full" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
-                    <path
-                        d="M0 300 Q 400 600 800 300 T 1600 300"
-                        fill="none"
-                        stroke="#EAEAEA"
-                        strokeWidth="20"
-                        className="opacity-50"
-                    />
-                    <path
-                        d="M-200 800 Q 600 500 1200 900 T 2200 800"
-                        fill="none"
-                        stroke="#EAEAEA"
-                        strokeWidth="30"
-                        className="opacity-50"
-                    />
-                    <circle cx="1200" cy="200" r="50" fill="none" stroke="#EAEAEA" strokeWidth="2" />
-                    <circle cx="400" cy="900" r="30" fill="none" stroke="#EAEAEA" strokeWidth="2" />
-                </svg>
+                <div className="absolute top-[20%] right-[10%] w-[40vw] h-[40vw] bg-blue-500/5 rounded-full blur-[100px]" />
+                <div className="absolute bottom-[10%] left-[5%] w-[30vw] h-[30vw] bg-blue-500/5 rounded-full blur-[80px]" />
             </motion.div>
-
-            {/* LAYER 3: Interactive / Mouse Reactivity (Accent) */}
-            {!isMobile && (
-                <motion.div
-                    className="absolute inset-0 will-change-transform"
-                    style={{ transform: txMouse }}
-                >
-                    <svg className="w-full h-full" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
-                        <circle cx="960" cy="540" r="200" fill={COLORS.accent} className="opacity-[0.03] blur-[20px]" />
-                        <g className="opacity-10">
-                            <circle cx="100" cy="100" r="4" fill={COLORS.accent} />
-                            <circle cx="1800" cy="900" r="6" fill={COLORS.accent} />
-                            <circle cx="500" cy="500" r="2" fill={COLORS.accent} />
-                        </g>
-                    </svg>
-                </motion.div>
-            )}
         </div>
     );
 };
 
-export const BalanceGraphic = ({ mouseX, mouseY, isMobile }) => {
-    const factor = 0.015;
+export const ModernGraphic = ({ mouseX, mouseY, isMobile }) => {
+    const factor = 0.03;
     const tx = useTransform(mouseX, (x) => (x - window.innerWidth / 2) * factor);
     const ty = useTransform(mouseY, (y) => (y - window.innerHeight / 2) * factor);
-    const rotate = useTransform(mouseX, (x) => (x - window.innerWidth / 2) * 0.005);
+    const rotate = useTransform(mouseX, (x) => (x - window.innerWidth / 2) * 0.03);
 
     return (
         <motion.div
             className="relative w-full h-full flex items-center justify-center will-change-transform"
-            style={{ x: tx, y: ty, rotate }}
+            style={{ x: tx, y: ty }}
         >
-            <svg viewBox="0 0 400 400" className="w-full h-full opacity-90">
-                {/* Background Particles - The "Living" part - Disabled on mobile for stability */}
-                {!isMobile && [...Array(6)].map((_, i) => (
-                    <motion.circle
-                        key={i}
-                        cx={100 + Math.random() * 200}
-                        cy={100 + Math.random() * 200}
-                        r={Math.random() * 3 + 1}
-                        fill={i % 2 === 0 ? COLORS.accent : COLORS.text}
-                        initial={{ opacity: 0.1 }}
-                        animate={{
-                            opacity: [0.1, 0.4, 0.1],
-                            y: [0, -30, 0],
-                            x: [0, (i - 3) * 10, 0]
-                        }}
-                        transition={{
-                            duration: 3 + i,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                            delay: i * 0.5
-                        }}
-                    />
-                ))}
+            {/* Dynamic Ambient Glows */}
+            <motion.div
+                className="absolute w-[150%] h-[150%] bg-blue-500/10 rounded-full blur-[100px] pointer-events-none"
+                animate={{
+                    scale: [1, 1.3, 1],
+                    opacity: [0.3, 0.5, 0.3],
+                    rotate: [0, 90]
+                }}
+                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+            />
 
-                {/* The Line - Equilibrium */}
-                <motion.line
-                    x1="100" y1="300" x2="300" y2="100"
-                    stroke={COLORS.text}
-                    strokeWidth="1"
-                    animate={{ strokeWidth: [1, 2, 1], opacity: [0.1, 0.3, 0.1] }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                />
+            <div className="relative w-72 h-72 sm:w-80 sm:h-80 md:w-96 md:h-96">
+                {/* Floating Glass Panels */}
+                <motion.div
+                    animate={{ y: [-15, 15, -15], rotate: [-2, 2, -2] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute inset-0 flex items-center justify-center"
+                >
+                    {/* The Prism Layer */}
+                    <motion.div
+                        style={{ rotate }}
+                        className="relative w-48 h-64 sm:w-56 sm:h-72 backdrop-blur-xl bg-white/10 border border-white/30 rounded-[30px] shadow-[0_20px_50px_rgba(0,0,0,0.1)] z-20 flex items-center justify-center overflow-hidden transition-all"
+                    >
+                        {/* Shimmering effect */}
+                        <motion.div
+                            animate={{ x: ['-100%', '200%'] }}
+                            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", repeatDelay: 1 }}
+                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-12"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/20 via-transparent to-white/10" />
 
-                {/* The Pixel (Square) */}
-                <motion.rect
-                    x="80" y="260" width="40" height="40"
-                    stroke={COLORS.accent}
-                    strokeWidth="2"
-                    fill="none"
-                    animate={!isMobile ? {
-                        rotate: 360,
-                        scale: [1, 1.1, 1]
-                    } : {}}
-                    transition={!isMobile ? {
-                        rotate: { duration: 15, repeat: Infinity, ease: "linear" },
-                        scale: { duration: 4, repeat: Infinity, ease: "easeInOut" }
-                    } : {}}
-                    style={{ transformBox: 'fill-box', transformOrigin: 'center' }}
-                />
+                        <div className="relative flex flex-col items-center gap-4">
+                            <div className="w-12 h-[1px] bg-blue-500" />
+                            <div className="text-[12px] font-bold tracking-[0.8em] text-blue-600 uppercase vertical-text mix-blend-overlay">Design • Code</div>
+                            <div className="w-12 h-[1px] bg-blue-500" />
+                        </div>
+                    </motion.div>
+                </motion.div>
 
-                {/* The Organic (Circle) */}
-                <motion.circle
-                    cx="320" cy="80" r="20"
-                    fill={COLORS.text}
+                {/* Satellite Shape (Solid/Deep) */}
+                <motion.div
                     animate={{
-                        y: [-10, 10, -10],
-                        scale: [1, 1.2, 1]
+                        rotate: 360,
+                        x: [20, -20, 20],
+                        y: [-20, 20, -20]
                     }}
                     transition={{
-                        duration: 5,
-                        repeat: Infinity,
-                        ease: "easeInOut"
+                        rotate: { duration: 30, repeat: Infinity, ease: "linear" },
+                        default: { duration: 8, repeat: Infinity, ease: "easeInOut" }
                     }}
+                    className="absolute -top-4 -right-4 w-40 h-40 bg-[#0A0A0A] rounded-full z-10 flex items-center justify-center border border-white/10 shadow-2xl overflow-hidden"
+                >
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-500/20 to-transparent" />
+                    {/* Minimal Internal Grid */}
+                    <div className="grid grid-cols-4 gap-2 opacity-20">
+                        {[...Array(16)].map((_, i) => (
+                            <div key={i} className="w-1 h-1 bg-white rounded-full" />
+                        ))}
+                    </div>
+                </motion.div>
+
+                {/* Light Orbs */}
+                <motion.div
+                    animate={{
+                        scale: [1, 1.4, 1],
+                        opacity: [0.4, 0.8, 0.4],
+                        x: [0, 30, 0]
+                    }}
+                    transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute -left-10 bottom-20 w-12 h-12 rounded-full bg-blue-400 blur-xl z-30 mix-blend-screen"
                 />
 
-                {/* Connecting Flow */}
-                <motion.path
-                    d="M 120 280 Q 200 200 300 100"
-                    fill="none"
-                    stroke={COLORS.text}
-                    strokeWidth="0.5"
-                    strokeDasharray="4 4"
-                    animate={{ strokeDashoffset: [0, -20] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-                    className="opacity-40"
-                />
-            </svg>
+                {/* Ornaments */}
+                <svg className="absolute inset-0 w-full h-full z-0 pointer-events-none" viewBox="0 0 400 400">
+                    <motion.circle
+                        cx="200" cy="200" r="180"
+                        fill="none" stroke="url(#blueGrad)" strokeWidth="0.5" strokeDasharray="5 5"
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+                    />
+                    <defs>
+                        <linearGradient id="blueGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" stopColor="#3B82F6" stopOpacity="0" />
+                            <stop offset="50%" stopColor="#3B82F6" stopOpacity="0.5" />
+                            <stop offset="100%" stopColor="#3B82F6" stopOpacity="0" />
+                        </linearGradient>
+                    </defs>
+                </svg>
+            </div>
         </motion.div>
     );
 };

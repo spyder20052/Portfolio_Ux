@@ -28,6 +28,7 @@ export default function App() {
   const [selectedProject, setSelectedProject] = useState(null);
   const [isScrolling, setIsScrolling] = useState(false);
 
+  const totalWidthRef = useRef(0);
   const containerRef = useRef(null);
   const sectionRefs = useRef([]);
   const scrollPosRef = useRef(0);
@@ -61,9 +62,10 @@ export default function App() {
     isScrollingTimeoutRef.current = setTimeout(() => setIsScrolling(false), 150);
   }, []);
 
-  // Transform for progress - dynamic function to react to totalWidth changes
+  // Transform for progress - logic using ref to ensure it always uses the latest width
   const progressPercent = useTransform(xMotionValue, (val) => {
-    return totalWidth > 0 ? (val / totalWidth) * 100 : 0;
+    const width = totalWidthRef.current;
+    return width > 0 ? (val / width) * 100 : 0;
   });
 
   const progressStyleWidth = useTransform(progressPercent, (v) => `${v}%`);
@@ -229,11 +231,14 @@ export default function App() {
   useEffect(() => {
     const updateWidth = () => {
       if (!containerRef.current) return;
+      let newWidth = 0;
       if (isMobile) {
-        setTotalWidth(document.documentElement.scrollHeight - window.innerHeight);
+        newWidth = document.documentElement.scrollHeight - window.innerHeight;
       } else {
-        setTotalWidth(containerRef.current.scrollWidth - window.innerWidth);
+        newWidth = containerRef.current.scrollWidth - window.innerWidth;
       }
+      setTotalWidth(newWidth);
+      totalWidthRef.current = newWidth;
     };
 
     updateWidth();
@@ -406,7 +411,7 @@ export default function App() {
           transformStyle: 'preserve-3d'
         } : {}}
       >
-        <LandingSection ref={el => sectionRefs.current[0] = el} />
+        <LandingSection ref={el => sectionRefs.current[0] = el} isMobile={isMobile} />
         <IntroSection ref={el => sectionRefs.current[1] = el} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />
         <GallerySection ref={el => sectionRefs.current[2] = el} onOpenProject={setSelectedProject} isScrolling={isScrolling} isMobile={isMobile} />
         <BioSection ref={el => sectionRefs.current[3] = el} isScrolling={isScrolling} />

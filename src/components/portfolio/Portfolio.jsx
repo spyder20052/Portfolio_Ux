@@ -74,36 +74,36 @@ export const ProjectDetail = ({ project, onClose, onOpenProject, isMobile }) => 
                     </div>
                 </div>
 
-                {/* Creative Column-Based Masonry Gallery */}
                 <div className="bg-[#0A0A0A] py-20 px-4 md:px-12">
                     <div className="max-w-[1600px] mx-auto columns-1 md:columns-2 lg:columns-3 gap-12 space-y-12">
-                        {project.images.slice(0, 9).map((img, i) => (
+                        {project.images.map((img, i) => (
                             <motion.div
                                 key={`${project.id}-img-${i}`}
                                 initial={!isMobile ? { opacity: 0, y: 50 } : { opacity: 1, y: 0 }}
                                 whileInView={!isMobile ? { opacity: 1, y: 0 } : {}}
-                                viewport={{ once: true, margin: "-10%" }}
+                                viewport={{ once: true, margin: "20%" }}
                                 transition={{
-                                    duration: 1,
-                                    delay: (i % 3) * 0.1,
+                                    duration: 0.8,
+                                    delay: isMobile ? 0 : (i % 3) * 0.1,
                                     ease: [0.16, 1, 0.3, 1]
                                 }}
-                                className="relative group break-inside-avoid-column flex flex-col items-center mb-12 will-change-transform"
-                                style={{ transform: 'translate3d(0,0,0)' }}
+                                className={`relative group break-inside-avoid-column flex flex-col items-center mb-12 ${!isMobile ? 'will-change-transform' : ''}`}
+                                style={!isMobile ? { transform: 'translate3d(0,0,0)' } : {}}
                             >
                                 <div className="relative w-full overflow-hidden bg-transparent transition-all duration-700">
                                     <img
                                         src={img}
                                         alt={`${project.title} - Vue ${i + 1}`}
                                         loading="lazy"
-                                        className="w-full h-auto object-contain shadow-2xl rounded-lg border border-white/5 transition-transform duration-700 group-hover:scale-[1.02]"
+                                        decoding="async"
+                                        className="w-full h-auto object-contain shadow-2xl rounded-lg border border-white/5 transition-transform duration-700 md:group-hover:scale-[1.02]"
                                     />
 
                                     {/* Minimalist Overlay - only shows on hover */}
-                                    <div className="absolute inset-0 bg-blue-600/0 group-hover:bg-blue-600/5 transition-colors duration-700 pointer-events-none rounded-lg"></div>
+                                    <div className="absolute inset-0 bg-blue-600/0 md:group-hover:bg-blue-600/5 transition-colors duration-700 pointer-events-none rounded-lg"></div>
 
                                     {/* Tech Detail Label */}
-                                    <div className="mt-4 opacity-40 group-hover:opacity-100 transition-all duration-700">
+                                    <div className="mt-4 opacity-40 md:group-hover:opacity-100 transition-all duration-700">
                                         <div className="flex items-center gap-2">
                                             <div className="w-4 h-[1px] bg-blue-500"></div>
                                             <span className="text-[10px] font-bold tracking-[0.3em] uppercase text-white/60">Vue {i + 1}</span>
