@@ -220,6 +220,7 @@ export default function App() {
 
   return (
     <div ref={containerRef} className={`${isMobile ? 'w-full' : 'h-screen w-screen overflow-hidden'} bg-[#0A0A0A] font-sans relative`}>
+      {!isMobile && !isLoading && <ParallaxBackground xMotionValue={xMotionValue} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />}
       <AnimatePresence mode="wait">
         {isLoading && <Loader key="loader" onComplete={() => setIsLoading(false)} />}
       </AnimatePresence>
@@ -247,7 +248,6 @@ export default function App() {
       {/* Global Foreground Elements - Only active once loaded */}
       {!isLoading && (
         <>
-          {!isMobile && <ParallaxBackground xMotionValue={xMotionValue} mouseX={mouseX} mouseY={mouseY} isMobile={isMobile} />}
 
           {selectedProject && (
             <ProjectDetail

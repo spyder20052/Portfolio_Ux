@@ -32,7 +32,7 @@ export const ParallaxBackground = ({ xMotionValue, mouseX, mouseY, isMobile }) =
                 className="absolute inset-0 will-change-transform"
                 style={{ transform: tx1 }}
             >
-                <svg className="w-full h-full opacity-40" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
+                <svg className="w-full h-full opacity-10" viewBox="0 0 1920 1080" preserveAspectRatio="xMidYMid slice">
                     <circle cx="200" cy="200" r="300" fill="#F5F5F5" />
                     <circle cx="1600" cy="800" r="400" fill="#F5F5F5" />
                 </svg>
