@@ -22,7 +22,7 @@ const LandingSection = React.forwardRef(({ isMobile }, ref) => {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.5 }}
-                    className="text-xs sm:text-sm md:text-xl font-light tracking-[0.2em] md:tracking-[0.4em] opacity-60 uppercase mb-6"
+                    className="text-xs sm:text-sm md:text-2xl font-light tracking-[0.2em] md:tracking-[0.4em] opacity-60 uppercase mb-6"
                 >
                     <ScrambleText active={true} delay={600}>Développeur & Graphic Designer</ScrambleText>
                 </motion.p>
