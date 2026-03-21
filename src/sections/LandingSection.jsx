@@ -5,12 +5,12 @@ import { RevealText, ScrambleText } from '../components/utils/TextAnimations';
 const LandingSection = React.forwardRef(({ isMobile }, ref) => {
     return (
         <div ref={ref} className={`w-full md:min-w-screen ${isMobile ? 'min-h-[85vh] py-20' : 'h-screen'} flex flex-col items-center justify-center relative px-6 md:px-20 shrink-0 border-b md:border-b-0 md:border-r border-gray-100 bg-white`}>
-            <div className="relative text-center md:text-left scale-[0.9] md:scale-100">
-                <h1 className="text-[4rem] sm:text-[5rem] md:text-[10rem] lg:text-[12rem] font-serif tracking-tighter leading-none mb-0">
+            <div className="relative text-center md:text-left scale-[1] md:scale-100">
+                <h1 className="text-[5rem] sm:text-[6rem] md:text-[12rem] lg:text-[14rem] font-serif tracking-tighter leading-none mb-0">
                     <motion.div
                         initial={{ opacity: 0, y: 50 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
+                        transition={{ duration: 1.2, delay: 0.2, ease: "easeInOut" }}
                     >
                         <RevealText active={true} delay={200}>Spynel KOUTON</RevealText>
                     </motion.div>
