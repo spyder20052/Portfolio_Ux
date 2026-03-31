@@ -2433,18 +2433,33 @@ label {
     .hero__title {
         white-space: normal;
         letter-spacing: -0.01em;
-        font-size: clamp(48px, 12vw, 90px);
+        font-size: clamp(40px, 12vw, 70px);
+        line-height: 1.2;
+    }
+
+    .hero__title > span > span:first-child {
+        display: block;
     }
 
     .hero {
         padding-left: 5%;
         padding-right: 5%;
     }
+
+    .scroll-hint {
+        display: none !important;
+    }
 }
 
 @media (max-width: 480px) {
+    .hero__title {
+        font-size: 42px !important;
+        line-height: 1.1 !important;
+    }
+
     .hero__sub {
-        font-size: 14px;
+        font-size: 13px;
+        margin-top: 15px;
     }
 
     #dot-canvas {
