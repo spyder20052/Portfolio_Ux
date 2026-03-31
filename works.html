@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="fr" class="is-loading">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Works | Spynel KOUTON</title>
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+    <style>
+        /* FOUC Protection - Hide body until CSS/JS loads */
+        body {
+            opacity: 0;
+            background: #0D0D0D;
+        }
+
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #0D0D0D;
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .intro-logo {
+            font-family: serif;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .nav-mobile-menu {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="custom-cursor"></div>
+    <div id="page-transition"></div>
+    <div id="intro-overlay">
+        <div class="intro-portal"></div>
+        <div class="intro-content">
+            <span class="intro-logo serif">kspynel.</span>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <a href="/" class="nav__logo">kspynel.</a>
+        <ul class="nav__links">
+            <li><a href="/works.html" class="nav__link">Projets</a></li>
+            <li><a href="/about.html" class="nav__link">À Propos</a></li>
+            <li><a href="/contact.html" class="nav__link">Contact</a></li>
+            <li><a href="#" class="nav__link nav__cta btn-rdv" data-cursor="ok"
+                    onclick="Calendly.initPopupWidget({url:'https://calendly.com/kspynel/30min'}); return false;">Prendre
+                    RDV ↗</a></li>
+        </ul>
+        <button class="nav-burger" id="nav-burger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- Menu mobile overlay -->
+    <div class="nav-mobile-menu" id="nav-mobile-menu">
+        <a href="/works.html">Projets</a>
+        <a href="/about.html">À Propos</a>
+        <a href="/contact.html">Contact</a>
+        <a href="#" class="btn-rdv-mobile"
+            onclick="Calendly.initPopupWidget({url:'https://calendly.com/spynel-kouton/30min'}); return false;">
+            Prendre RDV ↗
+        </a>
+    </div>
+
+    <main class="container">
+        <section class="page-header" style="margin-top: 150px; margin-bottom: 80px;">
+            <h1 class="hero-title sans text-upper" style="font-size: 14px; letter-spacing: 0.2em; color: #888;">Projets Sélectionnés</h1>
+            <h2 class="serif" style="font-size: clamp(40px, 6vw, 80px);">Mon Portfolio.</h2>
+        </section>
+
+        <section class="works-grid container reveal">
+            <!-- Project cards (1 to 20) -->
+            <!-- Project 01: Arbitra -->
+            <article class="work-card" data-cursor="card">
+                <a href="/case-study.html">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)" srcset="/assets/projects/arbitra/gallery-01-small.webp">
+                            <source media="(max-width: 1200px)"
+                                srcset="/assets/projects/arbitra/gallery-01-medium.webp">
+                            <img class="project-img" data-src="/assets/projects/arbitra/gallery-01-large.webp"
+                                src="/assets/projects/arbitra/gallery-01-small.webp" alt="Arbitra" loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">01</span>
+                        <div>
+                            <h3 class="work-card__title">Arbitra</h3>
+                            <p class="work-card__category">Web3 Dashboard · 2024</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 02: Snaki -->
+            <article class="work-card" data-cursor="card">
+                <a href="/case-study-2.html">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)" srcset="/assets/projects/snaki/cover-small.webp">
+                            <source media="(max-width: 1200px)" srcset="/assets/projects/snaki/cover-medium.webp">
+                            <img class="project-img" data-src="/assets/projects/snaki/cover-large.webp"
+                                src="/assets/projects/snaki/cover-small.webp" alt="Snaki" loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">02</span>
+                        <div>
+                            <h3 class="work-card__title">Snaki</h3>
+                            <p class="work-card__category">Identity / Branding · 2024</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 03: Astro -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=astro">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)" srcset="/assets/projects/astro/cover-small.webp">
+                            <img class="project-img" data-src="/assets/projects/astro/cover-large.webp"
+                                src="/assets/projects/astro/cover-small.webp" alt="Astro" loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">03</span>
+                        <div>
+                            <h3 class="work-card__title">Astro</h3>
+                            <p class="work-card__category">Web Design · 2024</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 04: Crispy -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=crispy">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)" srcset="/assets/projects/crispy/cover-small.webp">
+                            <img class="project-img" data-src="/assets/projects/crispy/cover-large.webp"
+                                src="/assets/projects/crispy/cover-small.webp" alt="Crispy" loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">04</span>
+                        <div>
+                            <h3 class="work-card__title">Crispy</h3>
+                            <p class="work-card__category">Food Branding · 2024</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 05: Future Studio -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=future-studio">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)"
+                                srcset="/assets/projects/future-studio/gallery-01-small.webp">
+                            <img class="project-img" data-src="/assets/projects/future-studio/gallery-01-large.webp"
+                                src="/assets/projects/future-studio/gallery-01-small.webp" alt="Future Studio"
+                                loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">05</span>
+                        <div>
+                            <h3 class="work-card__title">Future Studio</h3>
+                            <p class="work-card__category">Graphic Design · 2024</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+            <!-- Project 06: Scan360 -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=scan360">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)" srcset="/assets/projects/scan360/cover-small.webp">
+                            <img class="project-img" data-src="/assets/projects/scan360/cover-large.webp"
+                                src="/assets/projects/scan360/cover-small.webp" alt="Scan360" loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">06</span>
+                        <div>
+                            <h3 class="work-card__title">Scan360</h3>
+                            <p class="work-card__category">UI/UX Tech · 2024</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 07: Zitawi -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=zitawi">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)" srcset="/assets/projects/zitawi/gallery-01-small.webp">
+                            <img class="project-img" data-src="/assets/projects/zitawi/gallery-01-large.webp"
+                                src="/assets/projects/zitawi/gallery-01-small.webp" alt="Zitawi" loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">07</span>
+                        <div>
+                            <h3 class="work-card__title">Zitawi</h3>
+                            <p class="work-card__category">Branding · 2024</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 08: NextGen -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=nextgen">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)" srcset="/assets/projects/nextgen/gallery-01-small.webp">
+                            <img class="project-img" data-src="/assets/projects/nextgen/gallery-01-large.webp"
+                                src="/assets/projects/nextgen/gallery-01-small.webp" alt="NextGen" loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">08</span>
+                        <div>
+                            <h3 class="work-card__title">NextGen</h3>
+                            <p class="work-card__category">Web Design · 2024</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 09: Feller -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=feller">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)" srcset="/assets/projects/feller/gallery-01-small.webp">
+                            <img class="project-img" data-src="/assets/projects/feller/gallery-01-large.webp"
+                                src="/assets/projects/feller/gallery-01-small.webp" alt="Feller" loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">09</span>
+                        <div>
+                            <h3 class="work-card__title">Feller</h3>
+                            <p class="work-card__category">Architecture Identity · 2024</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 10: AI Shooting -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=shooting-ia">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)" srcset="/assets/projects/shooting-1/cover-small.webp">
+                            <img class="project-img" data-src="/assets/projects/shooting-1/cover-large.webp"
+                                src="/assets/projects/shooting-1/cover-small.webp" alt="AI Shooting" loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">10</span>
+                        <div>
+                            <h3 class="work-card__title">AI Shooting</h3>
+                            <p class="work-card__category">AI Creative · 2024</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+            <!-- Project 11: Logo ArbitraChain -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=logo-arbitrachain">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)"
+                                srcset="/assets/projects/branding-1/gallery-01-small.webp">
+                            <img class="project-img" data-src="/assets/projects/branding-1/gallery-01-large.webp"
+                                src="/assets/projects/branding-1/gallery-01-small.webp" alt="ArbitraChain"
+                                loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">11</span>
+                        <div>
+                            <h3 class="work-card__title">ArbitraChain</h3>
+                            <p class="work-card__category">Logo Design · 2024</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 12: Logo Ilot Foncier -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=logo-ilot-foncier">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)"
+                                srcset="/assets/projects/branding-2/gallery-01-small.webp">
+                            <img class="project-img" data-src="/assets/projects/branding-2/gallery-01-large.webp"
+                                src="/assets/projects/branding-2/gallery-01-small.webp" alt="Ilot Foncier"
+                                loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">12</span>
+                        <div>
+                            <h3 class="work-card__title">Ilot Foncier</h3>
+                            <p class="work-card__category">Identity · 2023</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 13: Student Innovation Lab -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=design-lab">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)" srcset="/assets/projects/lab/cover-small.webp">
+                            <img class="project-img" data-src="/assets/projects/lab/cover-large.webp"
+                                src="/assets/projects/lab/cover-small.webp" alt="SI Lab" loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">13</span>
+                        <div>
+                            <h3 class="work-card__title">SI Lab</h3>
+                            <p class="work-card__category">Branding · 2024</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 14: Visual Concept I -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=visual-concept-1">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)" srcset="/assets/projects/visual-1/gallery-01-small.webp">
+                            <img class="project-img" data-src="/assets/projects/visual-1/gallery-01-large.webp"
+                                src="/assets/projects/visual-1/gallery-01-small.webp" alt="Vintage" loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">14</span>
+                        <div>
+                            <h3 class="work-card__title">Vintage Art</h3>
+                            <p class="work-card__category">Visual Design · 2023</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 15: Visual Concept II -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=visual-concept-2">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)" srcset="/assets/projects/visual-2/cover-small.webp">
+                            <img class="project-img" data-src="/assets/projects/visual-2/cover-large.webp"
+                                src="/assets/projects/visual-2/cover-small.webp" alt="Retro" loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">15</span>
+                        <div>
+                            <h3 class="work-card__title">Retro Vision</h3>
+                            <p class="work-card__category">Graphic Design · 2023</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 16: Exp Lab I -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=exp-lab-1">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)" srcset="/assets/projects/experiments-1/cover-small.webp">
+                            <img class="project-img" data-src="/assets/projects/experiments-1/cover-large.webp"
+                                src="/assets/projects/experiments-1/cover-small.webp" alt="Halloween" loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">16</span>
+                        <div>
+                            <h3 class="work-card__title">Halloween BDE</h3>
+                            <p class="work-card__category">Event Design · 2023</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 17: Visual Concept III -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=visual-concept-3">
+                    <div class="work-card__image">
+                        <picture>
+                            <img class="project-img" data-src="/assets/projects/divers-1/gallery-01.webp"
+                                src="/assets/projects/divers-1/gallery-01.webp" alt="BDE">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">17</span>
+                        <div>
+                            <h3 class="work-card__title">BDE Visuals</h3>
+                            <p class="work-card__category">Event Branding · 2024</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 18: Exp Lab II -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=exp-lab-2">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)"
+                                srcset="/assets/projects/experiments-2/gallery-01-small.webp">
+                            <img class="project-img" data-src="/assets/projects/experiments-2/gallery-01-large.webp"
+                                src="/assets/projects/experiments-2/gallery-01-small.webp" alt="Signature"
+                                loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">18</span>
+                        <div>
+                            <h3 class="work-card__title">Signature Design</h3>
+                            <p class="work-card__category">Branding · 2024</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 19: CV Identity -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=cv-identity">
+                    <div class="work-card__image">
+                        <picture>
+                            <source media="(max-width: 600px)"
+                                srcset="/assets/projects/branding-1/gallery-01-small.webp">
+                            <img class="project-img" data-src="/assets/projects/branding-1/gallery-01-large.webp"
+                                src="/assets/projects/branding-1/gallery-01-small.webp" alt="CV" loading="lazy">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">19</span>
+                        <div>
+                            <h3 class="work-card__title">CV Portfolio</h3>
+                            <p class="work-card__category">Editorial Design · 2024</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+
+            <!-- Project 20: Divers Concept -->
+            <article class="work-card" data-cursor="card">
+                <a href="/project-detail.html?id=divers-concept">
+                    <div class="work-card__image">
+                        <picture>
+                            <img class="project-img" data-src="/assets/projects/divers-1/gallery-01.webp"
+                                src="/assets/projects/divers-1/gallery-01.webp" alt="Divers">
+                        </picture>
+                        <div class="work-card__overlay"><span>Voir le projet →</span></div>
+                    </div>
+                    <div class="work-card__meta">
+                        <span class="work-card__number">20</span>
+                        <div>
+                            <h3 class="work-card__title">Divers</h3>
+                            <p class="work-card__category">Creative Selection · 2023</p>
+                        </div>
+                    </div>
+                </a>
+            </article>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <h2 class="footer__slogan serif">Design with class.<br>Built to Last.</h2>
+            <div class="footer__grid">
+                <div class="footer__col">
+                    <h4>Identité</h4>
+                    <p class="sans" style="color: #888;">Spynel KOUTON<br>Designer graphique & Développeur</p>
+                </div>
+                <div class="footer__col">
+                    <h4>Services</h4>
+                    <a href="#">Design graphique</a>
+                    <a href="#">Développement web</a>
+                    <a href="#">UI/UX Design</a>
+                    <a href="#">Direction artistique</a>
+                </div>
+                <div class="footer__col">
+                    <h4>Social</h4>
+                    <a href="#"
+                        onclick="Calendly.initPopupWidget({url:'https://calendly.com/kspynel/30min'}); return false;">Prendre
+                        RDV ↗</a>
+                    <a href="https://wa.me/22943202239" target="_blank">WhatsApp</a>
+                    <a href="https://linkedin.com/in/spynel-kouton-756444273" target="_blank">LinkedIn</a>
+                </div>
+            </div>
+            <div class="footer__bottom sans">
+                <p>By Spynel KOUTON</p>
+                <p>© 2026 Tous droits réservés</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="/main.js"></script>
+</body>
+
+</html>

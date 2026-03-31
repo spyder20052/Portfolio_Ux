@@ -1,9 +1,0 @@
-@import "tailwindcss";
-
-.content-visibility-auto {
-    content-visibility: auto;
-}
-
-.contain-intrinsic-size-project-card {
-    contain-intrinsic-size: 550px 75vh;
-}

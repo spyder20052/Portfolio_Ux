@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="fr" class="is-loading">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Detail | kspynel.</title>
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        /* FOUC Protection - Hide body until CSS/JS loads */
+        body {
+            opacity: 0;
+            background: #0D0D0D;
+        }
+
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #0D0D0D;
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .intro-logo {
+            font-family: serif;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .nav-mobile-menu {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="is-project-page">
+    <div id="custom-cursor"></div>
+    <div id="page-transition"></div>
+
+    <!-- Floating Back Button -->
+    <a href="/works.html" class="back-to-works sans">← Back to Works</a>
+
+    <nav class="navbar">
+        <a href="/" class="nav__logo">kspynel.</a>
+        <ul class="nav__links">
+            <li><a href="/works.html" class="nav__link">Projets</a></li>
+            <li><a href="/about.html" class="nav__link">À Propos</a></li>
+            <li><a href="/contact.html" class="nav__link">Contact</a></li>
+            <li><a href="#" class="nav__link nav__cta btn-rdv" data-cursor="ok"
+                    onclick="Calendly.initPopupWidget({url:'https://calendly.com/kspynel/30min'}); return false;">Prendre
+                    RDV ↗</a></li>
+        </ul>
+        <button class="nav-burger" id="nav-burger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- Menu mobile overlay -->
+    <div class="nav-mobile-menu" id="nav-mobile-menu">
+        <a href="/works.html">Projets</a>
+        <a href="/about.html">À Propos</a>
+        <a href="/contact.html">Contact</a>
+        <a href="#" class="btn-rdv-mobile"
+            onclick="Calendly.initPopupWidget({url:'https://calendly.com/spynel-kouton/30min'}); return false;">
+            Prendre RDV ↗
+        </a>
+    </div>
+
+    <main id="dynamic-project-content">
+        <!-- Content injected dynamically by main.js -->
+        <div class="loading-state serif"
+            style="height: 100vh; display: flex; align-items: center; justify-content: center; font-size: 2rem;">
+            Chargement...
+        </div>
+    </main>
+
+    <script type="module" src="/main.js"></script>
+</body>
+
+</html>

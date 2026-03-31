@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="fr" class="is-loading">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact | Spynel KOUTON</title>
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+    <style>
+        /* FOUC Protection - Hide body until CSS/JS loads */
+        body {
+            opacity: 0;
+            background: #0D0D0D;
+        }
+
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #0D0D0D;
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .intro-logo {
+            font-family: serif;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .nav-mobile-menu {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="custom-cursor"></div>
+    <div id="page-transition"></div>
+    <div id="intro-overlay">
+        <div class="intro-portal"></div>
+        <div class="intro-content">
+            <span class="intro-logo serif">kspynel.</span>
+        </div>
+    </div>
+
+    <nav class="navbar">
+        <a href="/" class="nav__logo">kspynel.</a>
+        <ul class="nav__links">
+            <li><a href="/works.html" class="nav__link">Projets</a></li>
+            <li><a href="/about.html" class="nav__link">À Propos</a></li>
+            <li><a href="/contact.html" class="nav__link">Contact</a></li>
+            <li><a href="#" class="nav__link nav__cta btn-rdv" data-cursor="ok"
+                    onclick="Calendly.initPopupWidget({url:'https://calendly.com/kspynel/30min'}); return false;">Prendre
+                    RDV ↗</a></li>
+        </ul>
+        <button class="nav-burger" id="nav-burger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- Menu mobile overlay -->
+    <div class="nav-mobile-menu" id="nav-mobile-menu">
+        <a href="/works.html">Projets</a>
+        <a href="/about.html">À Propos</a>
+        <a href="/contact.html">Contact</a>
+        <a href="#" class="btn-rdv-mobile"
+            onclick="Calendly.initPopupWidget({url:'https://calendly.com/spynel-kouton/30min'}); return false;">
+            Prendre RDV ↗
+        </a>
+    </div>
+
+    <main class="container">
+        <section class="page-header" style="margin-top: 150px; margin-bottom: 100px;">
+            <h1 class="hero-title sans text-upper" style="font-size: 14px; letter-spacing: 0.2em; color: #888;">
+                Contactez-moi</h1>
+            <h2 class="serif" style="font-size: clamp(40px, 6vw, 80px);">Travaillons ensemble.</h2>
+        </section>
+
+        <section class="contact-layout reveal"
+            style="display: grid; grid-template-columns: 1.5fr 1fr; gap: var(--space-xl); padding-bottom: 150px;">
+            <div class="contact-form">
+                <form id="contact-form" action="https://formspree.io/f/xeepadqg" method="POST"
+                    style="display: flex; flex-direction: column; gap: 30px;">
+                    <div class="form-group">
+                        <label for="name">Nom complet</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">Adresse Email</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="type">Type de projet</label>
+                        <input type="text" id="type" name="type" placeholder="Ex: Identité visuelle, Site web...">
+                    </div>
+                    <div class="form-group">
+                        <label for="message">Votre Message</label>
+                        <textarea id="message" name="message" rows="4" required></textarea>
+                    </div>
+                    <button type="submit" id="submit-btn" class="btn-submit sans">Envoyer le message</button>
+                    <div id="form-status" class="sans" style="font-size: 13px; margin-top: 10px;"></div>
+                </form>
+            </div>
+
+            <div class="contact-info">
+                <div style="margin-bottom: 60px;">
+                    <h4 class="sans text-upper"
+                        style="font-size: 11px; letter-spacing: 0.1em; color: #888; margin-bottom: 20px;">Direct</h4>
+                    <a href="mailto:kspynel@gmail.com" class="serif"
+                        style="font-size: 2rem; border-bottom: 1px solid #000;">kspynel@gmail.com</a>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px;">
+                    <div>
+                        <h4 class="sans text-upper"
+                            style="font-size: 11px; letter-spacing: 0.1em; color: #888; margin-bottom: 15px;">Social
+                        </h4>
+                        <ul class="sans" style="display: flex; flex-direction: column; gap: 8px;">
+                            <li><a href="https://wa.me/22943202239" target="_blank">WhatsApp</a></li>
+                            <li><a href="https://linkedin.com/in/spynel-kouton-756444273" target="_blank">LinkedIn</a>
+                            </li>
+                            <li><a href="https://github.com/spynelkouton" target="_blank">GitHub</a></li>
+                        </ul>
+                    </div>
+                    <div>
+                        <h4 class="sans text-upper"
+                            style="font-size: 11px; letter-spacing: 0.1em; color: #888; margin-bottom: 15px;">RDV</h4>
+                        <a href="#" class="serif btn-rdv" data-cursor="ok"
+                            onclick="Calendly.initPopupWidget({url:'https://calendly.com/kspynel/30min'}); return false;"
+                            style="font-size: 1.2rem; border-bottom: 1px solid #888;">Prendre RDV ↗</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <h2 class="footer__slogan serif">Design with class.<br>Built to Last.</h2>
+            <div class="footer__grid">
+                <div class="footer__col">
+                    <h4>Identité</h4>
+                    <p class="sans" style="color: #888;">Spynel KOUTON<br>Designer graphique & Développeur</p>
+                </div>
+                <div class="footer__col">
+                    <h4>Services</h4>
+                    <a href="#">Design graphique</a>
+                    <a href="#">Développement web</a>
+                    <a href="#">UI/UX Design</a>
+                    <a href="#">Direction artistique</a>
+                </div>
+                <div class="footer__col">
+                    <h4>Social</h4>
+                    <a href="#"
+                        onclick="Calendly.initPopupWidget({url:'https://calendly.com/kspynel/30min'}); return false;">Prendre
+                        RDV ↗</a>
+                    <a href="https://wa.me/22943202239" target="_blank">WhatsApp</a>
+                    <a href="https://linkedin.com/in/spynel-kouton-756444273" target="_blank">LinkedIn</a>
+                </div>
+            </div>
+            <div class="footer__bottom sans">
+                <p>By Spynel KOUTON</p>
+                <p>© 2026 Tous droits réservés</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="/main.js"></script>
+    <style>
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .form-group label {
+            font-family: var(--font-sans);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.15em;
+            color: #888;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 18px 0;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #ddd;
+            font-family: var(--font-sans);
+            font-size: 16px;
+            color: var(--color-text);
+            transition: border-color 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+            outline: none;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            border-bottom-color: #000;
+        }
+
+        .btn-submit {
+            background: #000;
+            color: #fff;
+            border: none;
+            padding: 20px 40px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            font-weight: 600;
+            cursor: pointer;
+            width: fit-content;
+            margin-top: 20px;
+            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .btn-submit:hover {
+            background: #333;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 1024px) {
+            .contact-layout {
+                grid-template-columns: 1fr !important;
+                gap: 80px !important;
+            }
+        }
+    </style>
+</body>
+
+</html>

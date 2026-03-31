@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="fr" class="is-loading">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snaki | Case Study | kspynel.</title>
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+    <link rel="stylesheet" href="/style.css">
+    <style>
+        /* FOUC Protection - Hide body until CSS/JS loads */
+        body {
+            opacity: 0;
+            background: #0D0D0D;
+        }
+
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #0D0D0D;
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .intro-logo {
+            font-family: serif;
+            color: white;
+            font-size: 2rem;
+        }
+
+        .nav-mobile-menu {
+            display: none;
+        }
+    </style>
+</head>
+
+<body class="is-project-page">
+    <div id="custom-cursor"></div>
+    <div id="page-transition"></div>
+
+    <!-- Floating Back Button -->
+    <a href="/works.html" class="back-to-works sans">← Back to Works</a>
+
+    <nav class="navbar">
+        <a href="/" class="nav__logo">kspynel.</a>
+        <ul class="nav__links">
+            <li><a href="/works.html" class="nav__link">Projets</a></li>
+            <li><a href="/about.html" class="nav__link">À Propos</a></li>
+            <li><a href="/contact.html" class="nav__link">Contact</a></li>
+            <li><a href="#" class="nav__link nav__cta btn-rdv" data-cursor="ok"
+                    onclick="Calendly.initPopupWidget({url:'https://calendly.com/kspynel/30min'}); return false;">Prendre
+                    RDV ↗</a></li>
+        </ul>
+        <button class="nav-burger" id="nav-burger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- Menu mobile overlay -->
+    <div class="nav-mobile-menu" id="nav-mobile-menu">
+        <a href="/works.html">Projets</a>
+        <a href="/about.html">À Propos</a>
+        <a href="/contact.html">Contact</a>
+        <a href="#" class="btn-rdv-mobile"
+            onclick="Calendly.initPopupWidget({url:'https://calendly.com/spynel-kouton/30min'}); return false;">
+            Prendre RDV ↗
+        </a>
+    </div>
+
+    <main>
+        <!-- 1. Hero Immersif -->
+        <section class="project-hero">
+            <div class="project-hero__bg" style="background-image: url('/assets/projects/snaki/hero-large.webp');">
+            </div>
+            <div class="project-hero__content">
+                <h1 class="project-hero__title serif">
+                    <span>Snaki</span>
+                    <span><i>Identity.</i></span>
+                </h1>
+                <div class="project-hero__meta sans">Branding / 2024</div>
+                <div class="scroll-hint sans" style="margin-top: 40px; font-size: 10px; opacity: 0.5;">SCROLL TO
+                    DISCOVER</div>
+            </div>
+        </section>
+
+        <!-- 2. Bande méta -->
+        <section class="project-meta-bar">
+            <div class="container">
+                <div class="meta-grid">
+                    <div class="meta-col">
+                        <span class="meta-label">Rôle</span>
+                        <div class="meta-value">Direction Artistique</div>
+                    </div>
+                    <div class="meta-col">
+                        <span class="meta-label">Client</span>
+                        <div class="meta-value">Snaki Corp</div>
+                    </div>
+                    <div class="meta-col">
+                        <span class="meta-label">Année</span>
+                        <div class="meta-value">2024</div>
+                    </div>
+                    <div class="meta-col">
+                        <span class="meta-label">Expertise</span>
+                        <div class="meta-value">Visual Identity</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Statement -->
+        <section class="project-statement container">
+            <h2 class="serif">"Insuffler une énergie <span class="playfair-italic">pop</span> et <span
+                    class="playfair-bold">audacieuse</span> dans l'univers du snacking urbain."</h2>
+        </section>
+
+        <!-- 5. Galerie Immersive -->
+        <section class="project-gallery">
+            <div class="gallery-item full-width">
+                <img src="/assets/projects/snaki/gallery-01.webp" alt="Snaki Branding"
+                    style="width:100%; height:100%; object-fit:cover;" data-lightbox>
+            </div>
+            <div class="container" style="margin-top: 100px;">
+                <div class="gallery-grid">
+                    <div class="gallery-item reveal">
+                        <img src="/assets/projects/snaki/gallery-02.webp" alt="Snaki Visual"
+                            style="width:100%; height:100%; object-fit:cover;" data-lightbox>
+                    </div>
+                    <div class="gallery-item reveal" style="margin-top: 80px;">
+                        <img src="/assets/projects/snaki/gallery-03.webp" alt="Snaki Packaging"
+                            style="width:100%; height:100%; object-fit:cover;" data-lightbox>
+                    </div>
+                </div>
+            </div>
+            <div class="gallery-item detail reveal" style="margin-top: 100px;">
+                <img src="/assets/projects/snaki/hero.webp" alt="Snaki Presentation"
+                    style="width:100%; height:100%; object-fit:cover;" data-lightbox>
+            </div>
+        </section>
+
+        <!-- 9. Next Project Loop -->
+        <a href="/project-detail.html?id=astro" class="next-project">
+            <div class="next-project__bg" style="background-image: url('/assets/projects/astro/hero.webp');">
+            </div>
+            <div class="next-project__content">
+                <span class="next-project__label sans">Projet Suivant</span>
+                <h2 class="next-project__title serif">Astro</h2>
+            </div>
+        </a>
+    </main>
+
+    <script type="module" src="/main.js"></script>
+</body>
+
+</html>

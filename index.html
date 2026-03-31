@@ -1,57 +1,431 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="fr" class="is-loading">
 
 <head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Spynel | Graphic Designer & Developer</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <style>
-    /* Splash screen géré par transition CSS */
-    #splash-screen {
-      position: fixed;
-      inset: 0;
-      background: #0A0A0A;
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: opacity 0.5s ease-out;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spynel KOUTON | Art Director & Developer</title>
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+    <style>
+        /* FOUC Protection - Hide body until CSS/JS loads */
+        body {
+            opacity: 0;
+            background: #0D0D0D;
+        }
 
-    #splash-screen.hide {
-      opacity: 0;
-      pointer-events: none;
-    }
+        #intro-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #0D0D0D;
+            z-index: 10001;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
 
-    /* Empêche le flash blanc initial */
-    html,
-    body {
-      background: #0A0A0A;
-      margin: 0;
-      padding: 0;
-    }
+        .intro-logo {
+            font-family: serif;
+            color: white;
+            font-size: 2rem;
+        }
 
-    @keyframes spin {
-      to {
-        transform: rotate(360deg)
-      }
-    }
-  </style>
-  <link rel="stylesheet"
-    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,700;1,400&family=Inter:wght@100;300;400;700&display=swap">
+        .nav-mobile-menu {
+            display: none;
+        }
+    </style>
 </head>
 
 <body>
-  <div id="splash-screen">
-    <div
-      style="width:40px;height:40px;border:3px solid rgba(255,255,255,0.1);border-top-color:#3B82F6;border-radius:50%;animation:spin 0.8s linear infinite">
+    <div id="custom-cursor"></div>
+    <div id="page-transition"></div>
+
+    <div id="intro-overlay">
+        <div class="intro-portal"></div>
+        <div class="intro-content">
+            <span class="intro-logo serif">kspynel.</span>
+        </div>
     </div>
-  </div>
-  <div id="root"></div>
-  <script type="module" src="/src/main.jsx"></script>
+
+    <nav class="navbar">
+        <a href="/" class="nav__logo">kspynel.</a>
+        <ul class="nav__links">
+            <li><a href="/works.html" class="nav__link">Projets</a></li>
+            <li><a href="/about.html" class="nav__link">À Propos</a></li>
+            <li><a href="/contact.html" class="nav__link">Contact</a></li>
+            <li><a href="#" class="nav__link nav__cta btn-rdv" data-cursor="ok"
+                    onclick="Calendly.initPopupWidget({url:'https://calendly.com/kspynel/30min'}); return false;">Prendre
+                    RDV ↗</a></li>
+        </ul>
+        <button class="nav-burger" id="nav-burger" aria-label="Menu">
+            <span></span><span></span><span></span>
+        </button>
+    </nav>
+
+    <!-- Menu mobile overlay -->
+    <div class="nav-mobile-menu" id="nav-mobile-menu">
+        <a href="/works.html">Projets</a>
+        <a href="/about.html">À Propos</a>
+        <a href="/contact.html">Contact</a>
+        <a href="#" class="btn-rdv-mobile"
+            onclick="Calendly.initPopupWidget({url:'https://calendly.com/spynel-kouton/30min'}); return false;">
+            Prendre RDV ↗
+        </a>
+    </div>
+
+    <main>
+        <section class="hero container">
+            <h1 class="hero__title serif">
+                <span class="line-1">Creative</span>
+                <span class="line-2"><i class="highlight">DesIgn</i><span class="highlight">.</span>er</span>
+            </h1>
+            <div class="hero__bottom">
+                <p class="hero__sub sans">Spynel KOUTON — Basé à Cotonou, Bénin.<br>Spécialisé en Direction Artistique &
+                    Code Créatif.</p>
+                <a href="/works.html" class="hero__cta sans">Découvrir les travaux ↓</a>
+            </div>
+
+            <!-- Scroll Hint Vertical -->
+            <div class="scroll-hint">
+                <div class="scroll-hint__line"></div>
+                <span>Scroll</span>
+            </div>
+        </section>
+
+        <section class="projects-scroll" id="projects">
+            <!-- COLONNE GAUCHE — elle reste fixée -->
+            <div class="projects-sticky">
+                <span class="projects-label">Works sélectionnés</span>
+                <h2 class="projects-heading">
+                    Des projets qui<br><em>racontent une histoire</em>
+                </h2>
+                <p class="projects-sub">
+                    Designer graphique & Développeur<br>
+                    basé à Cotonou, Bénin.
+                </p>
+                <a href="/works.html" class="projects-cta">
+                    Voir tous les projets →
+                </a>
+                <!-- Barre de progression -->
+                <div class="projects-progress">
+                    <div class="projects-progress-bar"></div>
+                </div>
+                <!-- Scroll Hint Horizontal -->
+                <div class="scroll-hint-horizontal">
+                    <div class="scroll-arrow-track">
+                        <div class="scroll-arrow-head"></div>
+                    </div>
+                    <span class="scroll-hint-label">Défiler</span>
+                </div>
+                <!-- Compteur qui se met à jour -->
+                <div class="projects-counter">
+                    <span class="counter-current">01</span>
+                    <span class="counter-sep">/</span>
+                    <span class="counter-total">04</span>
+                </div>
+            </div>
+
+            <!-- COLONNE DROITE — défile horizontalement -->
+            <div class="projects-track-wrapper">
+                <div class="projects-track">
+
+                    <!-- CARD 01: Arbitra -->
+                    <article class="project-card" data-index="01">
+                        <a href="/case-study.html">
+                            <div class="card-img-wrapper">
+                                <img src="/assets/projects/arbitra/gallery-01.webp" alt="Arbitra" loading="lazy" />
+                            </div>
+                            <div class="card-meta">
+                                <span class="card-num">01</span>
+                                <div>
+                                    <p class="card-category">Web3 Dashboard · 2024</p>
+                                    <h3 class="card-title">Arbitra</h3>
+                                    <p class="card-type">Plateforme analytique Web3</p>
+                                </div>
+                            </div>
+                        </a>
+                    </article>
+
+                    <!-- CARD 02: Snaki -->
+                    <article class="project-card" data-index="02">
+                        <a href="/case-study-2.html">
+                            <div class="card-img-wrapper">
+                                <img src="/assets/projects/snaki/cover-large.webp" alt="Snaki" loading="lazy" />
+                            </div>
+                            <div class="card-meta">
+                                <span class="card-num">02</span>
+                                <div>
+                                    <p class="card-category">Identity / Branding · 2024</p>
+                                    <h3 class="card-title">Snaki</h3>
+                                    <p class="card-type">Identité visuelle moderne</p>
+                                </div>
+                            </div>
+                        </a>
+                    </article>
+
+                    <!-- CARD 03: Astro -->
+                    <article class="project-card" data-index="03">
+                        <a href="/project-detail.html?id=astro">
+                            <div class="card-img-wrapper">
+                                <img src="/assets/projects/astro/cover-large.webp" alt="Astro" loading="lazy" />
+                            </div>
+                            <div class="card-meta">
+                                <span class="card-num">03</span>
+                                <div>
+                                    <p class="card-category">Web Design · 2024</p>
+                                    <h3 class="card-title">Astro</h3>
+                                    <p class="card-type">Exploration spatiale immersive</p>
+                                </div>
+                            </div>
+                        </a>
+                    </article>
+
+                    <!-- CARD 04: Crispy -->
+                    <article class="project-card" data-index="04">
+                        <a href="/project-detail.html?id=crispy">
+                            <div class="card-img-wrapper">
+                                <img src="/assets/projects/crispy/cover-large.webp" alt="Crispy" loading="lazy" />
+                            </div>
+                            <div class="card-meta">
+                                <span class="card-num">04</span>
+                                <div>
+                                    <p class="card-category">Food Branding · 2024</p>
+                                    <h3 class="card-title">Crispy</h3>
+                                    <p class="card-type">Système visuel premium</p>
+                                </div>
+                            </div>
+                        </a>
+                    </article>
+
+                </div><!-- fin .projects-track -->
+            </div><!-- fin .projects-track-wrapper -->
+        </section>
+
+        <!-- Marquee Line 1 -->
+        <div class="marquee reveal" style="margin: 100px 0 0 0;">
+            <div class="marquee__track">
+                <div class="marquee__item">Digital Design</div><span class="marquee__sep"></span>
+                <div class="marquee__item">Art Direction</div><span class="marquee__sep"></span>
+                <div class="marquee__item">Visual Identity</div><span class="marquee__sep"></span>
+                <div class="marquee__item">Creative Coding</div><span class="marquee__sep"></span>
+                <div class="marquee__item">Digital Design</div><span class="marquee__sep"></span>
+                <div class="marquee__item">Art Direction</div><span class="marquee__sep"></span>
+                <div class="marquee__item">Visual Identity</div><span class="marquee__sep"></span>
+                <div class="marquee__item">Creative Coding</div><span class="marquee__sep"></span>
+            </div>
+        </div>
+        <!-- Marquee Line 2 (Reverse) -->
+        <div class="marquee marquee--reverse reveal" style="margin: 20px 0 100px 0;">
+            <div class="marquee__track">
+                <div class="marquee__item">User Experience</div><span class="marquee__sep"></span>
+                <div class="marquee__item">Web Development</div><span class="marquee__sep"></span>
+                <div class="marquee__item">Interactive Design</div><span class="marquee__sep"></span>
+                <div class="marquee__item">Branding Strategy</div><span class="marquee__sep"></span>
+                <div class="marquee__item">User Experience</div><span class="marquee__sep"></span>
+                <div class="marquee__item">Web Development</div><span class="marquee__sep"></span>
+                <div class="marquee__item">Interactive Design</div><span class="marquee__sep"></span>
+                <div class="marquee__item">Branding Strategy</div><span class="marquee__sep"></span>
+            </div>
+        </div>
+
+        <!-- NEW: Mini About -->
+        <section class="about-mini reveal section-padding">
+            <div class="about-mini__image">
+                <img src="/Ma_photo.webp" alt="Spynel KOUTON" loading="lazy" />
+            </div>
+            <div class="about-mini__content">
+                <span class="section-label">À propos</span>
+                <h2 class="serif">Spynel KOUTON</h2>
+                <p class="about-mini__bio sans">
+                    Passionné par la technologie et le design, je combine créativité
+                    et expertise technique pour créer des expériences digitales
+                    exceptionnelles depuis Cotonou, Bénin.
+                </p>
+                <div class="about-mini__stats">
+                    <div class="stat"><span class="stat__number" data-target="20">0</span><span
+                            class="stat__label">Projets
+                            livrés</span></div>
+                    <div class="stat"><span class="stat__number" data-target="2">0</span><span class="stat__label">Ans
+                            d'expérience</span></div>
+                    <div class="stat"><span class="stat__number" data-target="100">0</span><span class="stat__label">%
+                            Remote
+                            ready</span></div>
+                </div>
+                <a href="/about.html" class="btn-secondary">En savoir plus →</a>
+            </div>
+        </section>
+
+        <!-- NEW: Services interactifs -->
+        <section class="services-section reveal">
+            <span class="section-label">Ce que je fais</span>
+
+            <div class="services-list">
+                <div class="service-item active" data-index="01">
+                    <div class="service-item__header">
+                        <span class="service-item__num">01</span>
+                        <h3 class="service-item__title">Design graphique</h3>
+                        <div class="service-item__toggle">/</div>
+                    </div>
+                    <div class="service-item__body">
+                        <p class="sans">Identités visuelles, logos, chartes graphiques, affiches et supports imprimés.
+                            Chaque
+                            élément pensé pour raconter votre histoire.</p>
+                        <span class="service-item__tag">Photoshop · Canva · Illustrator</span>
+                    </div>
+                </div>
+
+                <div class="service-item" data-index="02">
+                    <div class="service-item__header">
+                        <span class="service-item__num">02</span>
+                        <h3 class="service-item__title">Développement Web</h3>
+                        <div class="service-item__toggle">+</div>
+                    </div>
+                    <div class="service-item__body">
+                        <p class="sans">Création de sites web performants, interactifs et responsifs. Du site vitrine à
+                            l'application web complexe.</p>
+                        <span class="service-item__tag">React · Vite · GSAP · Node.js</span>
+                    </div>
+                </div>
+
+                <div class="service-item" data-index="03">
+                    <div class="service-item__header">
+                        <span class="service-item__num">03</span>
+                        <h3 class="service-item__title">UI/UX Design</h3>
+                        <div class="service-item__toggle">+</div>
+                    </div>
+                    <div class="service-item__body">
+                        <p class="sans">Conception d'interfaces centrées sur l'utilisateur, alliant esthétique moderne
+                            et
+                            navigation intuitive.</p>
+                        <span class="service-item__tag">Figma · User Research · Wireframing · Prototyping</span>
+                    </div>
+                </div>
+
+                <div class="service-item" data-index="04">
+                    <div class="service-item__header">
+                        <span class="service-item__num">04</span>
+                        <h3 class="service-item__title">Montage vidéo</h3>
+                        <div class="service-item__toggle">+</div>
+                    </div>
+                    <div class="service-item__body">
+                        <p class="sans">Montage de vidéos dynamiques, création de Reels impactants et storytelling
+                            visuel
+                            pour captiver votre audience et sublimer votre identité de marque.</p>
+                        <span class="service-item__tag">CapCut · Veo · Storytelling</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Numéro géant en fond décoratif -->
+            <div class="services-bg-num" aria-hidden="true">01</div>
+        </section>
+
+        <!-- UPGRADED: Chiffres clés (Parallaxe) -->
+        <section class="numbers-section reveal">
+            <div class="parallax-bg-shape" style="top: 10%; left: -5%;">20</div>
+            <div class="parallax-bg-shape" style="bottom: 5%; right: -5%;">∞</div>
+
+            <div class="numbers-parallax-container">
+                <div class="number-parallax-item" data-speed="0.05">
+                    <span class="number-parallax-value" data-target="20">0+</span>
+                    <span class="number-parallax-label">Projets livrés</span>
+                </div>
+                <div class="number-parallax-item" data-speed="0.08">
+                    <span class="number-parallax-value" data-target="8">0</span>
+                    <span class="number-parallax-label">Pays clients</span>
+                </div>
+                <div class="number-parallax-item" data-speed="0.06">
+                    <span class="number-parallax-value" data-target="2" data-prefix="+" data-suffix="">0</span>
+                    <span class="number-parallax-label">Ans d'expertise</span>
+                </div>
+                <div class="number-parallax-item" data-speed="0.1">
+                    <span class="number-parallax-value">∞</span>
+                    <span class="number-parallax-label">Pixels posés</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW: Interactive CV Section -->
+        <section class="cv-section reveal">
+            <span class="section-label">Curriculum Vitae</span>
+            <h2 class="serif" style="font-size: clamp(32px, 5vw, 64px); margin: 20px 0;">Design & Code<br><em>en un seul
+                    document.</em></h2>
+
+            <div class="cv-container">
+                <div class="cv-card" id="cv-card">
+                    <div class="cv-card__header">
+                        <div class="cv-card__name">Spynel KOUTON</div>
+                        <div class="cv-card__title">Designer & Developer</div>
+                    </div>
+                    <div class="cv-card__mock-content">
+                        <div class="cv-line"></div>
+                        <div class="cv-line cv-line--short"></div>
+                        <div class="cv-line"></div>
+                        <div class="cv-line cv-line--short"></div>
+                        <div class="cv-line"></div>
+                    </div>
+                    <div class="cv-card__overlay">
+                        <a href="/Spynel_KOUTON_cv_dev_et_designer.pdf" download class="cv-download-btn">Télécharger le
+                            PDF</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NEW: CTA Final -->
+        <section class="cta-section reveal">
+            <span class="section-label">Prêt à démarrer ?</span>
+            <h2 class="cta-title serif">
+                Travaillons<br>
+                <em>ensemble.</em>
+            </h2>
+            <div class="cta-actions">
+                <a href="#" class="nav__link nav__cta btn-rdv"
+                    onclick="Calendly.initPopupWidget({url:'https://calendly.com/spynel-kouton/30min'}); return false;">
+                    Prendre RDV ↗
+                </a>
+                <a href="mailto:kspynel@gmail.com" class="btn-mail sans">
+                    kspynel@gmail.com
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <h2 class="footer__slogan serif">Design with class.<br>Built to Last.</h2>
+            <div class="footer__grid">
+                <div class="footer__col">
+                    <h4>Identité</h4>
+                    <p class="sans" style="color: #888;">Spynel KOUTON<br>Designer graphique & Développeur</p>
+                </div>
+                <div class="footer__col">
+                    <h4>Services</h4>
+                    <a href="#">Design graphique</a>
+                    <a href="#">Développement web</a>
+                    <a href="#">UI/UX Design</a>
+                    <a href="#">Direction artistique</a>
+                </div>
+                <div class="footer__col">
+                    <h4>Social</h4>
+                    <a href="#"
+                        onclick="Calendly.initPopupWidget({url:'https://calendly.com/kspynel/30min'}); return false;">Prendre
+                        RDV ↗</a>
+                    <a href="https://wa.me/22943202239" target="_blank">WhatsApp</a>
+                    <a href="https://linkedin.com/in/spynel-kouton-756444273" target="_blank">LinkedIn</a>
+                </div>
+            </div>
+            <div class="footer__bottom sans">
+                <p>By Spynel KOUTON</p>
+                <p>© 2026 Tous droits réservés</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="/main.js"></script>
 </body>
 
 </html>
