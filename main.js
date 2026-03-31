@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
     initCursor();
     initDynamicProjectPage();
     initProjectImageReveal();
+    initWorksCardReveal();
     initProjectsScroll();
     initHomeUpgrades();
     initHeroTitleInteraction();
@@ -739,6 +740,30 @@ function initProjectImageReveal() {
             gsap.set(img, { opacity: 0, y: 30 });
         }
         imgObserver.observe(img);
+    });
+}
+
+/**
+ * 10b. Works Page - Scroll Reveal for Work Cards (mobile-style matching homepage)
+ */
+function initWorksCardReveal() {
+    const workCards = document.querySelectorAll('.work-card');
+    if (!workCards.length) return;
+
+    const cardObserver = new IntersectionObserver((entries) => {
+        entries.forEach((entry, index) => {
+            if (entry.isIntersecting) {
+                // Staggered delay for a cascading reveal effect
+                setTimeout(() => {
+                    entry.target.classList.add('is-visible');
+                }, index * 100);
+                cardObserver.unobserve(entry.target);
+            }
+        });
+    }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
+
+    workCards.forEach(card => {
+        cardObserver.observe(card);
     });
 }
 

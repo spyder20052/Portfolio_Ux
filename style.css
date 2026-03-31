@@ -2453,8 +2453,8 @@ label {
 
 @media (max-width: 480px) {
     .hero__title {
-        font-size: 42px !important;
-        line-height: 1.1 !important;
+        font-size: clamp(52px, 14vw, 64px) !important;
+        line-height: 1.05 !important;
     }
 
     .hero__sub {
@@ -2731,21 +2731,73 @@ label {
 
 @media (max-width: 768px) {
     .works-grid {
-        grid-template-columns: 1fr !important;
-        gap: 20px !important;
-        padding-bottom: 80px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0 !important;
+        padding: 0 5% 80px !important;
     }
 
     .work-card {
-        margin-bottom: 40px !important;
+        margin-bottom: 50px !important;
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.8s cubic-bezier(0.19, 1, 0.22, 1),
+                    transform 0.8s cubic-bezier(0.19, 1, 0.22, 1);
     }
 
-    .work-card__title {
-        font-size: clamp(28px, 8vw, 40px) !important;
+    .work-card.is-visible {
+        opacity: 1 !important;
+        transform: translateY(0) !important;
+    }
+
+    .work-card__image {
+        aspect-ratio: 4/3 !important;
+        margin-bottom: 20px !important;
+        border-radius: 0 !important;
+        width: calc(100% + 10%) !important;
+        margin-left: -5% !important;
     }
 
     .work-card__meta {
-        gap: 15px !important;
+        align-items: flex-start !important;
+        gap: 16px !important;
+    }
+
+    .work-card__meta > div {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+    }
+
+    .work-card__number {
+        font-family: var(--font-serif) !important;
+        font-size: 13px !important;
+        color: var(--color-primary) !important;
+        padding-top: 5px !important;
+        margin-top: 0 !important;
+        flex-shrink: 0 !important;
+    }
+
+    .work-card__category {
+        order: -1;
+        font-size: 11px !important;
+        letter-spacing: 0.15em !important;
+        margin-bottom: 8px !important;
+        color: var(--color-primary) !important;
+    }
+
+    .work-card__title {
+        order: 2;
+        font-size: 28px !important;
+        font-weight: 500 !important;
+        line-height: 1.1 !important;
+        margin-bottom: 6px !important;
+    }
+
+    /* Page header spacing for mobile */
+    .page-header {
+        margin-top: 100px !important;
+        margin-bottom: 50px !important;
     }
 }
 
