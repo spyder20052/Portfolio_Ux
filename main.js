@@ -26,7 +26,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initParallax();
     initMobileMenu();
     initCursor();
-    initProjectPage();
     initDynamicProjectPage();
     initProjectImageReveal();
     initProjectsScroll();
@@ -125,6 +124,99 @@ function initHeroTitleInteraction() {
             ease: 'power2.out'
         });
     });
+
+    // ————————————————————————————————————————————————————————————————————————
+    // ELITE INTERACTIVE DOT: MAGNETIC & ELASTIC PHYSICS
+    // ————————————————————————————————————————————————————————————————————————
+    const dot = document.querySelector('.highlight-dot');
+    
+    if (dot) {
+        // Base floating animation (subtle breathing)
+        const floatTl = gsap.timeline({ repeat: -1 });
+        floatTl.to(dot, {
+            y: "-=8",
+            duration: 1.5,
+            ease: "sine.inOut"
+        }).to(dot, {
+            y: "+=8",
+            duration: 1.8,
+            ease: "sine.inOut"
+        });
+
+        const magneticArea = 180; // Radius of interaction
+        const snapThreshold = 35; // Dist to "snap" to cursor
+        
+        window.addEventListener('mousemove', (e) => {
+            const { clientX, clientY } = e;
+            const dotRect = dot.parentNode.getBoundingClientRect(); // Target relative to the title
+            const dotCenterX = dotRect.left + dotRect.width / 2;
+            const dotCenterY = dotRect.top + dotRect.height / 2;
+            
+            const deltaX = clientX - dotCenterX;
+            const deltaY = clientY - dotCenterY;
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            
+            if (distance < magneticArea) {
+                dot.classList.add('is-active');
+                
+                // Calculate magnetic pull (more intense as it gets closer)
+                const pullFactor = distance < snapThreshold ? 1 : (1 - distance / magneticArea) * 0.6;
+                const targetX = deltaX * pullFactor;
+                const targetY = deltaY * pullFactor;
+                
+                gsap.to(dot, {
+                    x: targetX,
+                    y: targetY,
+                    scale: 1.8 + (1 - distance / magneticArea), // Grows as it gets closer
+                    duration: 0.4,
+                    ease: "power2.out",
+                    overwrite: "auto"
+                });
+                
+                // Suspend base floating while interacting
+                floatTl.pause();
+            } else {
+                dot.classList.remove('is-active');
+                
+                // Spring back to origin with elastic physics
+                gsap.to(dot, {
+                    x: 0,
+                    y: 0,
+                    scale: 1,
+                    duration: 1.2,
+                    ease: "elastic.out(1, 0.4)",
+                    overwrite: "auto",
+                    onComplete: () => floatTl.resume()
+                });
+            }
+        });
+    }
+
+    // Interactive Hero Magnetic/Parallax Effect for other words
+    const heroTitle = document.querySelector('.hero__title');
+    const heroWords = document.querySelectorAll('.hero__title > span span:not(.highlight-dot)');
+    
+    if (heroTitle) {
+        window.addEventListener('mousemove', (e) => {
+            const { clientX, clientY } = e;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            const moveX = (clientX - centerX) / 45;
+            const moveY = (clientY - centerY) / 45;
+            
+            heroWords.forEach((word, index) => {
+                const depth = (index + 1) * 0.4;
+                gsap.to(word, {
+                    x: moveX * depth,
+                    y: moveY * depth,
+                    duration: 0.9,
+                    ease: "power2.out",
+                    overwrite: "auto"
+                });
+            });
+        });
+    }
 }
 
 import { projects } from './projects.js';
@@ -180,10 +272,13 @@ function initCursor() {
     window.addEventListener('mouseup', () => cursor.classList.remove('is-clicking'));
 
     gsap.ticker.add(() => {
-        const dt = 1.0 - Math.pow(1.0 - 0.2, gsap.ticker.deltaRatio());
+        const isInteracting = cursor.classList.contains('is-hovering') || cursor.classList.contains('is-clicking') || cursor.classList.contains('is-project');
+        
+        // Toujours garder le centrage mathématique pour éviter tout saut
+        const dt = 1.0 - Math.pow(1.0 - (isInteracting ? 1.0 : 0.4), gsap.ticker.deltaRatio());
         cursorX += (mouseX - cursorX) * dt;
         cursorY += (mouseY - cursorY) * dt;
-        gsap.set(cursor, { x: cursorX, y: cursorY });
+        gsap.set(cursor, { x: cursorX, y: cursorY, xPercent: -50, yPercent: -50 });
     });
 
     const addHoverEvents = () => {
@@ -232,11 +327,13 @@ function initDynamicProjectPage() {
             <div class="project-hero__bg" style="background-image: url('${project.heroImage}'); transform: scale(1.1);"></div>
             <div class="project-hero__content">
                 <h1 class="project-hero__title serif">
-                    <span>${project.title.split(' ')[0]}</span>
-                    <span><i>${project.title.split(' ').slice(1).join(' ') || ''}</i></span>
+                    ${project.title}
                 </h1>
-                <div class="project-hero__meta sans">${project.category} / ${project.year}</div>
-                <div class="scroll-hint sans" style="margin-top: 40px; font-size: 10px; opacity: 0.5;">SCROLL TO DISCOVER</div>
+                <div class="project-hero__meta sans"><strong>${project.title}</strong> — ${project.category} / ${project.year}</div>
+                <div class="scroll-indicator">
+                    <span class="sans">DÉCOUVRIR LE PROJET</span>
+                    <div class="scroll-indicator__line"></div>
+                </div>
             </div>
         </div>
 
@@ -308,13 +405,7 @@ function initDynamicProjectPage() {
         initProjectPage(); // This handles Hero, Back Button, and Gallery Parallax
         initLightbox();
         initProjectImageReveal();
-
-        // Hero entrance override (if needed)
-        const heroBg = document.querySelector('.project-hero__bg');
-        const heroTitle = document.querySelector('.project-hero__title');
-        if (heroBg) gsap.to(heroBg, { scale: 1, duration: 2, ease: 'power2.out' });
-        if (heroTitle) gsap.from(heroTitle.children, { y: 100, opacity: 0, duration: 1.2, stagger: 0.2, ease: 'expo.out' });
-    }, 400); // Increased delay to ensure DOM is ready
+    }, 400); 
 }
 
 function renderGallerySection(section, index, projectTitle) {
@@ -528,12 +619,21 @@ function initProjectPage() {
 
     // 1. Hero Entrance Animation
     const heroBg = hero.querySelector('.project-hero__bg');
-    const heroTitle = hero.querySelector('.project-hero__title span');
+    const heroTitle = hero.querySelector('.project-hero__title');
 
     if (heroBg && heroTitle) {
-        const heroTl = gsap.timeline({ delay: 0.2 });
+        // Force initial state directly to avoid CSS/JS race conditions
+        heroTitle.style.opacity = '0';
+        heroTitle.style.transform = 'translateY(30px)';
+        
+        const heroTl = gsap.timeline({ delay: 0.3 });
         heroTl.to(heroBg, { scale: 1, duration: 2.5, ease: 'power2.out' });
-        heroTl.to(heroTitle, { yPercent: 0, duration: 1.4, ease: 'expo.out' }, '-=2.0');
+        heroTl.to(heroTitle, { 
+            y: 0, 
+            opacity: 1,
+            duration: 1.4, 
+            ease: 'expo.out'
+        }, '-=2.0');
     }
 
     // 2. Floating "Back to Works" Button (Directives 5)

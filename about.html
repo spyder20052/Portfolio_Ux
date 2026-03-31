@@ -11,7 +11,7 @@
         /* FOUC Protection - Hide body until CSS/JS loads */
         body {
             opacity: 0;
-            background: #0D0D0D;
+            background: var(--color-text);
         }
 
         #intro-overlay {
@@ -20,7 +20,7 @@
             left: 0;
             width: 100%;
             height: 100vh;
-            background: #0D0D0D;
+            background: var(--color-text);
             z-index: 10001;
             display: flex;
             align-items: center;
@@ -46,7 +46,7 @@
     <div id="intro-overlay">
         <div class="intro-portal"></div>
         <div class="intro-content">
-            <span class="intro-logo serif">kspynel.</span>
+            <span class="intro-logo serif" style="color: var(--color-primary);">kspynel.</span>
         </div>
     </div>
 
