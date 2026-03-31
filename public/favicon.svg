@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <!-- Fond ultra sombre avec de beaux coins arrondis -->
+    <rect width="512" height="512" rx="128" fill="#0D0D0D"/>
+    
+    <!-- Contours très subtils pour un effet premium -->
+    <rect width="504" height="504" x="4" y="4" rx="124" fill="none" stroke="#222222" stroke-width="4"/>
+    
+    <!-- La lettre 'k' avec un style sérif moderne et distinctif -->
+    <!-- Pour un rendu parfait indépendant des polices système, on utilise un chemin (path) ou on convertit le texte pour être sûr -->
+    <!-- Utilisation de la police Playfair Display intégrée si possible, ou des polices par défaut -->
+    <text x="220" y="360" font-family="'Playfair Display', Georgia, 'Times New Roman', serif" font-size="280" font-weight="bold" font-style="italic" fill="#FAFAF8" text-anchor="middle">k</text>
+    
+    <!-- Le point caractérisant la marque 'kspynel.' -->
+    <circle cx="360" cy="355" r="24" fill="#FAFAF8"/>
+</svg>
