@@ -169,6 +169,15 @@ body {
     * {
         cursor: auto !important;
     }
+    #custom-cursor {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #custom-cursor {
+        display: none !important;
+    }
 }
 
 /* Page Transition Overlay */
@@ -1273,6 +1282,44 @@ label {
     .gallery-section--centered img {
         width: 100%;
     }
+
+    .meta-grid {
+        grid-template-columns: 1fr;
+        row-gap: 30px;
+    }
+
+    .meta-col {
+        padding: 0;
+        border-right: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 20px;
+    }
+
+    .meta-col:last-child {
+        border-bottom: none;
+    }
+
+    .meta-col:nth-child(even) {
+        border-left: none;
+    }
+
+    .project-meta-bar {
+        padding: 60px 0;
+    }
+
+    .project-statement {
+        padding: 80px 0;
+    }
+
+    .project-context {
+        padding: 8vh 0;
+        gap: 40px;
+    }
+
+    .project-statement h2 {
+        font-size: clamp(1.8rem, 6vw, 2.5rem);
+        padding: 0 20px;
+    }
 }
 
 /* ─── SECTION PROJECTS SCROLL (Sticky + Horizontal) ─────────────────── */
@@ -2285,9 +2332,10 @@ label {
 
 /* 4. About Mini */
 @media (max-width: 768px) {
-    .about-mini__grid {
+    .about-mini {
         grid-template-columns: 1fr !important;
         gap: 40px !important;
+        padding: 80px 5% !important;
     }
 
     .about-mini__image {
@@ -2296,13 +2344,16 @@ label {
     }
 
     .about-mini__stats {
+        display: grid !important;
         grid-template-columns: repeat(3, 1fr) !important;
+        gap: 20px !important;
     }
 }
 
 @media (max-width: 480px) {
     .about-mini__stats {
-        grid-template-columns: 1fr 1fr !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 30px 20px !important;
     }
 }
 

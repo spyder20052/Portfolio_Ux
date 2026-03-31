@@ -1104,7 +1104,7 @@ html<section class="projects-scroll" id="projects">
 
   <!-- COLONNE GAUCHE — elle reste fixée -->
   <div class="projects-sticky">
-    <span class="projects-label">Works sélectionnés</span>
+    <span class="projects-label">Projets sélectionnés</span>
     <h2 class="projects-heading">
       Des projets qui<br><em>racontent une histoire</em>
     </h2>
