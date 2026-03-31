@@ -146,6 +146,12 @@ function initCursor() {
     const cursor = document.getElementById('custom-cursor');
     if (!cursor) return;
 
+    // Completely disable custom cursor on touch devices to avoid ghost taps/display on mobile
+    if (window.matchMedia("(pointer: coarse)").matches || ('ontouchstart' in window) || navigator.maxTouchPoints > 0) {
+        cursor.style.display = 'none';
+        return;
+    }
+
     let mouseX = window.innerWidth / 2;
     let mouseY = window.innerHeight / 2;
     let cursorX = mouseX;
