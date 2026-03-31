@@ -134,8 +134,9 @@ function initCursor() {
     const cursor = document.getElementById('custom-cursor');
     if (!cursor) return;
 
-    // Completely disable custom cursor on touch devices to avoid ghost taps/display on mobile
-    if (window.matchMedia("(pointer: coarse)").matches || ('ontouchstart' in window) || navigator.maxTouchPoints > 0) {
+    // Disable custom cursor on mobile phones/tablets to avoid ghost taps
+    // We check innerWidth and primary pointer type to avoid false positives on touchscreen laptops
+    if (window.innerWidth <= 768 || window.matchMedia("(pointer: coarse)").matches) {
         cursor.style.display = 'none';
         return;
     }
