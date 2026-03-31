@@ -1836,7 +1836,7 @@ label {
 
 .services-bg-num {
     position: absolute;
-    right: -5%;
+    right: 8%; /* Increased from -5% to make the numbers more visible */
     top: 50%;
     transform: translateY(-50%);
     font-family: var(--font-serif);
