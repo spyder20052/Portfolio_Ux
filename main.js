@@ -42,24 +42,12 @@ document.addEventListener('DOMContentLoaded', () => {
     initMetricCounters();
     initContactForm();
 
-    // Intro Control Logic
+    // Intro Control Logic (Animation Disabled)
     const overlay = document.getElementById('intro-overlay');
-    const isHome = window.location.pathname === '/' || window.location.pathname === '/index.html' || window.location.pathname.endsWith('/');
-    const hasSeenIntro = sessionStorage.getItem('introShown');
-
     if (overlay) {
-        if (!hasSeenIntro && isHome) {
-            initIntro().then(() => {
-                sessionStorage.setItem('introShown', 'true');
-                initHeroAnimation();
-            });
-        } else {
-            overlay.style.display = 'none';
-            initHeroAnimation();
-        }
-    } else {
-        initHeroAnimation();
+        overlay.style.display = 'none';
     }
+    initHeroAnimation();
 });
 
 // Intro Doorway Animation (Refined for Immersion)
