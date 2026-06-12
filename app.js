@@ -394,10 +394,95 @@ function initProjets() {
   const dotsWrap = document.getElementById('hgal-dots');
   if (totEl) totEl.textContent = String(n).padStart(2, '0');
 
-  // ---- Rendu : pour chaque projet, un bloc infos PUIS ses visuels collés ----
+  // ---- Visuels dédiés par projet (dossiers BDE / Halloween / Vintage) ----
+  const seq = (dir, count) => Array.from({ length: count }, (_, k) => `/visuals/projets/${dir}/${String(k + 1).padStart(2, '0')}.webp`);
+  const SHOTS = {
+    'visual-concept-3': seq('bde', 14),     // BDE Epitech
+    'exp-lab-1': seq('halloween', 20),      // BDE Halloween
+    'visual-concept-1': seq('vintage', 7),  // Vintage
+  };
+  const HEROV = { crispy: '/visuals/showcase/crispy2.webp' };
+  const shotsFor = (p) => SHOTS[p.id] || collectImages(p);
+  const heroFor = (p) => (SHOTS[p.id] && SHOTS[p.id][0]) || HEROV[p.id] || p.heroImage;
+
+  // ---- Lightbox (mobile : tous les visuels du projet) ----
+  const lb = document.getElementById('lightbox');
+  const lbMedia = document.getElementById('lb-media');
+  const lbMeta = document.getElementById('lb-meta');
+  const openLB = (p) => {
+    if (!lb) return;
+    lbMeta.innerHTML = `
+      <span class="mono accent">${p.category} · ${p.year}</span>
+      <h2>${p.title}</h2>
+      <p class="lead">${p.description}</p>
+      <div class="lb-info"><div><span class="mono">Client</span><b>${p.client}</b></div><div><span class="mono">Rôle</span><b>${p.role}</b></div></div>
+      ${(p.results || []).length ? `<div class="lb-results">${p.results.map((r) => `<div><b>${r.value}</b><span>${r.label}</span></div>`).join('')}</div>` : ''}`;
+    lbMedia.innerHTML = shotsFor(p).map((s) => `<img class="lb-img" src="${s}" alt="${p.title}" loading="lazy" />`).join('');
+    lb.scrollTop = 0; lb.classList.add('is-open'); document.documentElement.style.overflow = 'hidden';
+  };
+  const closeLB = () => { if (!lb) return; lb.classList.remove('is-open'); document.documentElement.style.overflow = ''; };
+  document.getElementById('lb-close') && document.getElementById('lb-close').addEventListener('click', closeLB);
+  lb && lb.addEventListener('click', (e) => { if (e.target === lb) closeLB(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLB(); });
+
+  let current = -1;
+  const setCurrent = (i, dots, extra) => {
+    i = gsap.utils.clamp(0, n - 1, i);
+    if (i === current) return;
+    current = i;
+    if (curEl) curEl.textContent = String(i + 1).padStart(2, '0');
+    dots.forEach((d, di) => d.classList.toggle('is-active', di === i));
+    extra && extra(i);
+  };
+
+  // Le mobile et le desktop ont un DOM différent : on recharge si on franchit la rupture
+  const mqM = window.matchMedia('(max-width: 820px)');
+  try { mqM.addEventListener('change', () => window.location.reload()); } catch (e) { /* vieux navigateurs */ }
+
+  // ================= MOBILE : cartes plein écran + scroll-snap natif + lightbox =================
+  if (mqM.matches) {
+    strip.classList.add('hgal__strip--native');
+    strip.innerHTML = list.map((p, i) => `
+      <article class="hpanel cursor-target" data-id="${p.id}" data-i="${i}" role="button" tabindex="0" aria-label="${p.title}">
+        <div class="hpanel__media"><img src="${heroFor(p)}" alt="${p.title}" loading="${i < 3 ? 'eager' : 'lazy'}" /></div>
+        <div class="hpanel__meta">
+          <span class="hpanel__num">${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span>
+          <h3 class="hpanel__title">${p.title}</h3>
+          <span class="hpanel__cat">${p.category} · ${p.year}</span>
+          <span class="hpanel__see">Voir les visuels <i>↗</i></span>
+        </div>
+      </article>`).join('');
+    const panels = gsap.utils.toArray('.hpanel');
+    panels.forEach((pan) => {
+      const p = projects.find((x) => x.id === pan.dataset.id);
+      const go = () => p && openLB(p);
+      pan.addEventListener('click', go);
+      pan.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+    });
+    if (dotsWrap) dotsWrap.innerHTML = list.map((p, i) => `<button class="hgal__dot" data-i="${i}" aria-label="Projet ${i + 1} : ${p.title}"></button>`).join('');
+    const dots = dotsWrap ? gsap.utils.toArray('.hgal__dot') : [];
+    const mark = (i) => panels.forEach((pan, pi) => pan.classList.toggle('is-current', pi === i));
+    const onScroll = () => {
+      const max = strip.scrollWidth - strip.clientWidth;
+      if (fill) fill.style.transform = `scaleX(${max > 0 ? strip.scrollLeft / max : 0})`;
+      const center = strip.scrollLeft + strip.clientWidth / 2;
+      let idx = 0, best = Infinity;
+      panels.forEach((pan, pi) => { const c = pan.offsetLeft + pan.offsetWidth / 2; const d = Math.abs(c - center); if (d < best) { best = d; idx = pi; } });
+      setCurrent(idx, dots, mark);
+    };
+    strip.addEventListener('scroll', onScroll, { passive: true });
+    dots.forEach((d) => d.addEventListener('click', () => {
+      const pan = panels[+d.dataset.i];
+      strip.scrollTo({ left: pan.offsetLeft + pan.offsetWidth / 2 - strip.clientWidth / 2, behavior: 'smooth' });
+    }));
+    onScroll();
+    return;
+  }
+
+  // ================= DESKTOP : chapitres (infos + visuels collés) en ligne horizontale =================
   strip.innerHTML = list.map((p, i) => {
-    const shots = collectImages(p).map((src, j) =>
-      `<div class="hp-shot"><img src="${src}" alt="${p.title} — visuel ${j + 1}" loading="${i === 0 ? 'eager' : 'lazy'}" /></div>`).join('');
+    const shots = shotsFor(p).map((src, j) =>
+      `<div class="hp-shot"><img src="${src}" alt="${p.title} — visuel ${j + 1}" loading="${i === 0 ? 'eager' : 'lazy'}" decoding="async" /></div>`).join('');
     return `
       <section class="hp" id="proj-${i}" data-i="${i}" aria-label="${p.title}">
         <div class="hp-info">
@@ -415,59 +500,46 @@ function initProjets() {
   }).join('');
   const chapters = gsap.utils.toArray('.hp');
 
-  // ---- Navigation rapide : un point par projet (libellé au survol) ----
   if (dotsWrap) dotsWrap.innerHTML = list.map((p, i) =>
     `<button class="hgal__dot" data-i="${i}" aria-label="${i + 1}. ${p.title}"><span class="hgal__dot-label">${p.title}</span></button>`).join('');
   const dots = dotsWrap ? gsap.utils.toArray('.hgal__dot') : [];
 
-  let current = -1;
-  const setCurrent = (i) => {
-    i = gsap.utils.clamp(0, n - 1, i);
-    if (i === current) return;
-    current = i;
-    if (curEl) curEl.textContent = String(i + 1).padStart(2, '0');
-    dots.forEach((d, di) => d.classList.toggle('is-active', di === i));
+  if (REDUCE) { viewport.style.overflowX = 'auto'; return; } // sans animation : défilement horizontal natif
+
+  let offs = [], maxX = 1;
+  const calc = () => { maxX = Math.max(1, strip.scrollWidth - window.innerWidth); offs = chapters.map((c) => c.offsetLeft); };
+  calc();
+  const idxFromX = (x) => {
+    const probe = x + window.innerWidth * 0.32;
+    let idx = 0;
+    for (let k = 0; k < offs.length; k++) { if (offs[k] <= probe) idx = k; else break; }
+    return idx;
   };
-
-  const mm = gsap.matchMedia();
-
-  // ===== Tous écrans (mobile inclus) : une seule ligne horizontale, pin + scrub fluide =====
-  mm.add('(min-width: 1px)', () => {
-    let offs = [], maxX = 1;
-    const calc = () => {
-      maxX = Math.max(1, strip.scrollWidth - window.innerWidth);
-      offs = chapters.map((c) => c.offsetLeft);
-    };
-    calc();
-    const idxFromX = (x) => {
-      const probe = x + window.innerWidth * 0.32;
-      let idx = 0;
-      for (let k = 0; k < offs.length; k++) { if (offs[k] <= probe) idx = k; else break; }
-      return idx;
-    };
-    const tween = gsap.to(strip, {
-      x: () => -(strip.scrollWidth - window.innerWidth), ease: 'none',
-      scrollTrigger: {
-        trigger: viewport, start: 'top top',
-        end: () => `+=${Math.max(1, strip.scrollWidth - window.innerWidth)}`,
-        pin: viewport, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true,
-        onRefresh: calc,
-        onUpdate: (self) => {
-          if (fill) fill.style.transform = `scaleX(${self.progress})`;
-          setCurrent(idxFromX(self.progress * maxX));
-        },
+  const tween = gsap.to(strip, {
+    x: () => -(strip.scrollWidth - window.innerWidth), ease: 'none',
+    scrollTrigger: {
+      trigger: viewport, start: 'top top',
+      end: () => `+=${Math.max(1, strip.scrollWidth - window.innerWidth)}`,
+      pin: viewport, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true,
+      onRefresh: calc,
+      onUpdate: (self) => {
+        if (fill) fill.style.transform = `scaleX(${self.progress})`;
+        setCurrent(idxFromX(self.progress * maxX), dots);
       },
-    });
-    const st = tween.scrollTrigger;
-    const ac = new AbortController();
-    dots.forEach((d) => d.addEventListener('click', () => {
-      const target = gsap.utils.clamp(0, 1, (offs[+d.dataset.i] - window.innerWidth * 0.06) / maxX);
-      const y = st.start + target * (st.end - st.start);
-      window.__lenis ? window.__lenis.scrollTo(y) : window.scrollTo(0, y);
-    }, { signal: ac.signal }));
-    setCurrent(0);
-    return () => { ac.abort(); tween.kill(); gsap.set(strip, { clearProps: 'transform' }); };
+    },
   });
+  const st = tween.scrollTrigger;
+  dots.forEach((d) => d.addEventListener('click', () => {
+    const target = gsap.utils.clamp(0, 1, (offs[+d.dataset.i] - window.innerWidth * 0.06) / maxX);
+    const y = st.start + target * (st.end - st.start);
+    window.__lenis ? window.__lenis.scrollTo(y) : window.scrollTo(0, y);
+  }));
+  setCurrent(0, dots);
+
+  // FIX progression : les visuels en lazy faussent scrollWidth → on recalcule à chaque image chargée
+  const refreshSoon = (() => { let t; return () => { clearTimeout(t); t = setTimeout(() => ScrollTrigger.refresh(), 160); }; })();
+  strip.querySelectorAll('.hp-shot img').forEach((im) => { if (!im.complete) im.addEventListener('load', refreshSoon, { once: true }); });
+  window.addEventListener('load', () => ScrollTrigger.refresh());
 }
 
 /* ---------- Moodshot "la ville dort" : ambiance nocturne vivante en continu ---------- */
