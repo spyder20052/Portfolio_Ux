@@ -493,7 +493,7 @@ button { font-family: inherit; }
 .hgal__jump button { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--paper); background: rgba(10,10,11,0.55); border: 1px solid var(--line-strong); border-radius: var(--r-pill); padding: 9px 15px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; backdrop-filter: blur(6px); transition: background-color .25s, border-color .25s, color .25s; }
 .hgal__jump button:hover { border-color: var(--accent); color: var(--accent); }
 #hgal-before { padding: 9px 13px; }
-@media (max-width: 820px) { .hgal__jump { bottom: auto; top: 70px; right: var(--pad-x); } }
+@media (max-width: 820px) { .hgal__jump { position: static; inset: auto; justify-content: flex-end; padding: 16px var(--pad-x) 0; } }
 
 /* Mobile : version précédente — cartes plein écran + scroll-snap horizontal natif */
 .hgal__strip--native { overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; align-items: center; gap: clamp(16px, 4vw, 28px); padding-inline: clamp(16px, 5vw, 40px); }
