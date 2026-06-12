@@ -722,7 +722,35 @@ function initCounters() {
 }
 
 /* ---------- Page /about : accordéon expertises (une ouverte à la fois) ---------- */
+/* ---------- À propos : portrait avec le hover du hero (spotlight qui révèle un univers, sans voyage) ---------- */
+function initAboutPortrait() {
+  const box = document.querySelector('.about-portrait');
+  if (!box || !FINE) return;
+  const peek = box.querySelector('.about__peek');
+  if (!peek) return;
+  const pool = ['/profil2.webp', '/profil3.webp', '/profil4.webp']; // univers (Minecraft / Crayon / Pixel)
+  let active = false, last = -1;
+  box.addEventListener('pointerenter', () => {
+    let idx; do { idx = Math.floor(Math.random() * pool.length); } while (idx === last && pool.length > 1);
+    last = idx;
+    peek.style.backgroundImage = `url(${pool[idx]})`;
+    active = true;
+  });
+  box.addEventListener('pointermove', (e) => {
+    if (!active) return;
+    const r = box.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width) * 100;
+    const y = ((e.clientY - r.top) / r.height) * 100;
+    gsap.to(peek, { clipPath: `circle(26% at ${x}% ${y}%)`, duration: 0.35, ease: 'power2.out', overwrite: 'auto' });
+  });
+  box.addEventListener('pointerleave', () => {
+    active = false;
+    gsap.to(peek, { clipPath: 'circle(0% at 50% 50%)', duration: 0.4, ease: 'power2.in', overwrite: 'auto' });
+  });
+}
+
 function initAbout() {
+  initAboutPortrait();
   const items = gsap.utils.toArray('.exp__item');
   if (!items.length) return;
   items.forEach((item) => {

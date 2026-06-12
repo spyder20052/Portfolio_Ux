@@ -351,6 +351,8 @@ button { font-family: inherit; }
   will-change: transform; transform-style: preserve-3d;
 }
 .feature__media-inner { position: absolute; inset: -2%; width: 104%; height: 104%; object-fit: cover; background-size: cover; background-position: center; will-change: transform; }
+/* Spotlight "hover hero" sur le portrait À propos (révèle un univers, sans voyage au scroll) */
+.about__peek { position: absolute; inset: 0; z-index: 3; background-size: cover; background-position: center; clip-path: circle(0% at 50% 50%); pointer-events: none; will-change: clip-path; }
 
 /* ---- CTA : texte + média ---- */
 .cta { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: clamp(30px, 5vw, 70px); align-items: center; }

@@ -19,8 +19,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,700&display=swap" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" />
-  <!-- Polices du voyage d'univers (hero À propos) : non bloquantes -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;700&family=Gloria+Hallelujah&family=Press+Start+2P&display=swap" media="print" onload="this.media='all'" />
   <script>setTimeout(function(){document.documentElement.classList.remove('is-loading');var t=document.getElementById('transition');if(t&&getComputedStyle(t).visibility!=='hidden')t.style.visibility='hidden';},3500);</script>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 </head>
@@ -67,59 +65,23 @@
     </div>
   </div>
 
-  <!-- Hero à univers (même système que la home) : vraie photo → Minecraft → Crayon → Pixel -->
-  <section class="hero" id="hero" data-bg="#0a0a0b" data-glow="rgba(200,241,53,0.12)">
-    <div class="hero__pin">
-      <div class="hero__bg" aria-hidden="true"></div>
-      <div class="hero__glow" aria-hidden="true"></div>
-      <div class="hero__grain" aria-hidden="true"></div>
-      <div class="hero__swipe" aria-hidden="true">
-        <svg viewBox="0 0 100 100" preserveAspectRatio="none"><path id="hero-swipe-path" d="M0 100 H100 V100 H0 z"></path></svg>
-      </div>
-      <div class="shell hero__grid">
-        <div class="hero__intro" data-parallax="0.4">
-          <h1 class="hero__title" aria-label="Spynel Kouton">
-            <span class="row"><span class="splitline">Spynel</span></span>
-            <span class="row"><span class="splitline"><em>Kouton</em></span></span>
-          </h1>
-          <div class="hero__role-list" aria-hidden="true">
-            <div class="hero__role" data-role="0">Designer Graphique</div>
-            <div class="hero__role" data-role="1">Développeur Web</div>
-            <div class="hero__role" data-role="2">Directeur Artistique</div>
-          </div>
-          <div class="hero__meta">
-            <p class="lead">Je travaille à l'intersection du design et du code, depuis Cotonou. Des interfaces nettes, intentionnelles, qui racontent une histoire et tiennent dans le temps.</p>
-          </div>
-          <div class="hero__meta">
-            <a href="/Spynel_KOUTON_cv_dev_et_designer.pdf" download target="_blank" rel="noopener" class="btn btn--primary cursor-target">Télécharger mon CV <span class="btn__arrow">↓</span></a>
-            <a href="/projets.html" class="btn btn--ghost cursor-target">Voir les projets <span class="btn__arrow">↗</span></a>
-          </div>
-        </div>
-        <div class="hero__portrait cursor-target">
-          <img class="hero__layer" data-stage="3" src="/profil4.webp" alt="" aria-hidden="true" />
-          <img class="hero__layer" data-stage="2" src="/profil3.webp" alt="" aria-hidden="true" />
-          <img class="hero__layer" data-stage="1" src="/profil2.webp" alt="" aria-hidden="true" />
-          <img class="hero__layer hero__layer--real" data-stage="0" src="/profil.webp" alt="Portrait de Spynel Kouton" fetchpriority="high"
-            onerror="this.onerror=null;this.src='/profil.png'" />
-          <div class="hero__peek" aria-hidden="true"></div>
-        </div>
-      </div>
-      <div class="hero__mark" aria-hidden="true">
-        <svg viewBox="0 0 100 100">
-          <circle cx="50" cy="50" r="48" fill="none" stroke="currentColor" stroke-width="0.5" opacity="0.4" />
-          <path id="hero-mark-cross" d="M50 8 V92 M8 50 H92" stroke="currentColor" stroke-width="0.5" opacity="0.4" />
-        </svg>
-        <svg class="hero__mark-arrow" viewBox="0 0 12 14">
-          <path d="M6 0 v10 l-4 -4 -1 1 5 5 5 -5 -1 -1 -4 4 V0 z" fill="currentColor" />
-        </svg>
-      </div>
-    </div>
-  </section>
-
   <main class="shell" data-bg="#0a0a0b" data-glow="rgba(200,241,53,0.10)">
-    <!-- Bio -->
+    <header class="page-header">
+      <span class="mono">À propos</span>
+      <h1 class="page-header__title">Designer<br>& <em class="italic accent">développeur</em>.</h1>
+      <p class="page-header__intro">Je travaille à l'intersection du design et du code, depuis Cotonou. Mon obsession : des interfaces nettes, intentionnelles, qui racontent une histoire et tiennent dans le temps.</p>
+      <a href="/Spynel_KOUTON_cv_dev_et_designer.pdf" download target="_blank" rel="noopener" class="btn btn--primary cursor-target" style="margin-top:28px;">Télécharger mon CV <span class="btn__arrow">↓</span></a>
+    </header>
+
+    <!-- Portrait + bio (la photo a le hover du hero : un spotlight révèle un univers) -->
     <section class="feature section" data-bg="#0a1411" data-glow="rgba(50,230,160,0.14)">
-      <div class="feature__grid" style="grid-template-columns:1fr;max-width:840px;">
+      <div class="feature__grid">
+        <figure class="feature__media about-portrait cursor-target" style="aspect-ratio:4/5;">
+          <img class="feature__media-inner" src="/profil.webp" alt="Spynel Kouton"
+            style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;"
+            onerror="this.onerror=null;this.src='/profil.png'" />
+          <div class="about__peek" aria-hidden="true"></div>
+        </figure>
         <div class="feature__text">
           <p class="about__bio">Passionné par le <em class="italic accent">design</em> et le <em class="italic accent">code</em>, j'accompagne les marques dans leur transformation numérique.</p>
           <p class="lead">Plus de 2 ans à concevoir des identités, des interfaces et des sites qui privilégient la clarté, l'intention et la performance. De l'idée au pixel, en passant par la ligne de code.</p>
