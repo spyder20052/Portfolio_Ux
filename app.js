@@ -477,6 +477,12 @@ function initProjets() {
       const pan = panels[+d.dataset.i];
       strip.scrollTo({ left: pan.offsetLeft + pan.offsetWidth / 2 - strip.clientWidth / 2, behavior: 'smooth' });
     }));
+    // Passer / revenir avant la galerie
+    const goTo = (y) => (window.__lenis ? window.__lenis.scrollTo(y) : window.scrollTo(0, y));
+    const before = document.getElementById('hgal-before');
+    const after = document.getElementById('hgal-after');
+    before && before.addEventListener('click', () => goTo(Math.max(0, section.offsetTop - 8)));
+    after && after.addEventListener('click', () => goTo(section.offsetTop + section.offsetHeight + 8));
     onScroll();
     return;
   }
@@ -540,6 +546,13 @@ function initProjets() {
     window.__lenis ? window.__lenis.scrollTo(y) : window.scrollTo(0, y);
   }));
   setCurrent(0, dots);
+
+  // Passer la galerie (→ après) ou revenir avant, en un clic
+  const goTo = (y) => (window.__lenis ? window.__lenis.scrollTo(y) : window.scrollTo(0, y));
+  const before = document.getElementById('hgal-before');
+  const after = document.getElementById('hgal-after');
+  before && before.addEventListener('click', () => goTo(Math.max(0, st.start - 4)));
+  after && after.addEventListener('click', () => goTo(st.end + 4));
 
   // La largeur de chaque visuel est réservée via width/height (IMG_DIMS) → scrollWidth
   // correct dès le départ : pas de recalcul en plein scroll, donc pas de saut.

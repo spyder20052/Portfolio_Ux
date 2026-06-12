@@ -486,6 +486,13 @@ button { font-family: inherit; }
 .hgal__dot-label { position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.05em; padding: 4px 9px; background: var(--ink-2); border: 1px solid var(--line); border-radius: var(--r-pill); color: var(--paper); opacity: 0; pointer-events: none; transition: opacity .2s; }
 .hgal__dot:hover .hgal__dot-label { opacity: 1; }
 
+/* Boutons passer / revenir avant la galerie */
+.hgal__jump { position: absolute; top: clamp(16px, 3vh, 30px); right: clamp(20px, 6vw, 110px); z-index: 6; display: flex; gap: 8px; }
+.hgal__jump button { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--paper); background: rgba(255,255,255,0.04); border: 1px solid var(--line-strong); border-radius: var(--r-pill); padding: 9px 15px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; backdrop-filter: blur(6px); transition: background-color .25s, border-color .25s, color .25s; }
+.hgal__jump button:hover { border-color: var(--accent); color: var(--accent); }
+#hgal-before { padding: 9px 13px; }
+@media (max-width: 820px) { .hgal__jump { top: auto; bottom: 14px; right: var(--pad-x); } }
+
 /* Mobile : version précédente — cartes plein écran + scroll-snap horizontal natif */
 .hgal__strip--native { overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: none; align-items: center; gap: clamp(16px, 4vw, 28px); padding-inline: clamp(16px, 5vw, 40px); }
 .hgal__strip--native::-webkit-scrollbar { display: none; }
