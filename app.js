@@ -725,12 +725,13 @@ function initReveals() {
 function initCounters() {
   gsap.utils.toArray('.stat__num').forEach((el) => {
     const target = +el.dataset.target || 0;
-    if (REDUCE) { el.textContent = target; return; }
+    const prefix = el.dataset.prefix || '';
+    if (REDUCE) { el.textContent = prefix + target; return; }
     const obj = { v: 0 };
     gsap.to(obj, {
       v: target, duration: 1.6, ease: 'power2.out',
       scrollTrigger: { trigger: el, start: 'top 90%', once: true },
-      onUpdate: () => { el.textContent = Math.round(obj.v); },
+      onUpdate: () => { el.textContent = prefix + Math.round(obj.v); },
     });
   });
 }
