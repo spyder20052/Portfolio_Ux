@@ -560,6 +560,52 @@ button { font-family: inherit; }
 @keyframes pulseDot { 0% { box-shadow: 0 0 0 0 rgba(200,241,53,0.5); } 70% { box-shadow: 0 0 0 12px rgba(200,241,53,0); } 100% { box-shadow: 0 0 0 0 rgba(200,241,53,0); } }
 .avail__time { font-family: var(--font-display); font-weight: 600; font-size: 2.2rem; margin-top: 16px; font-variant-numeric: tabular-nums; }
 .avail__loc { font-family: var(--font-mono); font-size: 0.7rem; color: var(--paper-dim); letter-spacing: 0.08em; margin-top: 4px; }
+
+/* ===== Carte horloge ludique (heure live Cotonou, scène jour/nuit) ===== */
+.clockcard { border: 1px solid var(--line-strong); border-radius: 20px; overflow: hidden; background: var(--ink-2); box-shadow: 0 30px 70px -40px rgba(0,0,0,0.7); }
+.clockcard__bar { display: flex; align-items: center; gap: 7px; padding: 12px 16px; border-bottom: 1px solid var(--line); background: rgba(255,255,255,0.02); }
+.clockcard__dot { width: 11px; height: 11px; border-radius: 50%; flex: none; }
+.clockcard__dot:nth-child(1) { background: #ff5f57; }
+.clockcard__dot:nth-child(2) { background: #febc2e; }
+.clockcard__dot:nth-child(3) { background: #28c840; }
+.clockcard__status { margin-left: auto; display: flex; align-items: center; gap: 8px; font-family: var(--font-mono); font-size: 0.62rem; letter-spacing: 0.1em; text-transform: uppercase; color: var(--paper-dim); }
+.clockcard__body { position: relative; min-height: 170px; padding: 24px 22px; display: flex; flex-direction: column; justify-content: flex-end; overflow: hidden; }
+.clockcard__scene { position: absolute; inset: 0; z-index: 0; transition: background 1.2s ease; }
+.clockcard.is-day .clockcard__scene { background: linear-gradient(165deg, #aedcff 0%, #d8eeff 55%, #f3f9ff 100%); }
+.clockcard.is-night .clockcard__scene { background: linear-gradient(165deg, #0c1130 0%, #181038 60%, #241445 100%); }
+/* Astre : soleil le jour, croissant la nuit */
+.clockcard__orb { position: absolute; top: 26px; right: 30px; width: 46px; height: 46px; border-radius: 50%; transition: background .8s, box-shadow .8s; will-change: transform; }
+.clockcard.is-day .clockcard__orb { background: radial-gradient(circle at 38% 36%, #fff1b8, #ffb43c); box-shadow: 0 0 28px 6px rgba(255,179,60,0.6); }
+.clockcard.is-night .clockcard__orb { background: #eef1ff; box-shadow: 0 0 22px 3px rgba(220,225,255,0.45); overflow: hidden; }
+.clockcard__orb::after { content: ''; position: absolute; inset: 0; border-radius: 50%; opacity: 0; transition: opacity .8s; }
+.clockcard.is-night .clockcard__orb::after { opacity: 1; background: #181038; transform: translate(34%, -26%); }
+/* Nuages le jour */
+.clockcard__cloud { position: absolute; height: 14px; border-radius: 20px; background: rgba(255,255,255,0.92); box-shadow: 22px 4px 0 -2px rgba(255,255,255,0.92); transition: opacity .8s; }
+.clockcard__cloud::before { content: ''; position: absolute; width: 22px; height: 22px; border-radius: 50%; background: inherit; top: -8px; left: 8px; }
+.clockcard__cloud--1 { width: 34px; top: 40px; left: 26px; }
+.clockcard__cloud--2 { width: 26px; top: 74px; left: 120px; opacity: 0.8; }
+.clockcard.is-night .clockcard__cloud { opacity: 0; }
+/* Étoiles la nuit */
+.clockcard__star { position: absolute; width: 3px; height: 3px; border-radius: 50%; background: #fff; opacity: 0; transition: opacity .8s; box-shadow: 0 0 5px 1px rgba(255,255,255,0.6); }
+.clockcard.is-night .clockcard__star { opacity: 0.9; }
+.clockcard__readout { position: relative; z-index: 2; }
+.clockcard__time { display: flex; align-items: baseline; gap: 9px; font-family: var(--font-mono); font-weight: 600; font-size: clamp(2rem, 6vw, 2.7rem); letter-spacing: -0.02em; font-variant-numeric: tabular-nums; line-height: 1; transition: color .8s; }
+.clockcard.is-day .clockcard__time { color: #0c1426; }
+.clockcard.is-night .clockcard__time { color: #f3f1ff; }
+.clockcard__ampm { font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; padding: 3px 8px; border-radius: var(--r-pill); }
+.clockcard.is-day .clockcard__ampm { background: rgba(12,20,38,0.12); color: #0c1426; }
+.clockcard.is-night .clockcard__ampm { background: rgba(255,255,255,0.16); color: #f3f1ff; }
+.clockcard__date { display: inline-block; margin-top: 12px; font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.06em; text-transform: capitalize; padding: 4px 11px; border-radius: var(--r-pill); transition: background .8s, color .8s; }
+.clockcard.is-day .clockcard__date { background: rgba(12,20,38,0.1); color: #16233d; }
+.clockcard.is-night .clockcard__date { background: rgba(255,255,255,0.14); color: #e7e3ff; }
+.clockcard__loc { font-family: var(--font-mono); font-size: 0.68rem; color: var(--paper-dim); letter-spacing: 0.06em; padding: 13px 18px; border-top: 1px solid var(--line); }
+@media (prefers-reduced-motion: no-preference) {
+  .clockcard__orb { animation: orbFloat 5s ease-in-out infinite; }
+  .clockcard__cloud--1 { animation: cloudDrift 9s ease-in-out infinite; }
+  .clockcard__cloud--2 { animation: cloudDrift 11s ease-in-out infinite reverse; }
+}
+@keyframes orbFloat { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes cloudDrift { 0%,100% { transform: translateX(0); } 50% { transform: translateX(12px); } }
 .cside__block h4 { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--paper-faint); margin-bottom: 12px; }
 .cside__block a { display: block; color: var(--paper-dim); padding: 4px 0; transition: color .3s; }
 .cside__block a:hover { color: var(--accent); }

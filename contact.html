@@ -97,10 +97,27 @@
       </form>
 
       <aside class="contact-side reveal-up">
-        <div class="avail">
-          <span class="avail__status"><span class="pulse-dot"></span>Disponible pour missions</span>
-          <div class="avail__time" id="cotonou-time">--:--:--</div>
-          <div class="avail__loc">Cotonou, Bénin · GMT+1 — heure locale</div>
+        <div class="clockcard is-day" id="clockcard">
+          <div class="clockcard__bar">
+            <span class="clockcard__dot"></span><span class="clockcard__dot"></span><span class="clockcard__dot"></span>
+            <span class="clockcard__status"><span class="pulse-dot"></span>Disponible pour missions</span>
+          </div>
+          <div class="clockcard__body">
+            <div class="clockcard__scene" aria-hidden="true">
+              <span class="clockcard__orb"></span>
+              <span class="clockcard__cloud clockcard__cloud--1"></span>
+              <span class="clockcard__cloud clockcard__cloud--2"></span>
+              <span class="clockcard__star" style="top:20%;left:22%"></span>
+              <span class="clockcard__star" style="top:30%;left:68%"></span>
+              <span class="clockcard__star" style="top:58%;left:42%"></span>
+              <span class="clockcard__star" style="top:46%;left:84%"></span>
+            </div>
+            <div class="clockcard__readout">
+              <div class="clockcard__time"><span id="cotonou-time">--:--:--</span><span class="clockcard__ampm" id="cotonou-ampm"></span></div>
+              <span class="clockcard__date" id="cotonou-date">—</span>
+            </div>
+          </div>
+          <div class="clockcard__loc">Cotonou, Bénin · GMT+1 — heure locale</div>
         </div>
         <div class="cside__block">
           <h4>Direct</h4>

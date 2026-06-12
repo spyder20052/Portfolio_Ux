@@ -11,6 +11,7 @@ import { Draggable } from 'gsap/Draggable';
 import { InertiaPlugin } from 'gsap/InertiaPlugin';
 import { Observer } from 'gsap/Observer';
 import { projects } from './projects.js';
+import { IMG_DIMS } from './imgdims.js';
 
 gsap.registerPlugin(ScrollTrigger, SplitText, Physics2DPlugin, Flip, MorphSVGPlugin, TextPlugin, Draggable, InertiaPlugin, Observer);
 
@@ -479,8 +480,11 @@ function initProjets() {
 
   // ================= DESKTOP : chapitres (infos + visuels collés) en ligne horizontale =================
   strip.innerHTML = list.map((p, i) => {
-    const shots = shotsFor(p).map((src, j) =>
-      `<div class="hp-shot"><img src="${src}" alt="${p.title} — visuel ${j + 1}" loading="${i === 0 ? 'eager' : 'lazy'}" decoding="async" /></div>`).join('');
+    const shots = shotsFor(p).map((src, j) => {
+      const d = IMG_DIMS[src];
+      const dim = d ? ` width="${d[0]}" height="${d[1]}"` : '';
+      return `<div class="hp-shot"><img src="${src}"${dim} alt="${p.title} — visuel ${j + 1}" loading="${i === 0 ? 'eager' : 'lazy'}" decoding="async" /></div>`;
+    }).join('');
     return `
       <section class="hp" id="proj-${i}" data-i="${i}" aria-label="${p.title}">
         <div class="hp-info">
@@ -534,10 +538,10 @@ function initProjets() {
   }));
   setCurrent(0, dots);
 
-  // FIX progression : les visuels en lazy faussent scrollWidth → on recalcule à chaque image chargée
-  const refreshSoon = (() => { let t; return () => { clearTimeout(t); t = setTimeout(() => ScrollTrigger.refresh(), 160); }; })();
-  strip.querySelectorAll('.hp-shot img').forEach((im) => { if (!im.complete) im.addEventListener('load', refreshSoon, { once: true }); });
-  window.addEventListener('load', () => ScrollTrigger.refresh());
+  // La largeur de chaque visuel est réservée via width/height (IMG_DIMS) → scrollWidth
+  // correct dès le départ : pas de recalcul en plein scroll, donc pas de saut.
+  // Un seul refresh après chargement des polices (le titre peut changer la hauteur).
+  document.fonts && document.fonts.ready.then(() => ScrollTrigger.refresh());
 }
 
 /* ---------- Moodshot "la ville dort" : ambiance nocturne vivante en continu ---------- */
@@ -732,8 +736,26 @@ function initAbout() {
 function initContact() {
   const clock = document.getElementById('cotonou-time');
   if (clock) {
-    const fmt = new Intl.DateTimeFormat('fr-FR', { timeZone: 'Africa/Lagos', hour: '2-digit', minute: '2-digit', second: '2-digit' });
-    const tick = () => { clock.textContent = fmt.format(new Date()); };
+    const TZ = 'Africa/Lagos'; // Cotonou (GMT+1)
+    const ampmEl = document.getElementById('cotonou-ampm');
+    const dateEl = document.getElementById('cotonou-date');
+    const card = document.getElementById('clockcard');
+    const tFmt = new Intl.DateTimeFormat('fr-FR', { timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+    const aFmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, hour: 'numeric', hour12: true });
+    const dFmt = new Intl.DateTimeFormat('fr-FR', { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short' });
+    const hFmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, hour: 'numeric', hour12: false });
+    const tick = () => {
+      const now = new Date();
+      clock.textContent = tFmt.format(now);
+      if (ampmEl) ampmEl.textContent = (aFmt.format(now).match(/AM|PM/i) || [''])[0].toUpperCase();
+      if (dateEl) dateEl.textContent = dFmt.format(now).replace('.', '');
+      if (card) {
+        const h = parseInt(hFmt.format(now), 10) % 24;
+        const day = h >= 6 && h < 18;
+        card.classList.toggle('is-day', day);
+        card.classList.toggle('is-night', !day);
+      }
+    };
     tick(); setInterval(tick, 1000);
   }
   const form = document.getElementById('contact-form');
