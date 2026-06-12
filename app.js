@@ -385,13 +385,15 @@ function initProjets() {
   const viewport = document.getElementById('hgal-viewport');
   if (!strip || !section || !viewport) return;
 
-  const list = projects;
+  const list = projects.filter((p) => p.id !== 'visual-concept-2');
   const n = list.length;
   const curEl = document.getElementById('hgal-cur');
   const totEl = document.getElementById('hgal-tot');
   const fill = document.getElementById('hgal-fill');
   const dotsWrap = document.getElementById('hgal-dots');
   if (totEl) totEl.textContent = String(n).padStart(2, '0');
+  const cntEl = document.getElementById('projets-count');
+  if (cntEl) cntEl.textContent = n;
 
   // ---- Visuels dédiés par projet (dossiers BDE / Halloween / Vintage) ----
   const seq = (dir, count) => Array.from({ length: count }, (_, k) => `/visuals/projets/${dir}/${String(k + 1).padStart(2, '0')}.webp`);
