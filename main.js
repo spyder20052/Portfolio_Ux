@@ -2,6 +2,7 @@ import './style.css';
 import Lenis from 'lenis';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { Application } from '@splinetool/runtime';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -48,6 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
         overlay.style.display = 'none';
     }
     initHeroAnimation();
+    initSplineHero();
+    initSplinePlayground();
 });
 
 // Intro Doorway Animation (Refined for Immersion)
@@ -1390,4 +1393,36 @@ function initHeroBouncingDot() {
     }
 
     setTimeout(animate, 1200);
+}/**
+ * Spline Hero Initialization
+ */
+function initSplineHero() {
+    const canvas = document.getElementById('spline-scene');
+    if (!canvas) return;
+
+    const app = new Application(canvas);
+    // Liquid Gradient Scene
+    app.load('https://my.spline.design/webbrowsermockup-N2nD03COCkXuPvPvBTSFIPsF/')
+        .then(() => {
+            console.log('Spline Hero Loaded');
+            // Subtle fade-in of the canvas
+            gsap.from(canvas, { opacity: 0, duration: 1.5, ease: 'power2.out' });
+        })
+        .catch(err => console.error('Spline Hero Error:', err));
+}
+
+/**
+ * Spline Playground Initialization
+ */
+function initSplinePlayground() {
+    const canvas = document.getElementById('spline-playground');
+    if (!canvas) return;
+
+    const app = new Application(canvas);
+    // Web Browser Mockup Scene
+    app.load('https://my.spline.design/webbrowsermockup-N2nD03COCkXuPvPvBTSFIPsF/')
+        .then(() => {
+            console.log('Spline Playground Loaded');
+        })
+        .catch(err => console.error('Spline Playground Error:', err));
 }

@@ -373,6 +373,30 @@ img {
     flex-direction: column;
     justify-content: center;
     padding-top: 100px;
+    position: relative; /* Context for Spline */
+    overflow: hidden;
+}
+
+#spline-scene {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1; /* Behind content */
+}
+
+.hero__content {
+    position: relative;
+    z-index: 2; /* In front of Spline */
+    pointer-events: none; /* Let clicks pass to Spline if needed */
+}
+
+/* Re-enable events for buttons and titles if needed */
+.hero__title,
+.hero__bottom,
+.scroll-hint {
+    pointer-events: auto;
 }
 
 .hero__title {
@@ -2815,4 +2839,54 @@ body.is-project-page .navbar:not(.scrolled) .nav-burger span {
 
 body.is-project-page .navbar:not(.scrolled) .nav__link:hover {
     color: var(--color-primary) !important;
+}
+
+/* Digital Playground Section */
+.playground {
+    background-color: var(--color-bg);
+    overflow: hidden;
+    padding: 100px 0;
+}
+
+.playground__content {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xl);
+    min-height: 80vh;
+}
+
+.playground__text {
+    flex: 1;
+    max-width: 500px;
+}
+
+.playground__scene-wrapper {
+    flex: 1.5;
+    height: 70vh;
+    position: relative;
+    border-radius: 24px;
+    overflow: hidden;
+    /* Sage Green background to match Spline mockup theme */
+    background: #E8F0E8; 
+    box-shadow: 0 40px 80px rgba(0, 0, 0, 0.05);
+}
+
+#spline-playground {
+    width: 100%;
+    height: 100%;
+}
+
+@media (max-width: 768px) {
+    .playground__content {
+        flex-direction: column;
+        text-align: center;
+        gap: 40px;
+    }
+    .playground__text {
+        max-width: 100%;
+    }
+    .playground__scene-wrapper {
+        width: 100%;
+        height: 50vh;
+    }
 }

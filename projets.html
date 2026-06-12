@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr" class="is-loading">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Projets — Spynel KOUTON</title>
+  <meta name="description" content="Sélection de projets de Spynel KOUTON : design graphique, développement web, identité visuelle et direction artistique." />
+  <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
+  <script src="https://assets.calendly.com/assets/external/widget.js" async></script>
+  <style>
+    html,body{margin:0;background:#0a0a0b;}
+    html.is-loading body{opacity:0;}
+    #transition{position:fixed;inset:0;z-index:9000;visibility:visible;pointer-events:none;}
+    #transition svg{position:absolute;inset:0;width:100%;height:100%;}
+    #transition path{fill:#111114;}
+  </style>
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+</head>
+
+<body>
+  <div id="bg" aria-hidden="true"><div id="bg-glow"></div></div>
+  <div id="transition" aria-hidden="true">
+    <svg viewBox="0 0 100 100" preserveAspectRatio="none"><path id="transition-path" d="M0 0 H100 V100 Q50 122 0 100 Z"></path></svg>
+    <span id="transition-logo">kspynel.</span>
+  </div>
+  <div id="cursor-ring"></div>
+  <div id="cursor-dot"></div>
+
+  <nav class="nav">
+    <a href="/" class="nav__logo">kspynel.</a>
+    <ul class="nav__links">
+      <li><a href="/projets.html" class="nav__link cursor-target">Projets</a></li>
+      <li><a href="/about.html" class="nav__link cursor-target">À propos</a></li>
+      <li><a href="/contact.html" class="nav__link cursor-target">Contact</a></li>
+      <li><a href="#" class="nav__link nav__cta cursor-target btn-rdv"
+          onclick="Calendly.initPopupWidget({url:'https://calendly.com/kspynel/30min'}); return false;">Prendre RDV ↗</a></li>
+    </ul>
+    <button class="nav__burger" id="nav-burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+  </nav>
+
+  <div class="menu" id="menu" aria-hidden="true">
+    <nav class="menu__panel menu__panel--main">
+      <ul class="menu__list">
+        <li><a href="/projets.html">Projets</a></li>
+        <li><a href="/about.html">À propos</a></li>
+        <li><a href="/contact.html">Contact</a></li>
+      </ul>
+    </nav>
+    <div class="menu__panel menu__panel--cta">
+      <span class="menu__avail">Disponible pour missions</span>
+      <a href="#" class="btn btn--primary btn-rdv"
+        onclick="Calendly.initPopupWidget({url:'https://calendly.com/kspynel/30min'}); return false;">Prendre RDV ↗</a>
+    </div>
+    <div class="menu__panel menu__panel--social">
+      <a href="https://wa.me/22943202239" target="_blank">WhatsApp</a>
+      <a href="https://linkedin.com/in/spynel-kouton-756444273" target="_blank">LinkedIn</a>
+      <a href="https://github.com/spynelkouton" target="_blank">GitHub</a>
+    </div>
+  </div>
+
+  <main class="shell" data-bg="#0a0a0b" data-glow="rgba(200,241,53,0.10)">
+    <header class="page-header">
+      <div class="page-header__label">
+        <span class="mono">Index</span>
+        <span class="page-header__count"><span id="projets-count">20</span> réalisations</span>
+      </div>
+      <h1 class="page-header__title">Projets</h1>
+      <p class="page-header__intro">Une sélection de mes travaux, du design graphique au développement web. Chaque projet est une histoire de clarté, d'intention et de soin.</p>
+    </header>
+
+    <!-- Showcase : sites web en mouvement (cadre navigateur, défile au scroll) -->
+    <section class="showcase" id="showcase">
+      <div class="showcase__head">
+        <span class="mono">En mouvement</span>
+        <h2 class="section__title" data-split>Mes sites, <em class="italic accent">en action</em>.</h2>
+      </div>
+      <div id="showcase-track"></div>
+    </section>
+
+    <div class="grid-head">
+      <span class="mono">Tout l'index</span>
+      <h2 class="section__title" data-split>Tous les <em class="italic accent">projets</em>.</h2>
+    </div>
+
+    <div class="filter" role="tablist" aria-label="Filtrer les projets">
+      <button class="filter__btn is-active" data-filter="all">Tout</button>
+      <button class="filter__btn" data-filter="web">Web</button>
+      <button class="filter__btn" data-filter="uiux">UI / UX</button>
+      <button class="filter__btn" data-filter="branding">Branding</button>
+      <button class="filter__btn" data-filter="visuel">Visuel</button>
+    </div>
+
+  </main>
+
+  <!-- Slider plein écran : on parcourt les projets un à un au scroll -->
+  <section class="pslider" id="pslider" aria-label="Tous les projets">
+    <div id="projets-grid"></div>
+    <div class="pslider__ui">
+      <span class="pslider__count mono"><span id="pslide-current">01</span> <span class="pslider__sep">/</span> <span id="pslide-total">20</span></span>
+    </div>
+  </section>
+
+  <!-- Lightbox projet -->
+  <div id="lightbox" class="lightbox" aria-hidden="true" data-lenis-prevent>
+    <button class="lightbox__close" id="lb-close" aria-label="Fermer">✕</button>
+    <div class="lightbox__inner">
+      <div class="lightbox__meta" id="lb-meta"></div>
+      <div class="lightbox__media" id="lb-media"></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="footer__wave shell" aria-hidden="true">
+      <svg viewBox="0 0 1440 60" preserveAspectRatio="none">
+        <path id="footer-wave-path" fill="none" stroke="currentColor" stroke-width="2" d="M0 30 Q 360 30 720 30 T 1440 30" />
+      </svg>
+    </div>
+    <div class="shell">
+      <h2 class="footer__slogan">Design with class.<br>Built to last.</h2>
+      <div class="footer__grid">
+        <div class="footer__col">
+          <h4>Identité</h4>
+          <p>Spynel KOUTON</p>
+          <p>Designer graphique & Développeur</p>
+          <p>Cotonou, Bénin · GMT+1</p>
+        </div>
+        <div class="footer__col">
+          <h4>Navigation</h4>
+          <a href="/projets.html" class="cursor-target">Projets</a>
+          <a href="/about.html" class="cursor-target">À propos</a>
+          <a href="/contact.html" class="cursor-target">Contact</a>
+        </div>
+        <div class="footer__col">
+          <h4>Réseaux</h4>
+          <a href="https://wa.me/22943202239" target="_blank" class="cursor-target">WhatsApp</a>
+          <a href="https://linkedin.com/in/spynel-kouton-756444273" target="_blank" class="cursor-target">LinkedIn</a>
+          <a href="https://github.com/spynelkouton" target="_blank" class="cursor-target">GitHub</a>
+        </div>
+      </div>
+      <div class="footer__bottom">
+        <span>By Spynel KOUTON</span>
+        <span>© 2026 — Tous droits réservés</span>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/app.js"></script>
+</body>
+
+</html>
