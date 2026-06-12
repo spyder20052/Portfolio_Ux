@@ -428,7 +428,7 @@ button { font-family: inherit; }
 .browser__url { margin-left: 14px; font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.04em; color: var(--paper-dim); }
 .browser__screen { position: relative; aspect-ratio: 16/10; overflow: hidden; background: var(--ink); }
 .browser__page { position: absolute; top: 0; left: 0; width: 100%; will-change: transform; }
-.browser__page img, .browser__page video { width: 100%; display: block; }
+.browser__page img, .browser__page video { width: 100%; height: auto; display: block; }
 
 .grid-head { padding-top: clamp(40px, 7vh, 90px); display: grid; gap: 10px; }
 

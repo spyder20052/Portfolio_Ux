@@ -351,7 +351,7 @@ function initShowcase() {
           <span class="browser__url">${p.url}</span>
         </div>
         <div class="browser__screen">
-          <div class="browser__page">${p.imgs.map((s) => `<img src="${s}" alt="" loading="lazy" />`).join('')}</div>
+          <div class="browser__page">${p.imgs.map((s) => { const d = IMG_DIMS[s]; const dim = d ? ` width="${d[0]}" height="${d[1]}"` : ''; return `<img src="${s}"${dim} alt="" loading="lazy" decoding="async" />`; }).join('')}</div>
         </div>
       </figure>
     </article>`).join('');
@@ -401,6 +401,7 @@ function initProjets() {
     'visual-concept-3': seq('bde', 13),     // BDE Epitech
     'exp-lab-1': seq('halloween', 20),      // BDE Halloween
     'visual-concept-1': seq('vintage', 7),  // Vintage
+    'shooting-ia': seq('shooting', 11),     // Génération de shooting pour visuel de marque
   };
   const HEROV = { crispy: '/visuals/showcase/crispy2.webp' };
   const shotsFor = (p) => SHOTS[p.id] || collectImages(p);
