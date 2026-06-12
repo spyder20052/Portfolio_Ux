@@ -398,7 +398,7 @@ function initProjets() {
   // ---- Visuels dédiés par projet (dossiers BDE / Halloween / Vintage) ----
   const seq = (dir, count) => Array.from({ length: count }, (_, k) => `/visuals/projets/${dir}/${String(k + 1).padStart(2, '0')}.webp`);
   const SHOTS = {
-    'visual-concept-3': seq('bde', 14),     // BDE Epitech
+    'visual-concept-3': seq('bde', 13),     // BDE Epitech
     'exp-lab-1': seq('halloween', 20),      // BDE Halloween
     'visual-concept-1': seq('vintage', 7),  // Vintage
   };
