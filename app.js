@@ -778,21 +778,21 @@ function initAbout() {
 
 /* ---------- Page /contact : horloge Cotonou live + envoi AJAX + bouton Send→Sent (doc11) ---------- */
 function initContact() {
-  const clock = document.getElementById('cotonou-time');
-  if (clock) {
+  const hmEl = document.getElementById('cotonou-hm');
+  if (hmEl) {
     const TZ = 'Africa/Lagos'; // Cotonou (GMT+1)
-    const ampmEl = document.getElementById('cotonou-ampm');
+    const secEl = document.getElementById('cotonou-sec');
     const dateEl = document.getElementById('cotonou-date');
-    const card = document.getElementById('clockcard');
-    const tFmt = new Intl.DateTimeFormat('fr-FR', { timeZone: TZ, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-    const aFmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, hour: 'numeric', hour12: true });
-    const dFmt = new Intl.DateTimeFormat('fr-FR', { timeZone: TZ, weekday: 'short', day: 'numeric', month: 'short' });
+    const card = document.getElementById('clock');
+    const hmFmt = new Intl.DateTimeFormat('fr-FR', { timeZone: TZ, hour: '2-digit', minute: '2-digit', hour12: false });
+    const sFmt = new Intl.DateTimeFormat('fr-FR', { timeZone: TZ, second: '2-digit' });
+    const dFmt = new Intl.DateTimeFormat('fr-FR', { timeZone: TZ, weekday: 'long', day: 'numeric', month: 'long' });
     const hFmt = new Intl.DateTimeFormat('en-US', { timeZone: TZ, hour: 'numeric', hour12: false });
     const tick = () => {
       const now = new Date();
-      clock.textContent = tFmt.format(now);
-      if (ampmEl) ampmEl.textContent = (aFmt.format(now).match(/AM|PM/i) || [''])[0].toUpperCase();
-      if (dateEl) dateEl.textContent = dFmt.format(now).replace('.', '');
+      hmEl.textContent = hmFmt.format(now);
+      if (secEl) secEl.textContent = sFmt.format(now).padStart(2, '0');
+      if (dateEl) dateEl.textContent = dFmt.format(now);
       if (card) {
         const h = parseInt(hFmt.format(now), 10) % 24;
         const day = h >= 6 && h < 18;
