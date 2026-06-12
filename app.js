@@ -159,7 +159,7 @@ function initHero() {
   const portraitBox = document.querySelector('.hero__portrait');
   const stageLayers = ['0', '1', '2', '3'].map((s) => document.querySelector(`.hero__layer[data-stage="${s}"]`));
   const roles = gsap.utils.toArray('.hero__role');
-  const lightTargets = '.hero__title, .hero__role, .lead, .btn--ghost, .hero__mark';
+  const lightTargets = '.hero__title, .hero__role, .hero .lead, .hero .btn--ghost, .hero__mark';
   const setRole = (i) => roles.forEach((r, idx) => r.classList.toggle('is-active', idx === i));
   setRole(0);
 
@@ -169,7 +169,6 @@ function initHero() {
     { bg: '#0c1d12', glow: 'rgba(120,200,100,0.32)', fg: '#eaf6e8', accent: '#7ed957', font: "'Pixelify Sans', sans-serif", size: 'clamp(2.4rem,6.6vw,5.6rem)', weight: 700, tracking: '0.01em' }, // Minecraft
     { bg: '#efe6d2', glow: 'rgba(255,205,70,0.45)', fg: '#1a1408', accent: '#ff5a3c', font: "'Gloria Hallelujah', cursive", size: 'clamp(1.9rem,4.8vw,4rem)', weight: 400, tracking: '0' }, // Crayon (clair)
     { bg: '#141420', glow: 'rgba(180,120,255,0.34)', fg: '#ece8ff', accent: '#b478ff', font: "'Press Start 2P', monospace", size: 'clamp(1rem,2.6vw,2.3rem)', weight: 400, tracking: '0' }, // Pixel
-    { bg: '#1c1206', glow: 'rgba(214,150,70,0.32)', fg: '#f4ead6', accent: '#e8a23c', font: "'Pirata One', system-ui", size: 'clamp(3rem,8vw,7.5rem)', weight: 400, tracking: '0.01em' }, // One Piece
   ];
   const applyFont = (t) => gsap.set('.hero__title', { fontFamily: t.font, fontSize: t.size, fontWeight: t.weight, letterSpacing: t.tracking });
   const setTheme = (t) => {
@@ -180,7 +179,7 @@ function initHero() {
     applyFont(t);
   };
 
-  if (REDUCE) { gsap.set(stageLayers, { clipPath: 'circle(0% at 50% 50%)' }); setTheme(THEMES[4]); return; }
+  if (REDUCE) { gsap.set(stageLayers.slice(0, 3), { clipPath: 'circle(0% at 50% 50%)' }); setTheme(THEMES[3]); return; }
 
   // === INTRO : nom kinétique. Au repos, profil1 (One Piece) visible ===
   const split = new SplitText('.hero__title .splitline', { type: 'chars' });
@@ -220,7 +219,7 @@ function initHero() {
   let currentImg = 0; // index de l'image actuellement visible (maj au scroll)
   if (FINE) {
     const peek = document.querySelector('.hero__peek');
-    const pool = ['/profil.webp', '/profil2.webp', '/profil3.webp', '/profil4.webp', '/profil1.webp'];
+    const pool = ['/profil.webp', '/profil2.webp', '/profil3.webp', '/profil4.webp'];
     let active = false;
     portraitBox.addEventListener('pointerenter', () => {
       let idx; do { idx = Math.floor(Math.random() * pool.length); } while (idx === currentImg);
@@ -243,14 +242,14 @@ function initHero() {
   // === SCROLL : voyage d'univers (révélation + thème + police assortis) ===
   const tl = gsap.timeline({
     scrollTrigger: {
-      trigger: '.hero', start: 'top top', end: '+=170%', pin: true, anticipatePin: 1,
+      trigger: '.hero', start: 'top top', end: '+=150%', pin: true, anticipatePin: 1,
       invalidateOnRefresh: true, scrub: 0.4,
       onToggle: (self) => { if (self.isActive && roleTimer) { clearInterval(roleTimer); roleTimer = null; } },
       onUpdate: (self) => {
         if (!roleTimer) setRole(Math.min(roles.length - 1, Math.floor(self.progress * roles.length * 0.999)));
         markSpin.timeScale(1 + Math.abs(self.getVelocity() / 300));
         const pr = self.progress;
-        currentImg = pr < 0.23 ? 0 : pr < 0.44 ? 1 : pr < 0.65 ? 2 : pr < 0.86 ? 3 : 4;
+        currentImg = pr < 0.2 ? 0 : pr < 0.5 ? 1 : pr < 0.8 ? 2 : 3;
       },
     },
   });
@@ -263,12 +262,11 @@ function initHero() {
       // changement de POLICE/style synchronisé au milieu de la révélation
       .set('.hero__title', { fontFamily: t.font, fontSize: t.size, fontWeight: t.weight, letterSpacing: t.tracking }, at + d * 0.5);
   };
-  reveal(stageLayers[0], THEMES[1], 0.08); // vraie photo → Minecraft
-  reveal(stageLayers[1], THEMES[2], 0.30); // → Crayon
-  reveal(stageLayers[2], THEMES[3], 0.52); // → Pixel
-  reveal(stageLayers[3], THEMES[4], 0.74); // → One Piece
+  reveal(stageLayers[0], THEMES[1], 0.12); // vraie photo → Minecraft
+  reveal(stageLayers[1], THEMES[2], 0.42); // → Crayon
+  reveal(stageLayers[2], THEMES[3], 0.72); // → Pixel (univers final)
   // Sortie : le texte du hero s'efface (pas de rideau, pour laisser admirer l'entrée du manifeste)
-  tl.to('.hero__intro, .hero__mark', { opacity: 0, ease: 'power2.in', duration: 0.12 }, 0.9);
+  tl.to('.hero__intro, .hero__mark', { opacity: 0, ease: 'power2.in', duration: 0.12 }, 0.92);
 }
 
 /* ---------- Fonds qui alternent par section (crossfade animé) ---------- */
