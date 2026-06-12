@@ -573,7 +573,7 @@ button { font-family: inherit; }
 .avail__loc { font-family: var(--font-mono); font-size: 0.7rem; color: var(--paper-dim); letter-spacing: 0.08em; margin-top: 4px; }
 
 /* ===== Horloge épurée (heure + date Cotonou) avec fond animé jour/nuit ===== */
-.clock { position: relative; border: 1px solid var(--line-strong); border-radius: var(--r-md); overflow: hidden; background: var(--ink-2); box-shadow: 0 30px 70px -44px rgba(0,0,0,0.7); }
+.clock { position: relative; border-radius: var(--r-md); overflow: hidden; background: var(--ink-2); box-shadow: 0 30px 70px -44px rgba(0,0,0,0.7); }
 .clock__sky { position: absolute; inset: 0; z-index: 0; transition: background 1.6s ease; }
 .clock.is-day .clock__sky { background: linear-gradient(155deg, #241606 0%, #3a2410 48%, #18120a 100%); }
 .clock.is-night .clock__sky { background: linear-gradient(155deg, #0c1030 0%, #171041 52%, #0a0a1a 100%); }
