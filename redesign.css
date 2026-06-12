@@ -328,8 +328,8 @@ button { font-family: inherit; }
 .about__bio em { font-weight: 500; }
 .about__stats { display: flex; gap: clamp(36px, 6vw, 80px); flex-wrap: wrap; margin-bottom: 40px; }
 .stat { display: flex; flex-direction: column; gap: 6px; }
-.stat__num { font-family: var(--font-display); font-weight: 600; font-size: clamp(2.4rem, 5vw, 4rem); line-height: 1; }
-.stat__num::after { content: '+'; color: var(--accent); }
+.stat__num { font-family: var(--font-display); font-weight: 600; font-size: clamp(2.4rem, 5vw, 4rem); line-height: 1; white-space: nowrap; }
+.stat__num::before { content: '+'; color: var(--accent); }
 .stat__label { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--paper-dim); }
 
 /* ---- CTA final ---- */
