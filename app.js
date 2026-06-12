@@ -589,6 +589,8 @@ function initSplitReveals() {
 /* ---------- Particules de clic GLOBALES : éclatent partout où on clique ---------- */
 function initClickParticles() {
   if (REDUCE) return;
+  // Pas de simulation physique à chaque tap sur mobile/tactile (jank, menu qui rame)
+  if (!window.matchMedia('(pointer: fine)').matches) return;
   const container = document.createElement('div');
   container.style.cssText = 'position:fixed;left:0;top:0;z-index:9998;pointer-events:none;';
   document.body.appendChild(container);

@@ -4,12 +4,8 @@
    Stack : native CSS + GSAP. Pas de framework.
    ============================================================ */
 
-/* Fonts — Clash Display (titres) + Satoshi (texte) via Fontshare,
-   JetBrains Mono (méta) via Google. À self-host avant prod. */
-@import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&f[]=satoshi@400,500,700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap');
-/* Polices thématiques du voyage d'univers du Hero */
-@import url('https://fonts.googleapis.com/css2?family=Pirata+One&family=Pixelify+Sans:wght@400;700&family=Gloria+Hallelujah&family=Press+Start+2P&display=swap');
+/* Fonts chargées via <link> dans le <head> (preconnect + parallèle, non bloquant).
+   Voir index.html / projets.html / contact.html / about.html. */
 
 :root {
   /* ---- Couleurs (Theme Lock : dark, un seul accent) ---- */
@@ -151,6 +147,8 @@ button { font-family: inherit; }
 .menu__panel--cta .btn { background: var(--accent-ink); color: var(--accent); }
 .menu__avail { font-family: var(--font-mono); font-size: 0.78rem; letter-spacing: 0.1em; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
 .menu__avail::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent-ink); }
+.menu__cv { font-family: var(--font-mono); font-size: 0.82rem; letter-spacing: 0.04em; color: var(--accent-ink); text-decoration: underline; text-underline-offset: 4px; opacity: 0.85; transition: opacity 0.25s; }
+.menu__cv:hover { opacity: 1; }
 .menu__panel--social { background: var(--ink-2); display: flex; gap: clamp(18px, 5vw, 36px); justify-content: center; }
 .menu__panel--social a { font-family: var(--font-mono); font-size: 0.85rem; letter-spacing: 0.06em; color: var(--paper-dim); }
 @media (max-width: 900px) { .menu { display: flex; } }
