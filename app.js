@@ -36,6 +36,7 @@ function boot() {
   initClickParticles();
   initFooterWave();
   initFeatureMedia();
+  initMoodshot();
   initShowcase();
   initProjets();
   initContact();
@@ -325,7 +326,7 @@ function initShowcase() {
   const SC = {
     crispy: { title: 'Crispy', cat: 'Site Web · Food', year: '2024', client: 'Crispy', role: 'Design & Développement',
       url: 'crispy.kspynel.com', desc: "Site de commande pour une enseigne de restauration rapide premium. Interface gourmande, claire et fluide.",
-      imgs: ['/visuals/showcase/crispy2.webp'] },
+      imgs: ['/visuals/showcase/crispy-full.webp'] },
     'visual-concept-1': { title: 'Vintage', cat: 'Site Web · E-commerce', year: '2026', client: 'Vintage Bénin', role: 'Web Design & Direction Artistique',
       url: 'vintage.bj', desc: "Maquette du site Vintage Bénin : achat-vente de pièces uniques de seconde main. Une direction rétro, colorée et vivante.",
       imgs: ['/visuals/showcase/vintage.webp'] },
@@ -388,11 +389,12 @@ function groupOf(cat) {
   return 'visuel';
 }
 function initProjets() {
-  const track = document.getElementById('projets-grid');
-  const section = document.getElementById('pslider');
-  if (!track || !section) return;
+  const strip = document.getElementById('hgal-strip');
+  const section = document.getElementById('hgal');
+  const viewport = document.getElementById('hgal-viewport');
+  if (!strip || !section || !viewport) return;
 
-  // ---- Lightbox (détail projet, défile via data-lenis-prevent) ----
+  // ---- Lightbox (détail projet : tous les visuels) ----
   const lb = document.getElementById('lightbox');
   const lbMedia = document.getElementById('lb-media');
   const lbMeta = document.getElementById('lb-meta');
@@ -418,96 +420,161 @@ function initProjets() {
   lb && lb.addEventListener('click', (e) => { if (e.target === lb) closeLB(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLB(); });
 
-  const btns = gsap.utils.toArray('.filter__btn');
-  const curEl = document.getElementById('pslide-current');
-  const totEl = document.getElementById('pslide-total');
-  const outer = (s) => s.querySelector('.pslide__outer');
-  const inner = (s) => s.querySelector('.pslide__inner');
-  const bgOf = (s) => s.querySelector('.pslide__bg');
+  // Visuel d'aperçu par projet (Crispy : on intègre le visuel dédié)
+  const HERO = { crispy: '/visuals/showcase/crispy2.webp' };
+  const list = projects;
+  const n = list.length;
 
-  let st = null, slideEls = [], current = -1, slideTl = null, sliderObs = null, animating = false;
+  const curEl = document.getElementById('hgal-cur');
+  const totEl = document.getElementById('hgal-tot');
+  const fill = document.getElementById('hgal-fill');
+  const dotsWrap = document.getElementById('hgal-dots');
+  if (totEl) totEl.textContent = String(n).padStart(2, '0');
 
-  const renderSlides = (list) => {
-    track.innerHTML = list.map((p, i) => `
-      <div class="pslide" data-id="${p.id}">
-        <div class="pslide__outer"><div class="pslide__inner">
-          <div class="pslide__bg" style="background-image:url('${p.heroImage}')">
-            <div class="pslide__content">
-              <span class="pslide__num pslide__anim">${String(i + 1).padStart(2, '0')} / ${String(list.length).padStart(2, '0')}</span>
-              <h2 class="pslide__title pslide__anim">${p.title}</h2>
-              <span class="pslide__cat pslide__anim">${p.category} · ${p.year}</span>
-              <p class="pslide__desc pslide__anim">${p.description}</p>
-              <a class="btn btn--primary pslide__view pslide__anim cursor-target" role="button" tabindex="0" data-id="${p.id}">Voir le projet <span class="btn__arrow">↗</span></a>
-            </div>
-          </div></div>
-        </div>
-      </div>`).join('');
-    slideEls = gsap.utils.toArray('.pslide');
-    if (totEl) totEl.textContent = String(list.length).padStart(2, '0');
-    track.querySelectorAll('.pslide__view').forEach((el) => {
-      const p = projects.find((x) => x.id === el.dataset.id);
-      el.addEventListener('click', (e) => { e.preventDefault(); openLB(p); });
-    });
+  // ---- Rendu des panneaux (un par projet, visuels en ligne) ----
+  strip.innerHTML = list.map((p, i) => `
+    <article class="hpanel cursor-target" data-id="${p.id}" data-i="${i}" role="button" tabindex="0" aria-label="${p.title}">
+      <div class="hpanel__media"><img src="${HERO[p.id] || p.heroImage}" alt="${p.title}" loading="${i < 3 ? 'eager' : 'lazy'}" /></div>
+      <div class="hpanel__meta">
+        <span class="hpanel__num">${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span>
+        <h3 class="hpanel__title">${p.title}</h3>
+        <span class="hpanel__cat">${p.category} · ${p.year}</span>
+        <span class="hpanel__see">Voir les visuels <i>↗</i></span>
+      </div>
+    </article>`).join('');
+  const panels = gsap.utils.toArray('.hpanel');
+  panels.forEach((pan) => {
+    const p = projects.find((x) => x.id === pan.dataset.id);
+    const go = () => p && openLB(p);
+    pan.addEventListener('click', go);
+    pan.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+
+  // ---- Dots de navigation rapide ----
+  if (dotsWrap) dotsWrap.innerHTML = list.map((p, i) => `<button class="hgal__dot" data-i="${i}" aria-label="Projet ${i + 1} : ${p.title}"></button>`).join('');
+  const dots = dotsWrap ? gsap.utils.toArray('.hgal__dot') : [];
+
+  let current = -1;
+  const setCurrent = (i) => {
+    i = gsap.utils.clamp(0, n - 1, i);
+    if (i === current) return;
+    current = i;
+    if (curEl) curEl.textContent = String(i + 1).padStart(2, '0');
+    dots.forEach((d, di) => d.classList.toggle('is-active', di === i));
+    panels.forEach((pan, pi) => pan.classList.toggle('is-current', pi === i));
   };
 
-  const goto = (index, dir, onDone) => {
-    if (index === current || !slideEls[index]) { onDone && onDone(); return; }
-    const dF = dir === -1 ? -1 : 1;
-    slideTl && slideTl.kill();
-    slideTl = gsap.timeline({ defaults: { duration: 0.8, ease: 'power2.inOut' }, onComplete: () => onDone && onDone() });
-    if (current >= 0 && slideEls[current]) {
-      gsap.set(slideEls[current], { zIndex: 0 });
-      slideTl.to(bgOf(slideEls[current]), { yPercent: -12 * dF }, 0).set(slideEls[current], { autoAlpha: 0 });
-    }
-    const s = slideEls[index];
-    gsap.set(s, { autoAlpha: 1, zIndex: 1 });
-    slideTl.fromTo([outer(s), inner(s)], { yPercent: (i) => (i ? -100 * dF : 100 * dF) }, { yPercent: 0 }, 0)
-      .fromTo(bgOf(s), { yPercent: 12 * dF }, { yPercent: 0 }, 0)
-      .fromTo(s.querySelectorAll('.pslide__anim'), { autoAlpha: 0, yPercent: 60 * dF }, { autoAlpha: 1, yPercent: 0, duration: 0.6, ease: 'power2', stagger: 0.05 }, 0.2);
-    current = index;
-    if (curEl) curEl.textContent = String(index + 1).padStart(2, '0');
-  };
+  const mm = gsap.matchMedia();
 
-  // Slider PINNÉ : la section se fige plein écran, on parcourt les projets au scroll, sortie naturelle vers le footer
-  const setupSlider = () => {
-    if (st) { st.kill(); st = null; }
-    current = -1;
-    if (REDUCE) { gsap.set(slideEls, { clearProps: 'all' }); return; } // CSS montre les slides empilées
-    gsap.set(slideEls, { autoAlpha: 0 });
-    gsap.set(slideEls.map(outer), { yPercent: 100 });
-    gsap.set(slideEls.map(inner), { yPercent: -100 });
-    goto(0, 1);
-    if (slideEls.length < 2) return;
-    const n = slideEls.length;
-    const idxFrom = (prog) => Math.round(gsap.utils.clamp(0, 1, prog) * (n - 1));
-    st = ScrollTrigger.create({
-      trigger: section, start: 'top top', end: `+=${n * 110}%`, // ~1.1 écran par projet
-      pin: true, anticipatePin: 1, invalidateOnRefresh: true,
-      snap: { snapTo: 1 / (n - 1), duration: { min: 0.2, max: 0.5 }, ease: 'power1.inOut' },
-      onUpdate: (self) => {
-        const i = idxFrom(self.progress);
-        if (i !== current) goto(i, i > current ? 1 : -1);
+  // ===== DESKTOP / TABLETTE : section figée + défilement horizontal au scroll =====
+  mm.add('(min-width: 821px)', () => {
+    let snaps = [];
+    const calcSnaps = () => {
+      const max = strip.scrollWidth - window.innerWidth;
+      snaps = panels.map((pan) => max > 0
+        ? gsap.utils.clamp(0, 1, (pan.offsetLeft + pan.offsetWidth / 2 - window.innerWidth / 2) / max) : 0);
+    };
+    calcSnaps();
+    const nearestIdx = (prog) => {
+      let idx = 0, best = Infinity;
+      snaps.forEach((s, si) => { const d = Math.abs(s - prog); if (d < best) { best = d; idx = si; } });
+      return idx;
+    };
+    const tween = gsap.to(strip, {
+      x: () => -(strip.scrollWidth - window.innerWidth), ease: 'none',
+      scrollTrigger: {
+        trigger: viewport, start: 'top top',
+        end: () => `+=${Math.max(1, strip.scrollWidth - window.innerWidth)}`,
+        pin: viewport, scrub: 0.7, anticipatePin: 1, invalidateOnRefresh: true,
+        onRefresh: calcSnaps,
+        snap: { snapTo: (v) => snaps[nearestIdx(v)] ?? v, duration: { min: 0.15, max: 0.5 }, ease: 'power2.inOut' },
+        onUpdate: (self) => {
+          if (fill) fill.style.transform = `scaleX(${self.progress})`;
+          setCurrent(nearestIdx(self.progress));
+        },
       },
     });
+    const st = tween.scrollTrigger;
+    const ac = new AbortController();
+    dots.forEach((d) => d.addEventListener('click', () => {
+      const i = +d.dataset.i;
+      const y = st.start + (snaps[i] || 0) * (st.end - st.start);
+      window.__lenis ? window.__lenis.scrollTo(y) : window.scrollTo(0, y);
+    }, { signal: ac.signal }));
+    setCurrent(0);
+    return () => { ac.abort(); tween.kill(); gsap.set(strip, { clearProps: 'transform' }); };
+  });
+
+  // ===== MOBILE : scroll-snap horizontal natif (fluide, projet par projet) =====
+  mm.add('(max-width: 820px)', () => {
+    strip.classList.add('hgal__strip--native');
+    const ac = new AbortController();
+    const onScroll = () => {
+      const max = strip.scrollWidth - strip.clientWidth;
+      if (fill) fill.style.transform = `scaleX(${max > 0 ? strip.scrollLeft / max : 0})`;
+      const center = strip.scrollLeft + strip.clientWidth / 2;
+      let idx = 0, best = Infinity;
+      panels.forEach((pan, pi) => { const c = pan.offsetLeft + pan.offsetWidth / 2; const d = Math.abs(c - center); if (d < best) { best = d; idx = pi; } });
+      setCurrent(idx);
+    };
+    strip.addEventListener('scroll', onScroll, { passive: true, signal: ac.signal });
+    dots.forEach((d) => d.addEventListener('click', () => {
+      const pan = panels[+d.dataset.i];
+      strip.scrollTo({ left: pan.offsetLeft + pan.offsetWidth / 2 - strip.clientWidth / 2, behavior: 'smooth' });
+    }, { signal: ac.signal }));
+    onScroll();
+    return () => { ac.abort(); strip.classList.remove('hgal__strip--native'); };
+  });
+}
+
+/* ---------- Moodshot "la ville dort" : ambiance nocturne vivante en continu ---------- */
+function initMoodshot() {
+  const sec = document.querySelector('.moodshot');
+  if (!sec || REDUCE) return;
+  const img = sec.querySelector('.moodshot__img');
+  const dort = sec.querySelector('.moodshot__line em');
+
+  const aura = document.createElement('div');
+  aura.className = 'moodshot__aura';
+  sec.prepend(aura);
+  const ff = document.createElement('div');
+  ff.className = 'moodshot__fireflies';
+  sec.appendChild(ff);
+
+  // Halo derrière la fenêtre : respire (chaud ↔ froid)
+  gsap.set(aura, { opacity: 0.5, scale: 0.95 });
+  gsap.to(aura, { opacity: 0.85, scale: 1.12, duration: 3.4, ease: 'sine.inOut', repeat: -1, yoyo: true });
+
+  // La fenêtre flotte + scintille doucement (la lampe veille)
+  if (img) {
+    gsap.to(img, { y: -16, rotation: 0.5, duration: 4.6, ease: 'sine.inOut', repeat: -1, yoyo: true });
+    gsap.to(img, { filter: 'brightness(1.14)', duration: 2.7, ease: 'sine.inOut', repeat: -1, yoyo: true });
+  }
+
+  // "dort" rougeoie en boucle
+  if (dort) gsap.fromTo(dort,
+    { textShadow: '0 0 6px rgba(200,241,53,0)' },
+    { textShadow: '0 0 20px rgba(200,241,53,0.7)', duration: 2.3, ease: 'sine.inOut', repeat: -1, yoyo: true });
+
+  // Lucioles : remontent lentement, en continu
+  const COLORS = ['rgba(200,241,53,0.9)', 'rgba(255,120,90,0.85)', 'rgba(120,170,255,0.8)'];
+  const drift = (dot) => {
+    const w = ff.clientWidth || sec.clientWidth, h = ff.clientHeight || sec.clientHeight;
+    const x = gsap.utils.random(w * 0.18, w * 0.82);
+    const c = COLORS[Math.floor(gsap.utils.random(0, COLORS.length))];
+    const s = gsap.utils.random(0.6, 1.5);
+    gsap.set(dot, { x, y: h + 12, scale: s, opacity: 0, backgroundColor: c, boxShadow: `0 0 9px 2px ${c}` });
+    gsap.timeline({ onComplete: () => drift(dot) })
+      .to(dot, { opacity: gsap.utils.random(0.45, 0.95), duration: 0.9 }, 0)
+      .to(dot, { y: -24, x: x + gsap.utils.random(-50, 50), duration: gsap.utils.random(7, 12), ease: 'none' }, 0)
+      .to(dot, { opacity: 0, duration: 1.4 }, '>-1.6');
   };
-
-  renderSlides(projects);
-  setupSlider();
-
-  // ---- Filtre : reconstruit le slider ----
-  btns.forEach((btn) => btn.addEventListener('click', () => {
-    btns.forEach((b) => b.classList.toggle('is-active', b === btn));
-    const f = btn.dataset.filter;
-    const list = f === 'all' ? projects : projects.filter((p) => groupOf(p.category) === f);
-    if (!list.length) return;
-    renderSlides(list);
-    setupSlider();
-    ScrollTrigger.refresh();
-    const top = section.offsetTop;
-    window.__lenis ? window.__lenis.scrollTo(top) : window.scrollTo(0, top);
-  }));
-
-  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { setupSlider(); ScrollTrigger.refresh(); }, 250); });
+  for (let i = 0; i < 14; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'firefly';
+    ff.appendChild(dot);
+    gsap.delayedCall(i * 0.55, () => drift(dot));
+  }
 }
 
 /* ---------- Médias encadrés (GIFs) : reveal clip + parallaxe interne + tilt ---------- */

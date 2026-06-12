@@ -84,26 +84,22 @@
       <div id="showcase-track"></div>
     </section>
 
-    <div class="grid-head">
-      <span class="mono">Tout l'index</span>
-      <h2 class="section__title" data-split>Tous les <em class="italic accent">projets</em>.</h2>
-    </div>
-
-    <div class="filter" role="tablist" aria-label="Filtrer les projets">
-      <button class="filter__btn is-active" data-filter="all">Tout</button>
-      <button class="filter__btn" data-filter="web">Web</button>
-      <button class="filter__btn" data-filter="uiux">UI / UX</button>
-      <button class="filter__btn" data-filter="branding">Branding</button>
-      <button class="filter__btn" data-filter="visuel">Visuel</button>
-    </div>
-
   </main>
 
-  <!-- Slider plein écran : on parcourt les projets un à un au scroll -->
-  <section class="pslider" id="pslider" aria-label="Tous les projets">
-    <div id="projets-grid"></div>
-    <div class="pslider__ui">
-      <span class="pslider__count mono"><span id="pslide-current">01</span> <span class="pslider__sep">/</span> <span id="pslide-total">20</span></span>
+  <!-- Galerie horizontale : on parcourt tous les projets, projet par projet, au scroll -->
+  <section class="hgal" id="hgal" aria-label="Tous les projets">
+    <div class="hgal__head shell">
+      <span class="mono">Tout l'index</span>
+      <h2 class="hgal__title">Tous les <em class="italic accent">projets</em>.</h2>
+      <p class="hgal__hint mono">Défilez — chaque projet s'enchaîne · cliquez un point pour sauter</p>
+    </div>
+    <div class="hgal__viewport" id="hgal-viewport">
+      <div class="hgal__strip" id="hgal-strip"></div>
+      <div class="hgal__hud" aria-hidden="true">
+        <span class="hgal__count mono"><span id="hgal-cur">01</span> <span class="hgal__sep">/</span> <span id="hgal-tot">20</span></span>
+        <div class="hgal__bar"><span class="hgal__bar-fill" id="hgal-fill"></span></div>
+        <div class="hgal__dots" id="hgal-dots"></div>
+      </div>
     </div>
   </section>
 
