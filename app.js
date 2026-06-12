@@ -127,14 +127,15 @@ function initManifesto() {
   const text = document.querySelector('.manifesto__text');
   if (!wrap || !text || REDUCE) return;
   const mm = gsap.matchMedia();
-  // Desktop : scroll horizontal pinné + chars qui se dispersent
-  mm.add('(min-width: 769px)', () => {
+  // Tous écrans (mobile inclus) : scroll horizontal pinné + chars qui se dispersent
+  mm.add('(min-width: 1px)', () => {
     const split = SplitText.create(text, { type: 'chars,words' });
     let entered = false;
+    const mobile = window.matchMedia('(max-width: 768px)').matches;
     const scrollTween = gsap.to(text, {
       xPercent: -100, ease: 'none',
       scrollTrigger: {
-        trigger: wrap, pin: true, end: '+=1800', scrub: true, invalidateOnRefresh: true,
+        trigger: wrap, pin: true, end: mobile ? '+=1200' : '+=1800', scrub: true, invalidateOnRefresh: true,
         // L'entrée ne se joue QU'UNE FOIS, au moment où la section se cale (pin), donc après qu'on y soit
         onEnter: () => {
           if (entered) return; entered = true;
@@ -147,15 +148,6 @@ function initManifesto() {
         yPercent: 'random(-180, 180)', rotation: 'random(-18, 18)', ease: 'back.out(1.2)',
         scrollTrigger: { trigger: char, containerAnimation: scrollTween, start: 'left 100%', end: 'left 35%', scrub: 1 },
       });
-    });
-    return () => split.revert();
-  });
-  // Mobile : phrase qui se révèle simplement (pas de pin, pas de vide)
-  mm.add('(max-width: 768px)', () => {
-    const split = SplitText.create(text, { type: 'lines', mask: 'lines' });
-    gsap.from(split.lines, {
-      yPercent: 110, stagger: 0.12, duration: 0.9, ease: 'power3.out',
-      scrollTrigger: { trigger: wrap, start: 'top 75%' },
     });
     return () => split.revert();
   });
@@ -182,7 +174,7 @@ function initHero() {
   const applyFont = (t) => gsap.set('.hero__title', { fontFamily: t.font, fontSize: t.size, fontWeight: t.weight, letterSpacing: t.tracking });
   const setTheme = (t) => {
     gsap.set('.hero__bg', { backgroundColor: t.bg });
-    gsap.set('.hero__glow', { backgroundColor: t.glow });
+    gsap.set('.hero__glow', { color: t.glow });
     gsap.set([...document.querySelectorAll(lightTargets)], { color: t.fg });
     gsap.set('.hero__title em', { color: t.accent });
     applyFont(t);
@@ -265,7 +257,7 @@ function initHero() {
   const reveal = (layer, t, at, d = 0.17) => {
     tl.to(layer, { clipPath: 'circle(0% at 50% 50%)', ease: 'power2.inOut', duration: d }, at)
       .to('.hero__bg', { backgroundColor: t.bg, ease: 'power1.inOut', duration: d }, at)
-      .to('.hero__glow', { backgroundColor: t.glow, ease: 'power1.inOut', duration: d }, at)
+      .to('.hero__glow', { color: t.glow, ease: 'power1.inOut', duration: d }, at)
       .to(lightTargets, { color: t.fg, ease: 'power1.inOut', duration: d }, at)
       .to('.hero__title em', { color: t.accent, ease: 'power1.inOut', duration: d }, at)
       // changement de POLICE/style synchronisé au milieu de la révélation
@@ -290,7 +282,7 @@ function initSectionBackgrounds() {
     if (!sec || sec === current) return;
     current = sec;
     gsap.to(bg, { backgroundColor: sec.dataset.bg, duration: 1, ease: 'power2.out', overwrite: 'auto' });
-    if (glow && sec.dataset.glow) gsap.to(glow, { backgroundColor: sec.dataset.glow, duration: 1, ease: 'power2.out', overwrite: 'auto' });
+    if (glow && sec.dataset.glow) gsap.to(glow, { color: sec.dataset.glow, duration: 1, ease: 'power2.out', overwrite: 'auto' });
   };
   // Déterministe : la section qui occupe le centre du viewport impose sa couleur
   const pick = () => {
@@ -325,10 +317,10 @@ function initShowcase() {
   // Config : on peut surcharger titre / images / url par projet
   const SC = {
     crispy: { title: 'Crispy', cat: 'Site Web · Food', year: '2024', client: 'Crispy', role: 'Design & Développement',
-      url: 'crispy.kspynel.com', desc: "Site de commande pour une enseigne de restauration rapide premium. Interface gourmande, claire et fluide.",
+      url: 'spynelkouton.me/crispy', desc: "Site de commande pour une enseigne de restauration rapide premium. Interface gourmande, claire et fluide.",
       imgs: ['/visuals/showcase/crispy-full.webp'] },
     'visual-concept-1': { title: 'Vintage', cat: 'Site Web · E-commerce', year: '2026', client: 'Vintage Bénin', role: 'Web Design & Direction Artistique',
-      url: 'vintage.bj', desc: "Maquette du site Vintage Bénin : achat-vente de pièces uniques de seconde main. Une direction rétro, colorée et vivante.",
+      url: 'spynelkouton.me/vintage', desc: "Maquette du site Vintage Bénin : achat-vente de pièces uniques de seconde main. Une direction rétro, colorée et vivante.",
       imgs: ['/visuals/showcase/vintage.webp'] },
   };
   const order = ['crispy', 'arbitra', 'scan360', 'nextgen', 'astro', 'visual-concept-1'];
@@ -338,7 +330,7 @@ function initShowcase() {
     return {
       id, title: o.title || p.title, cat: o.cat || `${p.category} · ${p.year}`,
       client: o.client || p.client, role: o.role || p.role, desc: o.desc || p.description,
-      url: o.url || `${id}.kspynel.com`, imgs: o.imgs || collectImages(p),
+      url: o.url || `spynelkouton.me/${id}`, imgs: o.imgs || collectImages(p),
     };
   });
   track.innerHTML = items.map((p, i) => `
@@ -365,7 +357,7 @@ function initShowcase() {
       </figure>
     </article>`).join('');
 
-  gsap.matchMedia().add('(min-width: 821px)', () => {
+  gsap.matchMedia().add('(min-width: 1px)', () => {
     const triggers = [];
     gsap.utils.toArray('.showcase__item').forEach((item) => {
       const page = item.querySelector('.browser__page');
@@ -394,64 +386,38 @@ function initProjets() {
   const viewport = document.getElementById('hgal-viewport');
   if (!strip || !section || !viewport) return;
 
-  // ---- Lightbox (détail projet : tous les visuels) ----
-  const lb = document.getElementById('lightbox');
-  const lbMedia = document.getElementById('lb-media');
-  const lbMeta = document.getElementById('lb-meta');
-  const openLB = (p) => {
-    if (!lb) return;
-    lbMeta.innerHTML = `
-      <span class="mono accent">${p.category} · ${p.year}</span>
-      <h2>${p.title}</h2>
-      <p class="lead">${p.description}</p>
-      <div class="lb-info"><div><span class="mono">Client</span><b>${p.client}</b></div><div><span class="mono">Rôle</span><b>${p.role}</b></div></div>
-      ${(p.results || []).length ? `<div class="lb-results">${p.results.map((r) => `<div><b>${r.value}</b><span>${r.label}</span></div>`).join('')}</div>` : ''}`;
-    lbMedia.innerHTML = collectImages(p).map((s) => `<img class="lb-img" src="${s}" alt="${p.title}" loading="lazy" />`).join('');
-    lb.scrollTop = 0;
-    lb.classList.add('is-open');
-    document.documentElement.style.overflow = 'hidden';
-  };
-  const closeLB = () => {
-    if (!lb) return;
-    lb.classList.remove('is-open');
-    document.documentElement.style.overflow = '';
-  };
-  document.getElementById('lb-close') && document.getElementById('lb-close').addEventListener('click', closeLB);
-  lb && lb.addEventListener('click', (e) => { if (e.target === lb) closeLB(); });
-  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLB(); });
-
-  // Visuel d'aperçu par projet (Crispy : on intègre le visuel dédié)
-  const HERO = { crispy: '/visuals/showcase/crispy2.webp' };
   const list = projects;
   const n = list.length;
-
   const curEl = document.getElementById('hgal-cur');
   const totEl = document.getElementById('hgal-tot');
   const fill = document.getElementById('hgal-fill');
   const dotsWrap = document.getElementById('hgal-dots');
   if (totEl) totEl.textContent = String(n).padStart(2, '0');
 
-  // ---- Rendu des panneaux (un par projet, visuels en ligne) ----
-  strip.innerHTML = list.map((p, i) => `
-    <article class="hpanel cursor-target" data-id="${p.id}" data-i="${i}" role="button" tabindex="0" aria-label="${p.title}">
-      <div class="hpanel__media"><img src="${HERO[p.id] || p.heroImage}" alt="${p.title}" loading="${i < 3 ? 'eager' : 'lazy'}" /></div>
-      <div class="hpanel__meta">
-        <span class="hpanel__num">${String(i + 1).padStart(2, '0')} / ${String(n).padStart(2, '0')}</span>
-        <h3 class="hpanel__title">${p.title}</h3>
-        <span class="hpanel__cat">${p.category} · ${p.year}</span>
-        <span class="hpanel__see">Voir les visuels <i>↗</i></span>
-      </div>
-    </article>`).join('');
-  const panels = gsap.utils.toArray('.hpanel');
-  panels.forEach((pan) => {
-    const p = projects.find((x) => x.id === pan.dataset.id);
-    const go = () => p && openLB(p);
-    pan.addEventListener('click', go);
-    pan.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
-  });
+  // ---- Rendu : pour chaque projet, un bloc infos PUIS ses visuels collés ----
+  strip.innerHTML = list.map((p, i) => {
+    const shots = collectImages(p).map((src, j) =>
+      `<div class="hp-shot"><img src="${src}" alt="${p.title} — visuel ${j + 1}" loading="${i === 0 ? 'eager' : 'lazy'}" /></div>`).join('');
+    return `
+      <section class="hp" id="proj-${i}" data-i="${i}" aria-label="${p.title}">
+        <div class="hp-info">
+          <span class="hp-info__num">${String(i + 1).padStart(2, '0')} <i>/</i> ${String(n).padStart(2, '0')}</span>
+          <h3 class="hp-info__title">${p.title}</h3>
+          <span class="hp-info__cat">${p.category} · ${p.year}</span>
+          <p class="hp-info__desc">${p.description}</p>
+          <div class="hp-info__meta">
+            <div><span class="mono">Client</span><b>${p.client}</b></div>
+            <div><span class="mono">Rôle</span><b>${p.role}</b></div>
+          </div>
+        </div>
+        <div class="hp-shots">${shots}</div>
+      </section>`;
+  }).join('');
+  const chapters = gsap.utils.toArray('.hp');
 
-  // ---- Dots de navigation rapide ----
-  if (dotsWrap) dotsWrap.innerHTML = list.map((p, i) => `<button class="hgal__dot" data-i="${i}" aria-label="Projet ${i + 1} : ${p.title}"></button>`).join('');
+  // ---- Navigation rapide : un point par projet (libellé au survol) ----
+  if (dotsWrap) dotsWrap.innerHTML = list.map((p, i) =>
+    `<button class="hgal__dot" data-i="${i}" aria-label="${i + 1}. ${p.title}"><span class="hgal__dot-label">${p.title}</span></button>`).join('');
   const dots = dotsWrap ? gsap.utils.toArray('.hgal__dot') : [];
 
   let current = -1;
@@ -461,23 +427,22 @@ function initProjets() {
     current = i;
     if (curEl) curEl.textContent = String(i + 1).padStart(2, '0');
     dots.forEach((d, di) => d.classList.toggle('is-active', di === i));
-    panels.forEach((pan, pi) => pan.classList.toggle('is-current', pi === i));
   };
 
   const mm = gsap.matchMedia();
 
-  // ===== DESKTOP / TABLETTE : section figée + défilement horizontal au scroll =====
-  mm.add('(min-width: 821px)', () => {
-    let snaps = [];
-    const calcSnaps = () => {
-      const max = strip.scrollWidth - window.innerWidth;
-      snaps = panels.map((pan) => max > 0
-        ? gsap.utils.clamp(0, 1, (pan.offsetLeft + pan.offsetWidth / 2 - window.innerWidth / 2) / max) : 0);
+  // ===== Tous écrans (mobile inclus) : une seule ligne horizontale, pin + scrub fluide =====
+  mm.add('(min-width: 1px)', () => {
+    let offs = [], maxX = 1;
+    const calc = () => {
+      maxX = Math.max(1, strip.scrollWidth - window.innerWidth);
+      offs = chapters.map((c) => c.offsetLeft);
     };
-    calcSnaps();
-    const nearestIdx = (prog) => {
-      let idx = 0, best = Infinity;
-      snaps.forEach((s, si) => { const d = Math.abs(s - prog); if (d < best) { best = d; idx = si; } });
+    calc();
+    const idxFromX = (x) => {
+      const probe = x + window.innerWidth * 0.32;
+      let idx = 0;
+      for (let k = 0; k < offs.length; k++) { if (offs[k] <= probe) idx = k; else break; }
       return idx;
     };
     const tween = gsap.to(strip, {
@@ -485,45 +450,23 @@ function initProjets() {
       scrollTrigger: {
         trigger: viewport, start: 'top top',
         end: () => `+=${Math.max(1, strip.scrollWidth - window.innerWidth)}`,
-        pin: viewport, scrub: 0.7, anticipatePin: 1, invalidateOnRefresh: true,
-        onRefresh: calcSnaps,
-        snap: { snapTo: (v) => snaps[nearestIdx(v)] ?? v, duration: { min: 0.15, max: 0.5 }, ease: 'power2.inOut' },
+        pin: viewport, scrub: 0.6, anticipatePin: 1, invalidateOnRefresh: true,
+        onRefresh: calc,
         onUpdate: (self) => {
           if (fill) fill.style.transform = `scaleX(${self.progress})`;
-          setCurrent(nearestIdx(self.progress));
+          setCurrent(idxFromX(self.progress * maxX));
         },
       },
     });
     const st = tween.scrollTrigger;
     const ac = new AbortController();
     dots.forEach((d) => d.addEventListener('click', () => {
-      const i = +d.dataset.i;
-      const y = st.start + (snaps[i] || 0) * (st.end - st.start);
+      const target = gsap.utils.clamp(0, 1, (offs[+d.dataset.i] - window.innerWidth * 0.06) / maxX);
+      const y = st.start + target * (st.end - st.start);
       window.__lenis ? window.__lenis.scrollTo(y) : window.scrollTo(0, y);
     }, { signal: ac.signal }));
     setCurrent(0);
     return () => { ac.abort(); tween.kill(); gsap.set(strip, { clearProps: 'transform' }); };
-  });
-
-  // ===== MOBILE : scroll-snap horizontal natif (fluide, projet par projet) =====
-  mm.add('(max-width: 820px)', () => {
-    strip.classList.add('hgal__strip--native');
-    const ac = new AbortController();
-    const onScroll = () => {
-      const max = strip.scrollWidth - strip.clientWidth;
-      if (fill) fill.style.transform = `scaleX(${max > 0 ? strip.scrollLeft / max : 0})`;
-      const center = strip.scrollLeft + strip.clientWidth / 2;
-      let idx = 0, best = Infinity;
-      panels.forEach((pan, pi) => { const c = pan.offsetLeft + pan.offsetWidth / 2; const d = Math.abs(c - center); if (d < best) { best = d; idx = pi; } });
-      setCurrent(idx);
-    };
-    strip.addEventListener('scroll', onScroll, { passive: true, signal: ac.signal });
-    dots.forEach((d) => d.addEventListener('click', () => {
-      const pan = panels[+d.dataset.i];
-      strip.scrollTo({ left: pan.offsetLeft + pan.offsetWidth / 2 - strip.clientWidth / 2, behavior: 'smooth' });
-    }, { signal: ac.signal }));
-    onScroll();
-    return () => { ac.abort(); strip.classList.remove('hgal__strip--native'); };
   });
 }
 
@@ -815,6 +758,7 @@ function initMenu() {
   const toggle = (force) => {
     open = force !== undefined ? force : !open;
     burger.setAttribute('aria-expanded', open);
+    if (window.__lenis) open ? window.__lenis.stop() : window.__lenis.start();
     open ? tl.timeScale(1).play() : tl.timeScale(1.7).reverse();
   };
   burger.addEventListener('click', () => toggle());
