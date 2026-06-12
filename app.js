@@ -325,7 +325,7 @@ function initShowcase() {
   const SC = {
     crispy: { title: 'Crispy', cat: 'Site Web · Food', year: '2024', client: 'Crispy', role: 'Design & Développement',
       url: 'crispy.kspynel.com', desc: "Site de commande pour une enseigne de restauration rapide premium. Interface gourmande, claire et fluide.",
-      imgs: ['/visuals/showcase/crispy-1.webp', '/visuals/showcase/crispy-2.webp', '/visuals/showcase/crispy-3.webp'] },
+      imgs: ['/visuals/showcase/crispy2.webp'] },
     'visual-concept-1': { title: 'Vintage', cat: 'Site Web · E-commerce', year: '2026', client: 'Vintage Bénin', role: 'Web Design & Direction Artistique',
       url: 'vintage.bj', desc: "Maquette du site Vintage Bénin : achat-vente de pièces uniques de seconde main. Une direction rétro, colorée et vivante.",
       imgs: ['/visuals/showcase/vintage.webp'] },
