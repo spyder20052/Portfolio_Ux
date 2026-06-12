@@ -532,49 +532,8 @@ function initMoodshot() {
   const sec = document.querySelector('.moodshot');
   if (!sec || REDUCE) return;
   const img = sec.querySelector('.moodshot__img');
-  const dort = sec.querySelector('.moodshot__line em');
-
-  const aura = document.createElement('div');
-  aura.className = 'moodshot__aura';
-  sec.prepend(aura);
-  const ff = document.createElement('div');
-  ff.className = 'moodshot__fireflies';
-  sec.appendChild(ff);
-
-  // Halo derrière la fenêtre : respire (chaud ↔ froid)
-  gsap.set(aura, { opacity: 0.5, scale: 0.95 });
-  gsap.to(aura, { opacity: 0.85, scale: 1.12, duration: 3.4, ease: 'sine.inOut', repeat: -1, yoyo: true });
-
-  // La fenêtre flotte + scintille doucement (la lampe veille)
-  if (img) {
-    gsap.to(img, { y: -16, rotation: 0.5, duration: 4.6, ease: 'sine.inOut', repeat: -1, yoyo: true });
-    gsap.to(img, { filter: 'brightness(1.14)', duration: 2.7, ease: 'sine.inOut', repeat: -1, yoyo: true });
-  }
-
-  // "dort" rougeoie en boucle
-  if (dort) gsap.fromTo(dort,
-    { textShadow: '0 0 6px rgba(200,241,53,0)' },
-    { textShadow: '0 0 20px rgba(200,241,53,0.7)', duration: 2.3, ease: 'sine.inOut', repeat: -1, yoyo: true });
-
-  // Lucioles : remontent lentement, en continu
-  const COLORS = ['rgba(200,241,53,0.9)', 'rgba(255,120,90,0.85)', 'rgba(120,170,255,0.8)'];
-  const drift = (dot) => {
-    const w = ff.clientWidth || sec.clientWidth, h = ff.clientHeight || sec.clientHeight;
-    const x = gsap.utils.random(w * 0.18, w * 0.82);
-    const c = COLORS[Math.floor(gsap.utils.random(0, COLORS.length))];
-    const s = gsap.utils.random(0.6, 1.5);
-    gsap.set(dot, { x, y: h + 12, scale: s, opacity: 0, backgroundColor: c, boxShadow: `0 0 9px 2px ${c}` });
-    gsap.timeline({ onComplete: () => drift(dot) })
-      .to(dot, { opacity: gsap.utils.random(0.45, 0.95), duration: 0.9 }, 0)
-      .to(dot, { y: -24, x: x + gsap.utils.random(-50, 50), duration: gsap.utils.random(7, 12), ease: 'none' }, 0)
-      .to(dot, { opacity: 0, duration: 1.4 }, '>-1.6');
-  };
-  for (let i = 0; i < 14; i++) {
-    const dot = document.createElement('div');
-    dot.className = 'firefly';
-    ff.appendChild(dot);
-    gsap.delayedCall(i * 0.55, () => drift(dot));
-  }
+  // Juste un flottement doux et continu : pas de halo, pas de clignotement.
+  if (img) gsap.to(img, { y: -14, duration: 5.2, ease: 'sine.inOut', repeat: -1, yoyo: true });
 }
 
 /* ---------- Médias encadrés (GIFs) : reveal clip + parallaxe interne + tilt ---------- */
