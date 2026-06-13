@@ -202,8 +202,8 @@ function initHero() {
 
   // === VIE AU REPOS (idle) ===
   gsap.to('.hero__glow', { xPercent: 16, yPercent: -12, scale: 1.18, duration: 8, ease: 'sine.inOut', yoyo: true, repeat: -1 });
-  gsap.to('.hero__layer', { keyframes: { y: [0, -12, 0, 9, 0], ease: 'none', easeEach: 'sine.inOut' }, duration: 9, repeat: -1, ease: 'none' });
-  const markSpin = gsap.to('.hero__mark svg:first-child', { rotation: 360, duration: 16, ease: 'none', repeat: -1, transformOrigin: '50% 50%' });
+  gsap.set('.hero__layer', { scale: 1.08 }); // léger débord : le flottement n'expose jamais de bord vide
+  gsap.to('.hero__layer', { keyframes: { y: [0, -9, 0, 7, 0], ease: 'none', easeEach: 'sine.inOut' }, duration: 9, repeat: -1, ease: 'none' });
   let roleIdx = 0;
   const cycleRoles = () => { roleIdx = (roleIdx + 1) % roles.length; setRole(roleIdx); };
   let roleTimer = setInterval(cycleRoles, 2200);
@@ -212,13 +212,15 @@ function initHero() {
   //     seuil 900px → plus besoin de recharger (mode responsive devtools, rotation tel). ===
   const mm = gsap.matchMedia();
 
-  // -------- MOBILE : voyage d'univers TACTILE (tap + auto-cycle), sans scroll-pin --------
-  // Le portrait change d'univers tout seul et au toucher : une onde circulaire part du
-  // point touché ; fond + lueur + couleurs + police morphent.
+  // -------- MOBILE : voyage d'univers UNIQUEMENT AU TOUCHER (pas d'auto-cycle) --------
+  // Chaque tap sur le portrait dévoile l'univers suivant par une onde circulaire issue
+  // du point touché ; fond + lueur + couleurs + police morphent. Animations allégées
+  // pour rester fluides (pas de boucle infinie, will-change ciblé, repère masqué coupé).
   mm.add('(max-width: 900px)', () => {
     if (roleTimer) { clearInterval(roleTimer); roleTimer = null; }
     const dots = gsap.utils.toArray('.hero__dot');
     const uniLabel = document.querySelector('.hero__uni-label');
+    const hint = document.querySelector('.hero__tap-hint');
     const LABELS = ['Réel', 'Minecraft', 'Crayon', 'Pixel art'];
     // Tailles calibrées mobile (les tailles desktop des THEMES s'effondrent à leur min :
     // ex. Press Start 2P tombait à 1rem → "Spyne1" cassé). La hauteur du titre est figée
@@ -226,49 +228,43 @@ function initHero() {
     const SIZES_M = ['2.8rem', '2.5rem', '2.3rem', '1.5rem'];
     const applyFontM = (i) => gsap.set('.hero__title', { fontFamily: THEMES[i].font, fontSize: SIZES_M[i], fontWeight: THEMES[i].weight, letterSpacing: THEMES[i].tracking });
     applyFontM(0); // corrige la taille héritée du setTheme desktop
-    let idx = 0, autoTimer = null;
+    let idx = 0, busy = false, discovered = false;
     gsap.set(stageLayers, { clipPath: 'circle(150% at 50% 50%)', zIndex: 1 });
 
     const travel = (next, x = 50, y = 50) => {
       next = (next + stageLayers.length) % stageLayers.length;
-      if (next === idx) return;
+      if (next === idx || busy) return; // ignore les taps pendant l'onde → toujours fluide
+      busy = true;
       const inc = stageLayers[next], t = THEMES[next];
       // l'univers entrant se dévoile par une onde circulaire issue du point touché
-      gsap.set(inc, { zIndex: 6, clipPath: `circle(0% at ${x}% ${y}%)` });
+      // will-change posé juste le temps de l'onde puis retiré (mémoire mobile)
+      gsap.set(inc, { zIndex: 6, willChange: 'clip-path', clipPath: `circle(0% at ${x}% ${y}%)` });
       gsap.to(inc, {
-        clipPath: `circle(150% at ${x}% ${y}%)`, duration: 0.95, ease: 'power2.inOut',
-        onComplete: () => stageLayers.forEach((l, i) => gsap.set(l, { zIndex: i === next ? 5 : 1 })),
+        clipPath: `circle(150% at ${x}% ${y}%)`, duration: 0.8, ease: 'power2.inOut',
+        onComplete: () => { stageLayers.forEach((l, i) => gsap.set(l, { zIndex: i === next ? 5 : 1, willChange: 'auto' })); busy = false; },
       });
-      gsap.to('.hero__bg', { backgroundColor: t.bg, duration: 0.95, ease: 'power1.inOut' });
-      gsap.to('.hero__glow', { color: t.glow, duration: 0.95, ease: 'power1.inOut' });
-      gsap.to(lightTargets, { color: t.fg, duration: 0.95, ease: 'power1.inOut' });
-      gsap.to('.hero__title em', { color: t.accent, duration: 0.95, ease: 'power1.inOut' });
-      gsap.delayedCall(0.48, () => applyFontM(next)); // police assortie au milieu de l'onde (taille mobile, sans reflow)
+      gsap.to('.hero__bg', { backgroundColor: t.bg, duration: 0.8, ease: 'power1.inOut' });
+      gsap.to('.hero__glow', { color: t.glow, duration: 0.8, ease: 'power1.inOut' });
+      gsap.to(lightTargets, { color: t.fg, duration: 0.8, ease: 'power1.inOut' });
+      gsap.to('.hero__title em', { color: t.accent, duration: 0.8, ease: 'power1.inOut' });
+      gsap.delayedCall(0.4, () => applyFontM(next)); // police assortie au milieu de l'onde (sans reflow)
       dots.forEach((d, i) => d.classList.toggle('is-on', i === next));
       if (uniLabel) uniLabel.textContent = LABELS[next];
       setRole(Math.min(roles.length - 1, next));
       idx = next;
     };
 
-    const arm = () => { clearInterval(autoTimer); autoTimer = setInterval(() => travel(idx + 1), 3000); };
-    arm();
     const onTap = (e) => {
       const r = portraitBox.getBoundingClientRect();
       travel(idx + 1, ((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
-      arm(); // relance le compte à rebours après un tap manuel
+      // L'invite « touche pour voyager » disparaît une fois le geste découvert
+      if (!discovered) { discovered = true; if (hint) gsap.to(hint, { autoAlpha: 0, scale: 0.85, duration: 0.4, ease: 'power2.in', onComplete: () => hint.remove() }); }
     };
     portraitBox.addEventListener('pointerdown', onTap);
-    // Économie : on coupe l'auto quand le hero n'est plus à l'écran
-    const st = ScrollTrigger.create({
-      trigger: '.hero', start: 'top top', end: 'bottom top',
-      onLeave: () => clearInterval(autoTimer), onLeaveBack: () => clearInterval(autoTimer),
-      onEnter: arm, onEnterBack: arm,
-    });
+
     // Nettoyage si l'on repasse en desktop (matchMedia démonte ce contexte)
     return () => {
-      clearInterval(autoTimer);
       portraitBox.removeEventListener('pointerdown', onTap);
-      st.kill();
       if (!roleTimer) roleTimer = setInterval(cycleRoles, 2200); // rend le cycle de rôles au desktop
     };
   });
@@ -278,6 +274,8 @@ function initHero() {
     let currentImg = 0; // index de l'image actuellement visible (maj au scroll)
     const heroEl = document.querySelector('.hero');
     let onParallax = null, onPeekEnter = null, onPeekMove = null, onPeekLeave = null;
+    // Repère de scroll rotatif (créé ici car masqué/inutile sur mobile)
+    const markSpin = gsap.to('.hero__mark svg:first-child', { rotation: 360, duration: 16, ease: 'none', repeat: -1, transformOrigin: '50% 50%' });
 
     // === Parallax souris ===
     if (FINE) {
