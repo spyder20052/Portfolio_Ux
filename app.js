@@ -422,11 +422,20 @@ function initProjets() {
       ${(p.results || []).length ? `<div class="lb-results">${p.results.map((r) => `<div><b>${r.value}</b><span>${r.label}</span></div>`).join('')}</div>` : ''}`;
     lbMedia.innerHTML = shotsFor(p).map((s) => `<img class="lb-img" src="${s}" alt="${p.title}" loading="lazy" />`).join('');
     lb.scrollTop = 0; lb.classList.add('is-open'); document.documentElement.style.overflow = 'hidden';
+    // On empile un état d'historique : la flèche « retour » fermera la fenêtre au lieu de quitter la page
+    history.pushState({ lb: true }, '');
   };
-  const closeLB = () => { if (!lb) return; lb.classList.remove('is-open'); document.documentElement.style.overflow = ''; };
-  document.getElementById('lb-close') && document.getElementById('lb-close').addEventListener('click', closeLB);
+  const closeLB = (fromPop) => {
+    if (!lb || !lb.classList.contains('is-open')) return;
+    lb.classList.remove('is-open'); document.documentElement.style.overflow = '';
+    // Fermeture via le bouton/Échap : on retire l'état empilé pour garder l'historique propre
+    if (!fromPop && history.state && history.state.lb) history.back();
+  };
+  document.getElementById('lb-close') && document.getElementById('lb-close').addEventListener('click', () => closeLB());
   lb && lb.addEventListener('click', (e) => { if (e.target === lb) closeLB(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLB(); });
+  // Flèche « retour » du navigateur : si la lightbox est ouverte, on la ferme (et on reste sur la galerie)
+  window.addEventListener('popstate', () => { if (lb && lb.classList.contains('is-open')) closeLB(true); });
 
   let current = -1;
   const setCurrent = (i, dots, extra) => {
