@@ -6,6 +6,7 @@ import { SplitText } from 'gsap/SplitText';
 import { Physics2DPlugin } from 'gsap/Physics2DPlugin';
 import { Flip } from 'gsap/Flip';
 import { MorphSVGPlugin } from 'gsap/MorphSVGPlugin';
+import { DrawSVGPlugin } from 'gsap/DrawSVGPlugin';
 import { TextPlugin } from 'gsap/TextPlugin';
 import { Draggable } from 'gsap/Draggable';
 import { InertiaPlugin } from 'gsap/InertiaPlugin';
@@ -13,7 +14,7 @@ import { Observer } from 'gsap/Observer';
 import { projects } from './projects.js';
 import { IMG_DIMS } from './imgdims.js';
 
-gsap.registerPlugin(ScrollTrigger, SplitText, Physics2DPlugin, Flip, MorphSVGPlugin, TextPlugin, Draggable, InertiaPlugin, Observer);
+gsap.registerPlugin(ScrollTrigger, SplitText, Physics2DPlugin, Flip, MorphSVGPlugin, DrawSVGPlugin, TextPlugin, Draggable, InertiaPlugin, Observer);
 
 const REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 const FINE = window.matchMedia('(pointer: fine)').matches;
@@ -61,9 +62,11 @@ else Promise.resolve().then(boot);
 /* ---------- Smooth scroll ---------- */
 function initLenis() {
   const lenis = new Lenis({
-    duration: 1.2,
+    duration: 1.7,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     smoothWheel: true,
+    wheelMultiplier: 0.55, // chaque coup de molette avance bien moins → défilement posé
+    touchMultiplier: 1.1,
   });
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((time) => lenis.raf(time * 1000));
@@ -132,23 +135,23 @@ function initManifesto() {
   // Tous écrans (mobile inclus) : scroll horizontal pinné + chars qui se dispersent
   mm.add('(min-width: 1px)', () => {
     const split = SplitText.create(text, { type: 'chars,words' });
-    let entered = false;
     const mobile = window.matchMedia('(max-width: 768px)').matches;
+    // Le texte part hors-champ à droite (padding-left:100vw en CSS) : il entre par la droite
+    // au fur et à mesure du scroll, et CHAQUE lettre se met en place (scatter → en place).
+    // Course longue + scrub lissé + scroll ralenti → lisible.
     const scrollTween = gsap.to(text, {
       xPercent: -100, ease: 'none',
       scrollTrigger: {
-        trigger: wrap, pin: true, end: mobile ? '+=1200' : '+=1800', scrub: true, invalidateOnRefresh: true,
-        // L'entrée ne se joue QU'UNE FOIS, au moment où la section se cale (pin), donc après qu'on y soit
-        onEnter: () => {
-          if (entered) return; entered = true;
-          gsap.from(text, { yPercent: 90, autoAlpha: 0, duration: 1, ease: 'power3.out', overwrite: 'auto' });
-        },
+        trigger: wrap, pin: true, start: 'top top', end: mobile ? '+=3000' : '+=4600',
+        scrub: 1, invalidateOnRefresh: true,
       },
     });
     split.chars.forEach((char) => {
       gsap.from(char, {
-        yPercent: 'random(-180, 180)', rotation: 'random(-18, 18)', ease: 'back.out(1.2)',
-        scrollTrigger: { trigger: char, containerAnimation: scrollTween, start: 'left 100%', end: 'left 35%', scrub: 1 },
+        yPercent: () => gsap.utils.random(-220, 220), rotation: () => gsap.utils.random(-25, 25),
+        autoAlpha: 0, scale: 0.4, ease: 'back.out(1.3)',
+        // zone large (du bord droit jusqu'au quart gauche) → l'apparition est visible sur tout l'écran
+        scrollTrigger: { trigger: char, containerAnimation: scrollTween, start: 'left 100%', end: 'left 22%', scrub: 1 },
       });
     });
     return () => split.revert();
@@ -667,6 +670,8 @@ function initMoodshot() {
   new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { resize(); start(); } else stop(); }), { threshold: 0 }).observe(sec);
 }
 
+/* ---------- Zoom au scroll : on plonge dans un visuel (pin + scale + perspective) ---------- */
+
 /* ---------- Médias encadrés (GIFs) : reveal clip + parallaxe interne + tilt ---------- */
 function initFeatureMedia() {
   if (REDUCE) return;
@@ -732,13 +737,12 @@ function initDecor() {
         const sr = svg.getBoundingClientRect(), wr = wave.getBoundingClientRect();
         const lineL = sr.left - wr.left;          // début exact de la ligne (relatif à la vague)
         const lineR = lineL + sr.width - PETW;    // fin exacte (le chien reste dessus)
-        let facing = 1;
-        gsap.set(pet, { x: lineL });
-        // Va-et-vient, strictement sur la ligne ; il se retourne aux extrémités
-        gsap.to(pet, {
-          x: lineR, duration: 26, ease: 'none', repeat: -1, yoyo: true,
-          onRepeat: () => { facing *= -1; gsap.set(pet, { scaleX: facing }); },
-        });
+        // Timeline explicite : il regarde toujours dans le sens où il court (jamais à l'envers)
+        gsap.timeline({ repeat: -1 })
+          .set(pet, { x: lineL, scaleX: 1 })
+          .to(pet, { x: lineR, duration: 26, ease: 'none' })   // → vers la droite, face à droite
+          .set(pet, { scaleX: -1 })
+          .to(pet, { x: lineL, duration: 26, ease: 'none' });  // ← vers la gauche, face à gauche
       };
       // On démarre quand le footer est visible (mise en page prête → bornes correctes)
       new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) run(); }), { threshold: 0.1 }).observe(wave);
@@ -749,8 +753,8 @@ function initDecor() {
 function initFooterWave() {
   const path = document.querySelector('#footer-wave-path');
   if (!path || REDUCE) return;
-  const flat = 'M0 30 Q 360 30 720 30 T 1440 30';
-  const wave = 'M0 30 Q 360 -18 720 30 T 1440 30';
+  const flat = 'M0 30 Q 120 30 240 30 Q 360 30 480 30 Q 600 30 720 30 Q 840 30 960 30 Q 1080 30 1200 30 Q 1320 30 1440 30';
+  const wave = 'M0 30 Q 120 -14 240 30 Q 360 74 480 30 Q 600 -14 720 30 Q 840 74 960 30 Q 1080 -14 1200 30 Q 1320 74 1440 30';
   ScrollTrigger.create({
     trigger: '.footer', start: 'top bottom', toggleActions: 'play none none reverse',
     onEnter: (self) => {
@@ -992,14 +996,22 @@ function initPageTransition() {
     gsap.set(path, { attr: { d: open } });
   });
 
-  // ENTER : le rideau (déjà couvert) se retire
-  if (REDUCE) { overlay.style.visibility = 'hidden'; }
+  const wipeS = logo && logo.querySelector('#td-wipe-s');
+  const wipeF = logo && logo.querySelector('#td-wipe-f');
+  // ENTER : le contour de « kspynel. » se dessine G→D, le remplissage lime suit juste derrière (continu)
+  if (REDUCE) { overlay.style.visibility = 'hidden'; if (logo) gsap.set(logo, { opacity: 0 }); }
   else {
     gsap.set(path, { attr: { d: covered } });
     gsap.set(logo, { opacity: 1 });
-    gsap.timeline()
-      .to(logo, { opacity: 0, duration: 0.3, ease: 'power2.in' })
-      .to(path, { duration: 0.8, ease: 'power4.inOut', morphSVG: open }, '-=0.1')
+    const tl = gsap.timeline();
+    if (wipeS && wipeF) {
+      gsap.set([wipeS, wipeF], { attr: { width: 0 } });
+      tl.to(wipeS, { attr: { width: 500 }, duration: 1.0, ease: 'power1.inOut' }, 0)        // contour qui se dessine
+        .to(wipeF, { attr: { width: 500 }, duration: 1.0, ease: 'power1.inOut' }, 0.28);    // remplissage qui suit
+    }
+    // Enchaîne sans rupture : le logo s'efface pendant que le rideau se retire
+    tl.to(logo, { opacity: 0, duration: 0.5, ease: 'power2.inOut' }, '>-0.02')
+      .to(path, { duration: 0.8, ease: 'power4.inOut', morphSVG: open }, '-=0.34')
       .set(overlay, { visibility: 'hidden' });
   }
 

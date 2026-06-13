@@ -13,8 +13,8 @@
     html,body{margin:0;background:#0a0a0b;}
     html.is-loading body{opacity:0;}
     #transition{position:fixed;inset:0;z-index:9000;visibility:visible;pointer-events:none;}
-    #transition svg{position:absolute;inset:0;width:100%;height:100%;}
-    #transition path{fill:#111114;}
+    #transition>svg{position:absolute;inset:0;width:100%;height:100%;}
+    #transition-path{fill:#111114;}
   </style>
   <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,9 +26,9 @@
   <!-- Failsafe perf mobile : révèle le contenu même si le module JS tarde -->
   <script>setTimeout(function(){document.documentElement.classList.remove('is-loading');var t=document.getElementById('transition');if(t&&getComputedStyle(t).visibility!=='hidden')t.style.visibility='hidden';},3500);</script>
   <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-  <script type="module" crossorigin src="/assets/main-ezcxKdTv.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/app-Djk2TVe2.js">
-  <link rel="stylesheet" crossorigin href="/assets/app-CG_DIfMU.css">
+  <script type="module" crossorigin src="/assets/main-wXSv4hg-.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/app-DtdlotYo.js">
+  <link rel="stylesheet" crossorigin href="/assets/app-DaxUcJu4.css">
 </head>
 
 <body>
@@ -37,7 +37,7 @@
   </div>
   <div id="transition" aria-hidden="true">
     <svg viewBox="0 0 100 100" preserveAspectRatio="none"><path id="transition-path" d="M0 0 H100 V100 Q50 122 0 100 Z"></path></svg>
-    <span id="transition-logo">kspynel.</span>
+    <div id="transition-logo"><svg class="transition-draw" viewBox="0 0 480 140" preserveAspectRatio="xMidYMid meet"><defs><mask id="td-mask-s"><rect id="td-wipe-s" x="-6" y="0" width="0" height="140" fill="#fff"></rect></mask><mask id="td-mask-f"><rect id="td-wipe-f" x="-6" y="0" width="0" height="140" fill="#fff"></rect></mask></defs><text id="td-stroke" x="240" y="92" text-anchor="middle" mask="url(#td-mask-s)">kspynel.</text><text id="td-fill" x="240" y="92" text-anchor="middle" mask="url(#td-mask-f)">kspynel.</text></svg></div>
   </div>
   <div id="cursor-ring"></div>
   <div id="cursor-dot"></div>
