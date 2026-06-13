@@ -973,6 +973,16 @@ function initPageTransition() {
   const covered = 'M0 0 H100 V100 Q50 122 0 100 Z'; // couvre tout, bord bas convexe
   const open = 'M0 0 H100 V0 Q50 0 0 0 Z';           // retiré en haut
 
+  // bfcache (retour arrière mobile) : la page peut être restaurée avec le rideau
+  // figé en position « couvert ». On le rouvre dès qu'elle réapparaît.
+  window.addEventListener('pageshow', (e) => {
+    if (!e.persisted) return;
+    document.documentElement.classList.remove('is-loading');
+    gsap.set(overlay, { visibility: 'hidden' });
+    if (logo) gsap.set(logo, { opacity: 0 });
+    gsap.set(path, { attr: { d: open } });
+  });
+
   // ENTER : le rideau (déjà couvert) se retire
   if (REDUCE) { overlay.style.visibility = 'hidden'; }
   else {
