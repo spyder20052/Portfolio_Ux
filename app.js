@@ -36,6 +36,7 @@ function boot() {
   initCounters();
   initClickParticles();
   initFooterWave();
+  initDecor();
   initFeatureMedia();
   initMoodshot();
   initShowcase();
@@ -578,39 +579,46 @@ function initMoodshot() {
   let W = 0, H = 0;
   const resize = () => {
     const r = sec.getBoundingClientRect();
-    W = r.width; H = r.height;
+    W = r.width; H = Math.max(r.height, sec.offsetHeight, sec.scrollHeight);
     canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
     canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   };
   resize();
   let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 200); });
+  window.addEventListener('load', resize);
+  if (document.fonts) document.fonts.ready.then(resize);
+  if (img) img.addEventListener('load', resize); // la fenêtre (lazy) agrandit la section en chargeant
+  gsap.delayedCall(0.6, resize);
 
   const rnd = (a, b) => a + Math.random() * (b - a);
-  const COUNT = Math.round(gsap.utils.clamp(60, 160, W / 10));
+  const COUNT = Math.round(gsap.utils.clamp(120, 250, W / 6.5));
   const drops = [];
   for (let i = 0; i < COUNT; i++) {
-    const depth = Math.random(); // 0 = loin (petit/lent/pâle), 1 = près (grand/rapide/net)
-    drops.push({ x: rnd(-0.15 * W, 1.15 * W), y: rnd(-H, H), depth,
-      len: 7 + depth * 26, speed: 200 + depth * 540, thick: 0.5 + depth * 1.5, alpha: 0.05 + depth * 0.22 });
+    const depth = Math.random();           // 0 = loin (lent/pâle/fin), 1 = près (rapide/net/épais)
+    const speed = 300 + depth * 250;       // écart faible → angles cohérents, un peu plus lent
+    drops.push({ x: rnd(-0.2 * W, 1.2 * W), y: rnd(-H, H), depth, speed,
+      len: speed * 0.05, thick: 0.5 + depth * 1.1, alpha: 0.07 + depth * 0.2 });
   }
 
-  let wind = 18, t = 0, last = 0, raf = 0, running = false;
+  let wind = 0, gust = 0, t = 0, last = 0, raf = 0, running = false;
   const frame = (now) => {
     if (!running) return;
     const dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016;
     last = now; t += dt;
-    // Brise : base + deux oscillations lentes (rafales qui passent)
-    wind = 16 + Math.sin(t * 0.5) * 16 + Math.sin(t * 0.16) * 26;
+    gust += (0 - gust) * Math.min(1, dt / 1.6); // la rafale retombe en ~1.6 s
+    // Brise douce + rafale : le MÊME vent pour toutes les gouttes → angle cohérent
+    wind = 18 + Math.sin(t * 0.4) * 15 + Math.sin(t * 0.11) * 22 + gust;
     ctx.clearRect(0, 0, W, H);
     ctx.lineCap = 'round';
     for (const d of drops) {
-      const vx = wind * (0.35 + d.depth), vy = d.speed;
+      const vx = wind * (0.85 + d.depth * 0.3); // vent quasi uniforme + légère parallaxe de profondeur
+      const vy = d.speed;
       d.x += vx * dt; d.y += vy * dt;
-      if (d.y > H + d.len) { d.y = rnd(-0.3 * H, -10); d.x = rnd(-0.15 * W, 1.15 * W); }
-      if (d.x > 1.2 * W) d.x = -0.15 * W; else if (d.x < -0.2 * W) d.x = 1.15 * W;
-      const m = d.len / Math.hypot(vx, vy); // streak orienté selon le vent
-      ctx.strokeStyle = `rgba(176,202,232,${d.alpha})`;
+      if (d.y > H + d.len) { d.y = rnd(-0.4 * H, -10); d.x = rnd(-0.2 * W, 1.2 * W); }
+      if (d.x > 1.25 * W) d.x = -0.2 * W; else if (d.x < -0.25 * W) d.x = 1.2 * W;
+      const m = d.len / Math.hypot(vx, vy); // traînée orientée selon la vitesse (motion blur)
+      ctx.strokeStyle = `rgba(190,206,228,${d.alpha})`;
       ctx.lineWidth = d.thick;
       ctx.beginPath();
       ctx.moveTo(d.x, d.y);
@@ -621,8 +629,33 @@ function initMoodshot() {
   };
   const start = () => { if (!running) { running = true; last = 0; raf = requestAnimationFrame(frame); } };
   const stop = () => { running = false; cancelAnimationFrame(raf); };
+
+  // ---- Éclairs (qu'on ne voit pas) : la scène flashe, suivie d'une rafale (le « tonnerre ») ----
+  const flash = document.createElement('div');
+  flash.className = 'moodshot__flash';
+  flash.setAttribute('aria-hidden', 'true');
+  sec.appendChild(flash);
+  const blast = () => { gust = rnd(150, 300) * (Math.random() < 0.5 ? -1 : 1); }; // rafale forte
+  const lightning = () => {
+    if (running) {
+      const tl = gsap.timeline();
+      tl.set(flash, { opacity: 0 })
+        .to(flash, { opacity: rnd(0.45, 0.7), duration: 0.05, ease: 'none' })
+        .to(flash, { opacity: 0.06, duration: 0.09 })
+        .to(flash, { opacity: rnd(0.6, 0.95), duration: 0.05 }) // 2e coup, plus fort
+        .to(flash, { opacity: 0, duration: 0.55, ease: 'power2.out' });
+      gsap.delayedCall(rnd(0.15, 0.5), blast); // la bourrasque arrive juste après l'éclair
+    }
+    gsap.delayedCall(rnd(7, 18), lightning);
+  };
+  gsap.delayedCall(rnd(4, 9), lightning);
+
+  // ---- Rafales aléatoires indépendantes (le vent qui « passe » fort) ----
+  const scheduleGust = () => { if (running) blast(); gsap.delayedCall(rnd(5, 13), scheduleGust); };
+  gsap.delayedCall(rnd(3, 7), scheduleGust);
+
   // Pause hors écran (perf)
-  new IntersectionObserver((es) => es.forEach((e) => (e.isIntersecting ? start() : stop())), { threshold: 0 }).observe(sec);
+  new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { resize(); start(); } else stop(); }), { threshold: 0 }).observe(sec);
 }
 
 /* ---------- Médias encadrés (GIFs) : reveal clip + parallaxe interne + tilt ---------- */
@@ -658,6 +691,52 @@ function initFeatureMedia() {
 }
 
 /* ---------- Footer : vague qui rebondit élastiquement à l'arrivée (doc2) ---------- */
+/* ---------- Déco : illustration du footer + chien qui court le long de la navbar ---------- */
+function initDecor() {
+  // Illustration placée à côté du slogan du footer (statique, bien alignée)
+  const footer = document.querySelector('.footer');
+  const slogan = footer && footer.querySelector('.footer__slogan');
+  if (slogan && !footer.querySelector('.footer__art')) {
+    const art = document.createElement('img');
+    art.className = 'footer__art'; art.src = '/footer.png'; art.alt = ''; art.loading = 'lazy';
+    art.setAttribute('aria-hidden', 'true');
+    const row = document.createElement('div');
+    row.className = 'footer__hero';
+    slogan.parentNode.insertBefore(row, slogan);
+    row.appendChild(slogan);
+    row.appendChild(art);
+  }
+  // Chien (court sur place dans le gif) qui traverse la ligne verte du footer → il « avance »
+  const wave = document.querySelector('.footer__wave');
+  if (wave && !wave.querySelector('.footer__pet')) {
+    const pet = document.createElement('img');
+    pet.className = 'footer__pet'; pet.src = '/pet.webp'; pet.alt = '';
+    pet.setAttribute('aria-hidden', 'true');
+    wave.appendChild(pet);
+    if (!REDUCE) {
+      const PETW = 74; // largeur approx (hauteur 54 × 4/3)
+      const svg = wave.querySelector('svg');
+      let started = false;
+      const run = () => {
+        if (started || !svg) return;
+        started = true;
+        const sr = svg.getBoundingClientRect(), wr = wave.getBoundingClientRect();
+        const lineL = sr.left - wr.left;          // début exact de la ligne (relatif à la vague)
+        const lineR = lineL + sr.width - PETW;    // fin exacte (le chien reste dessus)
+        let facing = 1;
+        gsap.set(pet, { x: lineL });
+        // Va-et-vient, strictement sur la ligne ; il se retourne aux extrémités
+        gsap.to(pet, {
+          x: lineR, duration: 26, ease: 'none', repeat: -1, yoyo: true,
+          onRepeat: () => { facing *= -1; gsap.set(pet, { scaleX: facing }); },
+        });
+      };
+      // On démarre quand le footer est visible (mise en page prête → bornes correctes)
+      new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) run(); }), { threshold: 0.1 }).observe(wave);
+    }
+  }
+}
+
 function initFooterWave() {
   const path = document.querySelector('#footer-wave-path');
   if (!path || REDUCE) return;
