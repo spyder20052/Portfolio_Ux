@@ -565,8 +565,64 @@ function initMoodshot() {
   const sec = document.querySelector('.moodshot');
   if (!sec || REDUCE) return;
   const img = sec.querySelector('.moodshot__img');
-  // Juste un flottement doux et continu : pas de halo, pas de clignotement.
+  // Flottement doux de la fenêtre
   if (img) gsap.to(img, { y: -14, duration: 5.2, ease: 'sine.inOut', repeat: -1, yoyo: true });
+
+  // ---- Pluie en canvas : 3 plans de profondeur (perspective) + brises de vent ----
+  const canvas = document.createElement('canvas');
+  canvas.className = 'moodshot__rain';
+  canvas.setAttribute('aria-hidden', 'true');
+  sec.appendChild(canvas);
+  const ctx = canvas.getContext('2d');
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  let W = 0, H = 0;
+  const resize = () => {
+    const r = sec.getBoundingClientRect();
+    W = r.width; H = r.height;
+    canvas.width = Math.round(W * dpr); canvas.height = Math.round(H * dpr);
+    canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  };
+  resize();
+  let rt; window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(resize, 200); });
+
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const COUNT = Math.round(gsap.utils.clamp(60, 160, W / 10));
+  const drops = [];
+  for (let i = 0; i < COUNT; i++) {
+    const depth = Math.random(); // 0 = loin (petit/lent/pâle), 1 = près (grand/rapide/net)
+    drops.push({ x: rnd(-0.15 * W, 1.15 * W), y: rnd(-H, H), depth,
+      len: 7 + depth * 26, speed: 200 + depth * 540, thick: 0.5 + depth * 1.5, alpha: 0.05 + depth * 0.22 });
+  }
+
+  let wind = 18, t = 0, last = 0, raf = 0, running = false;
+  const frame = (now) => {
+    if (!running) return;
+    const dt = last ? Math.min(0.05, (now - last) / 1000) : 0.016;
+    last = now; t += dt;
+    // Brise : base + deux oscillations lentes (rafales qui passent)
+    wind = 16 + Math.sin(t * 0.5) * 16 + Math.sin(t * 0.16) * 26;
+    ctx.clearRect(0, 0, W, H);
+    ctx.lineCap = 'round';
+    for (const d of drops) {
+      const vx = wind * (0.35 + d.depth), vy = d.speed;
+      d.x += vx * dt; d.y += vy * dt;
+      if (d.y > H + d.len) { d.y = rnd(-0.3 * H, -10); d.x = rnd(-0.15 * W, 1.15 * W); }
+      if (d.x > 1.2 * W) d.x = -0.15 * W; else if (d.x < -0.2 * W) d.x = 1.15 * W;
+      const m = d.len / Math.hypot(vx, vy); // streak orienté selon le vent
+      ctx.strokeStyle = `rgba(176,202,232,${d.alpha})`;
+      ctx.lineWidth = d.thick;
+      ctx.beginPath();
+      ctx.moveTo(d.x, d.y);
+      ctx.lineTo(d.x - vx * m, d.y - vy * m);
+      ctx.stroke();
+    }
+    raf = requestAnimationFrame(frame);
+  };
+  const start = () => { if (!running) { running = true; last = 0; raf = requestAnimationFrame(frame); } };
+  const stop = () => { running = false; cancelAnimationFrame(raf); };
+  // Pause hors écran (perf)
+  new IntersectionObserver((es) => es.forEach((e) => (e.isIntersecting ? start() : stop())), { threshold: 0 }).observe(sec);
 }
 
 /* ---------- Médias encadrés (GIFs) : reveal clip + parallaxe interne + tilt ---------- */
