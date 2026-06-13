@@ -251,6 +251,9 @@ button { font-family: inherit; }
 }
 /* Calque spotlight : au survol, montre aléatoirement un autre univers */
 .hero__peek { position: absolute; inset: 0; z-index: 10; background-size: cover; background-position: center; clip-path: circle(0% at 50% 50%); pointer-events: none; will-change: clip-path; }
+/* Indicateur d'univers + indice tactile : mobile uniquement */
+.hero__universe, .hero__tap-hint { display: none; }
+@keyframes heroTapPulse { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
 /* Couches empilées par ordre DOM (la dernière = au-dessus = première révélée) */
 .hero__layer { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; will-change: transform, clip-path; }
 .hero__portrait::after {
@@ -689,8 +692,50 @@ button { font-family: inherit; }
 }
 
 @media (max-width: 900px) {
-  .hero__grid { grid-template-columns: 1fr; gap: 36px; }
-  .hero__portrait { width: 100%; max-width: 320px; height: auto; margin-left: 0; justify-self: start; }
+  /* HERO MOBILE — voyage d'univers tactile : portrait plein-largeur en tête,
+     puis nom / rôles / pitch / CTA. Pas de scroll-pin (inadapté au tel). */
+  /* Tout le hero tient dans un seul écran (100dvh) : le portrait absorbe l'espace
+     restant après le bloc texte → aucun scroll, quel que soit le téléphone. */
+  .hero__pin { height: 100dvh; min-height: 100dvh; box-sizing: border-box; padding-block: 70px 34px; display: flex; }
+  .hero__grid { flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: stretch; gap: clamp(12px, 1.8vh, 22px); }
+  .hero__portrait {
+    order: 1; flex: 1 1 auto; min-height: 140px; width: 100%; max-width: none;
+    height: auto; aspect-ratio: auto; margin: 0; justify-self: stretch;
+    cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent;
+    box-shadow: 0 30px 70px -45px rgba(200,241,53,0.40), 0 0 0 1px var(--line);
+  }
+  .hero__intro { order: 2; flex: 0 0 auto; }
+  /* Hauteur réservée : la police change selon l'univers, mais le bloc reste
+     stable → rôles / pitch / CTA ne bougent plus. Nom centré dans la réserve. */
+  .hero__title { font-size: clamp(2.4rem, 12vw, 2.8rem); min-height: clamp(88px, 23vw, 112px); display: grid; align-content: center; }
+  .hero__role-list { margin-top: clamp(8px, 1.4vh, 14px); }
+  .hero__meta { margin-top: clamp(10px, 1.6vh, 18px); flex-wrap: nowrap; gap: 10px; }
+  .hero__meta .lead { max-width: none; font-size: 0.95rem; }
+  /* CTA sur une seule ligne : boutons resserrés, texte non coupé */
+  .hero__meta .btn { padding: 13px 16px; font-size: 0.86rem; gap: 7px; white-space: nowrap; flex: 0 1 auto; }
+  .hero__mark { display: none; }
+
+  /* Bandeau d'univers (overlay bas du portrait) */
+  .hero__universe {
+    display: flex; align-items: center; gap: 12px;
+    position: absolute; left: 0; right: 0; bottom: 0; z-index: 11;
+    padding: 38px 16px 14px;
+    background: linear-gradient(to top, rgba(0,0,0,0.55), transparent);
+    pointer-events: none;
+  }
+  .hero__dots { display: flex; gap: 7px; }
+  .hero__dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,0.35); transition: width .4s var(--ease-out), background .4s var(--ease-out); }
+  .hero__dot.is-on { width: 20px; border-radius: 4px; background: var(--accent); }
+  .hero__uni-label { font-family: var(--font-mono); font-size: 0.66rem; letter-spacing: 0.18em; text-transform: uppercase; color: #fff; opacity: 0.85; }
+
+  /* Indice tactile en haut du portrait */
+  .hero__tap-hint {
+    display: block; position: absolute; top: 12px; right: 12px; z-index: 11;
+    font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: #fff; background: rgba(0,0,0,0.42); padding: 6px 11px; border-radius: 999px;
+    backdrop-filter: blur(6px); pointer-events: none; animation: heroTapPulse 2.4s ease-in-out infinite;
+  }
+
   .footer__grid { grid-template-columns: 1fr 1fr; }
   .nav__links { display: none; }
   .nav__burger {

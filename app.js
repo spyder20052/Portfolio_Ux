@@ -208,70 +208,155 @@ function initHero() {
   const cycleRoles = () => { roleIdx = (roleIdx + 1) % roles.length; setRole(roleIdx); };
   let roleTimer = setInterval(cycleRoles, 2200);
 
-  // === Parallax souris ===
-  if (FINE) {
-    const pEls = gsap.utils.toArray('[data-parallax]');
-    const qx = pEls.map((el) => gsap.quickTo(el, 'x', { duration: 0.8, ease: 'power3.out' }));
-    const qy = pEls.map((el) => gsap.quickTo(el, 'y', { duration: 0.8, ease: 'power3.out' }));
-    document.querySelector('.hero').addEventListener('pointermove', (e) => {
-      const cx = e.clientX / innerWidth - 0.5;
-      const cy = e.clientY / innerHeight - 0.5;
-      pEls.forEach((el, i) => { const d = parseFloat(el.dataset.parallax); qx[i](cx * 40 * d); qy[i](cy * 40 * d); });
-    });
-  }
+  // === Bascule responsive propre (gsap.matchMedia) : ré-évaluée au franchissement du
+  //     seuil 900px → plus besoin de recharger (mode responsive devtools, rotation tel). ===
+  const mm = gsap.matchMedia();
 
-  // === HOVER : spotlight qui révèle aléatoirement un AUTRE univers (jamais celui déjà affiché) ===
-  let currentImg = 0; // index de l'image actuellement visible (maj au scroll)
-  if (FINE) {
-    const peek = document.querySelector('.hero__peek');
-    const pool = ['/profil.webp', '/profil2.webp', '/profil3.webp', '/profil4.webp'];
-    let active = false;
-    portraitBox.addEventListener('pointerenter', () => {
-      let idx; do { idx = Math.floor(Math.random() * pool.length); } while (idx === currentImg);
-      peek.style.backgroundImage = `url(${pool[idx]})`;
-      active = true;
-    });
-    portraitBox.addEventListener('pointermove', (e) => {
-      if (!active) return;
+  // -------- MOBILE : voyage d'univers TACTILE (tap + auto-cycle), sans scroll-pin --------
+  // Le portrait change d'univers tout seul et au toucher : une onde circulaire part du
+  // point touché ; fond + lueur + couleurs + police morphent.
+  mm.add('(max-width: 900px)', () => {
+    if (roleTimer) { clearInterval(roleTimer); roleTimer = null; }
+    const dots = gsap.utils.toArray('.hero__dot');
+    const uniLabel = document.querySelector('.hero__uni-label');
+    const LABELS = ['Réel', 'Minecraft', 'Crayon', 'Pixel art'];
+    // Tailles calibrées mobile (les tailles desktop des THEMES s'effondrent à leur min :
+    // ex. Press Start 2P tombait à 1rem → "Spyne1" cassé). La hauteur du titre est figée
+    // en CSS, donc changer de police ne déplace plus les éléments en dessous.
+    const SIZES_M = ['2.8rem', '2.5rem', '2.3rem', '1.5rem'];
+    const applyFontM = (i) => gsap.set('.hero__title', { fontFamily: THEMES[i].font, fontSize: SIZES_M[i], fontWeight: THEMES[i].weight, letterSpacing: THEMES[i].tracking });
+    applyFontM(0); // corrige la taille héritée du setTheme desktop
+    let idx = 0, autoTimer = null;
+    gsap.set(stageLayers, { clipPath: 'circle(150% at 50% 50%)', zIndex: 1 });
+
+    const travel = (next, x = 50, y = 50) => {
+      next = (next + stageLayers.length) % stageLayers.length;
+      if (next === idx) return;
+      const inc = stageLayers[next], t = THEMES[next];
+      // l'univers entrant se dévoile par une onde circulaire issue du point touché
+      gsap.set(inc, { zIndex: 6, clipPath: `circle(0% at ${x}% ${y}%)` });
+      gsap.to(inc, {
+        clipPath: `circle(150% at ${x}% ${y}%)`, duration: 0.95, ease: 'power2.inOut',
+        onComplete: () => stageLayers.forEach((l, i) => gsap.set(l, { zIndex: i === next ? 5 : 1 })),
+      });
+      gsap.to('.hero__bg', { backgroundColor: t.bg, duration: 0.95, ease: 'power1.inOut' });
+      gsap.to('.hero__glow', { color: t.glow, duration: 0.95, ease: 'power1.inOut' });
+      gsap.to(lightTargets, { color: t.fg, duration: 0.95, ease: 'power1.inOut' });
+      gsap.to('.hero__title em', { color: t.accent, duration: 0.95, ease: 'power1.inOut' });
+      gsap.delayedCall(0.48, () => applyFontM(next)); // police assortie au milieu de l'onde (taille mobile, sans reflow)
+      dots.forEach((d, i) => d.classList.toggle('is-on', i === next));
+      if (uniLabel) uniLabel.textContent = LABELS[next];
+      setRole(Math.min(roles.length - 1, next));
+      idx = next;
+    };
+
+    const arm = () => { clearInterval(autoTimer); autoTimer = setInterval(() => travel(idx + 1), 3000); };
+    arm();
+    const onTap = (e) => {
       const r = portraitBox.getBoundingClientRect();
-      const x = ((e.clientX - r.left) / r.width) * 100;
-      const y = ((e.clientY - r.top) / r.height) * 100;
-      gsap.to(peek, { clipPath: `circle(22% at ${x}% ${y}%)`, duration: 0.35, ease: 'power2.out', overwrite: 'auto' });
+      travel(idx + 1, ((e.clientX - r.left) / r.width) * 100, ((e.clientY - r.top) / r.height) * 100);
+      arm(); // relance le compte à rebours après un tap manuel
+    };
+    portraitBox.addEventListener('pointerdown', onTap);
+    // Économie : on coupe l'auto quand le hero n'est plus à l'écran
+    const st = ScrollTrigger.create({
+      trigger: '.hero', start: 'top top', end: 'bottom top',
+      onLeave: () => clearInterval(autoTimer), onLeaveBack: () => clearInterval(autoTimer),
+      onEnter: arm, onEnterBack: arm,
     });
-    portraitBox.addEventListener('pointerleave', () => {
-      active = false;
-      gsap.to(peek, { clipPath: 'circle(0% at 50% 50%)', duration: 0.4, ease: 'power2.in', overwrite: 'auto' });
-    });
-  }
-
-  // === SCROLL : voyage d'univers (révélation + thème + police assortis) ===
-  const tl = gsap.timeline({
-    scrollTrigger: {
-      trigger: '.hero', start: 'top top', end: '+=150%', pin: true, anticipatePin: 1,
-      invalidateOnRefresh: true, scrub: 0.4,
-      onToggle: (self) => { if (self.isActive && roleTimer) { clearInterval(roleTimer); roleTimer = null; } },
-      onUpdate: (self) => {
-        if (!roleTimer) setRole(Math.min(roles.length - 1, Math.floor(self.progress * roles.length * 0.999)));
-        markSpin.timeScale(1 + Math.abs(self.getVelocity() / 300));
-        const pr = self.progress;
-        currentImg = pr < 0.2 ? 0 : pr < 0.5 ? 1 : pr < 0.8 ? 2 : 3;
-      },
-    },
+    // Nettoyage si l'on repasse en desktop (matchMedia démonte ce contexte)
+    return () => {
+      clearInterval(autoTimer);
+      portraitBox.removeEventListener('pointerdown', onTap);
+      st.kill();
+      if (!roleTimer) roleTimer = setInterval(cycleRoles, 2200); // rend le cycle de rôles au desktop
+    };
   });
-  const reveal = (layer, t, at, d = 0.17) => {
-    tl.to(layer, { clipPath: 'circle(0% at 50% 50%)', ease: 'power2.inOut', duration: d }, at)
-      .to('.hero__bg', { backgroundColor: t.bg, ease: 'power1.inOut', duration: d }, at)
-      .to('.hero__glow', { color: t.glow, ease: 'power1.inOut', duration: d }, at)
-      .to(lightTargets, { color: t.fg, ease: 'power1.inOut', duration: d }, at)
-      .to('.hero__title em', { color: t.accent, ease: 'power1.inOut', duration: d }, at)
-      // changement de POLICE/style synchronisé au milieu de la révélation
-      .set('.hero__title', { fontFamily: t.font, fontSize: t.size, fontWeight: t.weight, letterSpacing: t.tracking }, at + d * 0.5);
-  };
-  reveal(stageLayers[0], THEMES[1], 0.12); // vraie photo → Minecraft
-  reveal(stageLayers[1], THEMES[2], 0.42); // → Crayon
-  reveal(stageLayers[2], THEMES[3], 0.72); // → Pixel (univers final)
-  // Sortie : le texte du hero s'efface (pas de rideau, pour laisser admirer l'entrée du manifeste)
-  tl.to('.hero__intro, .hero__mark', { opacity: 0, ease: 'power2.in', duration: 0.12 }, 0.92);
+
+  // -------- DESKTOP : parallax souris + spotlight hover + voyage au SCROLL (pin) --------
+  mm.add('(min-width: 901px)', () => {
+    let currentImg = 0; // index de l'image actuellement visible (maj au scroll)
+    const heroEl = document.querySelector('.hero');
+    let onParallax = null, onPeekEnter = null, onPeekMove = null, onPeekLeave = null;
+
+    // === Parallax souris ===
+    if (FINE) {
+      const pEls = gsap.utils.toArray('[data-parallax]');
+      const qx = pEls.map((el) => gsap.quickTo(el, 'x', { duration: 0.8, ease: 'power3.out' }));
+      const qy = pEls.map((el) => gsap.quickTo(el, 'y', { duration: 0.8, ease: 'power3.out' }));
+      onParallax = (e) => {
+        const cx = e.clientX / innerWidth - 0.5;
+        const cy = e.clientY / innerHeight - 0.5;
+        pEls.forEach((el, i) => { const d = parseFloat(el.dataset.parallax); qx[i](cx * 40 * d); qy[i](cy * 40 * d); });
+      };
+      heroEl.addEventListener('pointermove', onParallax);
+    }
+
+    // === HOVER : spotlight qui révèle aléatoirement un AUTRE univers (jamais celui déjà affiché) ===
+    if (FINE) {
+      const peek = document.querySelector('.hero__peek');
+      const pool = ['/profil.webp', '/profil2.webp', '/profil3.webp', '/profil4.webp'];
+      let active = false;
+      onPeekEnter = () => {
+        let i; do { i = Math.floor(Math.random() * pool.length); } while (i === currentImg);
+        peek.style.backgroundImage = `url(${pool[i]})`;
+        active = true;
+      };
+      onPeekMove = (e) => {
+        if (!active) return;
+        const r = portraitBox.getBoundingClientRect();
+        const x = ((e.clientX - r.left) / r.width) * 100;
+        const y = ((e.clientY - r.top) / r.height) * 100;
+        gsap.to(peek, { clipPath: `circle(22% at ${x}% ${y}%)`, duration: 0.35, ease: 'power2.out', overwrite: 'auto' });
+      };
+      onPeekLeave = () => {
+        active = false;
+        gsap.to(peek, { clipPath: 'circle(0% at 50% 50%)', duration: 0.4, ease: 'power2.in', overwrite: 'auto' });
+      };
+      portraitBox.addEventListener('pointerenter', onPeekEnter);
+      portraitBox.addEventListener('pointermove', onPeekMove);
+      portraitBox.addEventListener('pointerleave', onPeekLeave);
+    }
+
+    // === SCROLL : voyage d'univers (révélation + thème + police assortis) ===
+    const tl = gsap.timeline({
+      scrollTrigger: {
+        trigger: '.hero', start: 'top top', end: '+=150%', pin: true, anticipatePin: 1,
+        invalidateOnRefresh: true, scrub: 0.4,
+        onToggle: (self) => { if (self.isActive && roleTimer) { clearInterval(roleTimer); roleTimer = null; } },
+        onUpdate: (self) => {
+          if (!roleTimer) setRole(Math.min(roles.length - 1, Math.floor(self.progress * roles.length * 0.999)));
+          markSpin.timeScale(1 + Math.abs(self.getVelocity() / 300));
+          const pr = self.progress;
+          currentImg = pr < 0.2 ? 0 : pr < 0.5 ? 1 : pr < 0.8 ? 2 : 3;
+        },
+      },
+    });
+    const reveal = (layer, t, at, d = 0.17) => {
+      tl.to(layer, { clipPath: 'circle(0% at 50% 50%)', ease: 'power2.inOut', duration: d }, at)
+        .to('.hero__bg', { backgroundColor: t.bg, ease: 'power1.inOut', duration: d }, at)
+        .to('.hero__glow', { color: t.glow, ease: 'power1.inOut', duration: d }, at)
+        .to(lightTargets, { color: t.fg, ease: 'power1.inOut', duration: d }, at)
+        .to('.hero__title em', { color: t.accent, ease: 'power1.inOut', duration: d }, at)
+        // changement de POLICE/style synchronisé au milieu de la révélation
+        .set('.hero__title', { fontFamily: t.font, fontSize: t.size, fontWeight: t.weight, letterSpacing: t.tracking }, at + d * 0.5);
+    };
+    reveal(stageLayers[0], THEMES[1], 0.12); // vraie photo → Minecraft
+    reveal(stageLayers[1], THEMES[2], 0.42); // → Crayon
+    reveal(stageLayers[2], THEMES[3], 0.72); // → Pixel (univers final)
+    // Sortie : le texte du hero s'efface (pas de rideau, pour laisser admirer l'entrée du manifeste)
+    tl.to('.hero__intro, .hero__mark', { opacity: 0, ease: 'power2.in', duration: 0.12 }, 0.92);
+
+    // Nettoyage si l'on repasse en mobile (le timeline + son ScrollTrigger sont auto-révertés)
+    return () => {
+      if (onParallax) heroEl.removeEventListener('pointermove', onParallax);
+      if (onPeekEnter) {
+        portraitBox.removeEventListener('pointerenter', onPeekEnter);
+        portraitBox.removeEventListener('pointermove', onPeekMove);
+        portraitBox.removeEventListener('pointerleave', onPeekLeave);
+      }
+    };
+  });
 }
 
 /* ---------- Fonds qui alternent par section (crossfade animé) ---------- */
