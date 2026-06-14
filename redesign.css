@@ -424,6 +424,8 @@ button { font-family: inherit; }
 /* Fondu de fin vers le noir profond demandé (#0a0a0b) → la vidéo se dissout dans le noir,
    sans rupture (le fond du clip est lui-même noir). Piloté par le scrub. */
 .zoom__fade { position: absolute; inset: 0; background: #0a0a0b; opacity: 0; z-index: 6; pointer-events: none; }
+/* Téléphone : section retirée (perf + UX mobile) */
+@media (max-width: 900px) { .zoom { display: none; } }
 
 /* ============================================================
    PAGE PROJETS

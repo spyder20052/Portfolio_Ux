@@ -760,7 +760,11 @@ function initImageZoom() {
   const v = sec && sec.querySelector('.zoom__media');
   if (!sec || !v) return;
 
+  // Sur téléphone : section retirée → on supprime l'élément (évite tout chargement vidéo) et on n'initialise rien
+  if (window.matchMedia('(max-width: 900px)').matches) { sec.remove(); return; }
+
   const fade = sec.querySelector('.zoom__fade');
+  v.preload = 'auto'; // préchargement activé seulement sur desktop (le HTML reste en preload=none)
   v.muted = true; v.defaultMuted = true; v.playsInline = true; v.pause();
   // Amorce le décodage/buffer pour que le seek soit immédiat (play/pause muet, autorisé)
   const prime = () => { const p = v.play(); if (p && p.then) p.then(() => v.pause()).catch(() => {}); };
