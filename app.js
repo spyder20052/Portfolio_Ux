@@ -731,20 +731,50 @@ function initMoodshot() {
   flash.className = 'moodshot__flash';
   flash.setAttribute('aria-hidden', 'true');
   sec.appendChild(flash);
-  const blast = () => { gust = rnd(150, 300) * (Math.random() < 0.5 ? -1 : 1); }; // rafale forte
-  const lightning = () => {
-    if (running) {
-      const tl = gsap.timeline();
-      tl.set(flash, { opacity: 0 })
-        .to(flash, { opacity: rnd(0.45, 0.7), duration: 0.05, ease: 'none' })
-        .to(flash, { opacity: 0.06, duration: 0.09 })
-        .to(flash, { opacity: rnd(0.6, 0.95), duration: 0.05 }) // 2e coup, plus fort
-        .to(flash, { opacity: 0, duration: 0.55, ease: 'power2.out' });
-      gsap.delayedCall(rnd(0.15, 0.5), blast); // la bourrasque arrive juste après l'éclair
+  const blast = (p = 1) => { gust = rnd(120, 300) * p * (Math.random() < 0.5 ? -1 : 1); }; // rafale (force ∝ intensité)
+
+  // ---- Le GRONDEMENT : secousse organique de la scène, jamais identique. `power` 0..1
+  //      module amplitude, durée, nombre de saccades → de lointain/doux à proche/violent. ----
+  const rumble = (power) => {
+    const amp = 2 + power * 11;            // 2px (lointain) → ~13px (juste au-dessus)
+    const dur = 0.55 + power * 1.0;        // un orage proche « roule » plus longtemps
+    const n = Math.round(rnd(5, 9));       // nombre de saccades variable
+    const xs = [0], ys = [0], rots = [0];
+    for (let i = 1; i <= n; i++) {
+      const decay = (1 - i / (n + 1)) ** 1.4;   // l'amplitude retombe progressivement
+      xs.push(rnd(-amp, amp) * decay);
+      ys.push(rnd(-amp, amp) * 0.6 * decay);
+      rots.push(rnd(-amp, amp) * 0.05 * decay); // micro-rotation pour le réalisme
     }
+    xs.push(0); ys.push(0); rots.push(0);
+    gsap.fromTo('.moodshot__inner', { x: 0, y: 0, rotation: 0 },
+      { keyframes: { x: xs, y: ys, rotation: rots }, duration: dur, ease: 'power2.out', overwrite: true });
+    // un orage proche déclenche parfois un second roulement (tonnerre qui « roule »)
+    if (power > 0.6 && Math.random() < 0.5) gsap.delayedCall(rnd(0.35, 0.7), () => rumble(power * rnd(0.3, 0.55)));
+  };
+
+  // ---- Éclair + grondement : `power` (distance de l'orage) fait varier TOUT à chaque fois :
+  //      éclat de l'éclair, délai avant le grondement, et force de la secousse. ----
+  const strike = (power) => {
+    gsap.timeline()
+      .set(flash, { opacity: 0 })
+      .to(flash, { opacity: 0.25 + power * 0.5, duration: 0.05, ease: 'none' })
+      .to(flash, { opacity: 0.06, duration: 0.09 })
+      .to(flash, { opacity: 0.35 + power * 0.6, duration: 0.05 }) // 2e coup, plus fort
+      .to(flash, { opacity: 0, duration: 0.45 + power * 0.3, ease: 'power2.out' });
+    // proche = grondement quasi immédiat et fort ; lointain = tardif et doux (la lumière devance le son)
+    const delay = 0.12 + (1 - power) * 0.95;
+    gsap.delayedCall(delay, () => { blast(power); rumble(power); });
+  };
+  const lightning = () => {
+    if (running) strike(rnd(0.25, 0.9)); // intensité aléatoire → jamais statique
     gsap.delayedCall(rnd(7, 18), lightning);
   };
   gsap.delayedCall(rnd(4, 9), lightning);
+
+  // ---- PREMIER coup de tonnerre : à l'arrivée sur la section, un éclair PROCHE et puissant.
+  //      Une seule fois. Aucun son, tout est visuel. ----
+  ScrollTrigger.create({ trigger: sec, start: 'top 62%', once: true, onEnter: () => strike(rnd(0.85, 1)) });
 
   // ---- Rafales aléatoires indépendantes (le vent qui « passe » fort) ----
   const scheduleGust = () => { if (running) blast(); gsap.delayedCall(rnd(5, 13), scheduleGust); };
