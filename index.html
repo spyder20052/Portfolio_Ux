@@ -189,6 +189,18 @@
       </div>
     </section>
 
+    <!-- ===== ZOOM AU SCROLL : on plonge dans un visuel (vidéo native, sans contrôle) ===== -->
+    <section class="zoom" id="zoom" data-bg="#000000" data-glow="rgba(200,241,53,0.06)" aria-label="Zoom">
+      <div class="zoom__inner">
+        <video class="zoom__media" muted playsinline preload="auto" disablepictureinpicture disableremoteplayback
+          poster="/visuals/showcase/detail-poster.webp" aria-hidden="true" tabindex="-1">
+          <source src="/visuals/showcase/detail.mp4" type="video/mp4" />
+        </video>
+        <span class="zoom__cap mono">Chaque détail compte</span>
+        <div class="zoom__fade" aria-hidden="true"></div>
+      </div>
+    </section>
+
     <!-- ===== À PROPOS condensé ===== -->
     <section class="section shell about" id="about" data-bg="#06241b" data-glow="rgba(50,230,160,0.18)">
       <div class="about__grid">

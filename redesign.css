@@ -414,21 +414,16 @@ button { font-family: inherit; }
   .moodshot__line { grid-column: 1; text-align: center; justify-self: center; }
 }
 
-/* ---- Zoom au scroll : on plonge dans un visuel (perspective) ---- */
-.zoom { position: relative; background: #000; height: 220vh; }
+/* ---- Vidéo dont la lecture est pilotée par le scroll (scrub avant/arrière) ---- */
+.zoom { position: relative; background: #000; height: 360vh; }
 .zoom__inner { position: sticky; top: 0; height: 100vh; overflow: hidden; display: grid; place-items: center; background: #000; }
-/* Conteneur vidéo : zoomé au scroll */
-.zoom__video { position: absolute; inset: 0; overflow: hidden; background: #000; transform-origin: center center; will-change: transform; }
-/* iframe YouTube en plein cadre, sur-dimensionnée pour rogner tout le chrome (titre, contrôles) ;
-   aucun contrôle cliquable (pointer-events:none), apparaît en fondu une fois prête. */
-.zoom__video iframe { position: absolute; top: 50%; left: 50%; width: 100vw; height: 56.25vw; min-height: 100vh; min-width: 177.78vh;
-  transform: translate(-50%, -50%) scale(1.35); border: 0; pointer-events: none; opacity: 0; transition: opacity .8s ease; }
-.zoom__video.is-ready iframe { opacity: 1; }
+/* Vidéo native plein cadre. Aucun contrôle (pas d'attribut controls),
+   non cliquable (pointer-events:none) → l'UI du lecteur n'apparaît jamais. */
+.zoom__media { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; pointer-events: none; background: #000; }
 .zoom__cap { position: absolute; bottom: clamp(24px, 5vh, 50px); left: 0; right: 0; text-align: center; z-index: 5; color: var(--paper); mix-blend-mode: difference; }
-/* Voile bref (couleur de la section suivante) qui masque l'indicateur play/pause de YouTube au moment de la boucle */
-.zoom__seam { position: absolute; inset: 0; background: #06241b; opacity: 0; z-index: 4; pointer-events: none; }
-/* Fondu vers la fin du zoom → transition propre, MÊME couleur que la section À propos qui suit */
-.zoom__fade { position: absolute; inset: 0; background: #06241b; opacity: 0; z-index: 6; pointer-events: none; }
+/* Fondu de fin vers le noir profond demandé (#0a0a0b) → la vidéo se dissout dans le noir,
+   sans rupture (le fond du clip est lui-même noir). Piloté par le scrub. */
+.zoom__fade { position: absolute; inset: 0; background: #0a0a0b; opacity: 0; z-index: 6; pointer-events: none; }
 
 /* ============================================================
    PAGE PROJETS

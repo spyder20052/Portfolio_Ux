@@ -39,6 +39,7 @@ function boot() {
   initFooterWave();
   initDecor();
   initFeatureMedia();
+  initImageZoom();
   initMoodshot();
   initShowcase();
   initProjets();
@@ -62,11 +63,11 @@ else Promise.resolve().then(boot);
 /* ---------- Smooth scroll ---------- */
 function initLenis() {
   const lenis = new Lenis({
-    duration: 1.7,
+    duration: 1.45,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     smoothWheel: true,
-    wheelMultiplier: 0.55, // chaque coup de molette avance bien moins → défilement posé
-    touchMultiplier: 1.1,
+    wheelMultiplier: 0.72, // défilement un peu plus vif
+    touchMultiplier: 1.3,
   });
   lenis.on('scroll', ScrollTrigger.update);
   gsap.ticker.add((time) => lenis.raf(time * 1000));
@@ -753,7 +754,38 @@ function initMoodshot() {
   new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { resize(); start(); } else stop(); }), { threshold: 0 }).observe(sec);
 }
 
-/* ---------- Zoom au scroll : on plonge dans un visuel (pin + scale + perspective) ---------- */
+/* ---------- Vidéo « scrubbée » au scroll : la lecture suit la progression (avant/arrière) ---------- */
+function initImageZoom() {
+  const sec = document.querySelector('.zoom');
+  const v = sec && sec.querySelector('.zoom__media');
+  if (!sec || !v) return;
+
+  const fade = sec.querySelector('.zoom__fade');
+  v.muted = true; v.defaultMuted = true; v.playsInline = true; v.pause();
+  // Amorce le décodage/buffer pour que le seek soit immédiat (play/pause muet, autorisé)
+  const prime = () => { const p = v.play(); if (p && p.then) p.then(() => v.pause()).catch(() => {}); };
+  prime();
+
+  let dur = 0;
+  const setDur = () => { dur = v.duration || 0; };
+  if (v.readyState >= 1) setDur(); else v.addEventListener('loadedmetadata', setDur, { once: true });
+
+  if (REDUCE) return;
+
+  // currentTime piloté par la progression du scroll dans la section (sticky → reste à l'écran).
+  // Pas de pin (le sticky CSS suffit) → évite tout doublon de section.
+  ScrollTrigger.create({
+    trigger: sec, start: 'top top', end: 'bottom bottom', scrub: true, invalidateOnRefresh: true,
+    onUpdate: (self) => {
+      if (!dur) { setDur(); return; }
+      const t = Math.min(dur - 0.04, Math.max(0, self.progress * dur));
+      // ne re-seek que si l'écart dépasse ~1 frame (évite de saturer le décodeur)
+      if (Math.abs(v.currentTime - t) > 0.033) { try { v.currentTime = t; } catch (_) { /* seek en cours */ } }
+      // Fondu final court (7 derniers % du scroll) → on enchaîne vite sur la section suivante
+      if (fade) fade.style.opacity = gsap.utils.clamp(0, 1, (self.progress - 0.93) / 0.07);
+    },
+  });
+}
 
 /* ---------- Médias encadrés (GIFs) : reveal clip + parallaxe interne + tilt ---------- */
 function initFeatureMedia() {
